@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SnakeID — 10,000 snakes. One ID to collect them all.</title>
+<style>
+:root{--bg:#070612;--cream:#F5F3FF;--grey:#9a97b0;--gold:#FFD84D;--lime:#B8FF42;--magenta:#FF2FB3;--green:#22E07A;--blue:#35BFFF;--line:#2a2745}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--cream);font-family:Georgia,serif}
+.mono{font-family:ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;font-size:11px}
+header{position:sticky;top:0;background:#070612;border-bottom:1px solid var(--line);padding:12px 16px;z-index:10} .toprow{display:flex;justify-content:space-between;align-items:center;gap:12px} header nav{margin-top:10px}
+header nav{display:flex;flex-wrap:wrap;gap:10px} header nav a{color:var(--grey);text-decoration:none;font-size:11px} header nav a:hover{color:var(--gold)}
+.btn{display:inline-block;background:var(--gold);color:#000;padding:12px 18px;text-decoration:none;font-family:ui-monospace,monospace;font-weight:bold;max-width:100%;cursor:pointer;border:0}
+.btn2{border:1px solid var(--line);color:var(--cream);padding:12px 18px;text-decoration:none;font-family:ui-monospace,monospace;cursor:pointer;background:transparent}
+.wrap{max-width:1020px;margin:0 auto;padding:24px 20px}
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);padding:20px 0 40px}
+#snakeCanvas{width:100%;height:340px;display:block;background:#0b0a20;border:1px solid var(--line)}
+h1{font-size:52px;line-height:1.05;margin:18px 0 8px} h1 i{color:var(--gold)} h2{font-size:36px;margin:8px 0}
+p{color:var(--grey);line-height:1.6;font-family:system-ui,sans-serif}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border:1px solid var(--line)}
+.card{border-right:1px solid var(--line);padding:18px} .card:last-child{border-right:0}
+table{width:100%;border-collapse:collapse} td,th{border-bottom:1px dashed var(--line);padding:14px 8px;text-align:left;font-family:system-ui,sans-serif}
+.gold{color:var(--gold)} .lime{color:var(--lime)} .mag{color:var(--magenta)}
+.panel{border:1px solid var(--line);padding:18px;background:#0d0b24}
+.bar{height:18px;background:#1a1836;border:1px solid var(--line)} .bar i{display:block;height:100%;width:0%;background:repeating-linear-gradient(45deg,var(--gold),var(--gold) 10px,#8a6d00 10px,#8a6d00 20px)}
+footer{border-top:1px solid var(--line);padding:24px 20px;color:var(--grey)}
+.addr{word-break:break-all;font-family:ui-monospace,monospace;font-size:12px;color:var(--cream)}
+.listing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:12px}
+.listing{border:1px solid var(--line);padding:10px;background:#0d0b24}
+.listing img{width:100%;height:auto;display:block}
+.listing .price{color:var(--gold);font-family:ui-monospace,monospace;font-size:13px}
+.locked-box{border:1px dashed var(--gold);padding:18px;background:#14102a}
+@media(max-width:600px){h1{font-size:34px;line-height:1.15} #snakeCanvas{height:240px} header{padding:10px 12px} .btn,.btn2{padding:10px 12px;font-size:12px}}
+
+header nav a.active{color:var(--gold)}</style></head><body>
+<header><div class="toprow"><div><b>SnakeID</b></div><button class="btn2 mono" id="tradeAgentBtn" type="button">Trade via Agent</button></div><nav class="mono"><a href="/">Home</a><a href="/mint.html">Mint</a><a href="/market.html" class="active">Market</a></nav></header>
+<div class="wrap">
+<div class="panel" id="agentFlow" style="margin-top:16px"><p class="mono gold">Trade via Agent — how it works</p><p>1. Copy the mint / buy / list prompt below. 2. Paste it to your agent (e.g. Binance AI Pro). 3. Your agent verifies the contracts on-chain and shows a transaction preview. 4. You confirm in your wallet, then sign. This site never asks you to connect a wallet and never asks for a seed phrase or private key.</p></div>
+
+<section id="market"><p class="mono gold">Market</p><h2 id="marketTitle">Market</h2>
+<div class="panel">
+<p><b>Market fee:</b> 5% · <b>Seller receives:</b> 95% · <b>Royalty:</b> none on top of the fee</p>
+<p><b>Minimum listing:</b> 0.001 BNB</p>
+<p class="mono">Market contract: <span class="addr" id="marketAddress">0x0a5e8d61230241312a623e17d61540d0dff2feb7</span></p>
+<p><a class="mono" href="https://bscscan.com/address/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">View Market contract on BscScan ↗</a> · <a class="mono" href="https://sourcify.dev/server/v2/contract/56/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">Sourcify verified ↗</a></p>
+<div id="marketLocked" class="locked-box">
+<p><b>🔒 Market locked — opens after sold out.</b></p>
+<p id="marketLockText">The market is locked while minting is still running. It opens automatically when all 10,000 snakes are minted (totalMinted = 10,000, the same moment Mint becomes SOLD OUT). No listings, no buys and no trading until then — this is enforced on this website, not inside the market contract.</p>
+<p class="mono" id="marketLockProgress">Minted so far: loading…</p>
+</div>
+<div id="marketLive" style="display:none">
+<p><b>Market is open.</b> All 10,000 snakes are minted. Listings below are read live from the market contract on BNB Chain.</p>
+<p class="mono" id="marketScan">Scanning market…</p>
+<p class="mono" id="marketStats"></p>
+<div class="listing-grid" id="marketItems"></div>
+<p><button class="btn2" id="copyListPrompt" type="button">Copy list prompt for your agent</button> <button class="btn2" id="copyBuyPrompt" type="button">Copy buy prompt for your agent</button> <span class="mono" id="marketPromptCopied"></span></p>
+</div>
+</div></section>
+</div>
+<footer><div class="wrap"><p>SnakeID · Built on BNB Chain · Follow on X ↗ @snakeidbnb</p><p class="mono">© 2026 SnakeID · NFT 0xafc6bca0e191e396306343213b04ff9a8d717263 · Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7</p></div></footer>
+<script>
+
+const NFT='0xafc6bca0e191e396306343213b04ff9a8d717263';
+const MARKET='0x0a5e8d61230241312a623e17d61540d0dff2feb7';
+const OWNER='0x11b38f8854060515cd93f03f3f198ea675ad9c91';
+const MAX_SUPPLY=10000;
+const MINT_OPEN_TS=Date.UTC(2026,10,3,16,0,0); // Tue 3 Nov 2026 16:00 UTC
+const RPCS=['https://bsc-dataseed.binance.org','https://bsc-dataseed1.binance.org','https://bsc-dataseed2.binance.org'];
+async function rpcCall(to, data){
+  for(const rpc of RPCS){
+    try{
+      const r=await fetch(rpc,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'eth_call',params:[{to:to,data:data},'latest'],id:1})});
+      const j=await r.json(); if(j && j.result) return j.result;
+    }catch(e){}
+  }
+  return null;
+}
+function copyText(t, el){ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>{ el.textContent='COPIED \u2713'; }); } else { el.textContent='Copy failed \u2014 select the prompt manually.'; } }
+document.getElementById('tradeAgentBtn').addEventListener('click', function(){
+  document.getElementById('agentFlow').scrollIntoView({behavior:'smooth'});
+});
+
+const SEL_TOTAL_MINTED='0xa2309ff8';
+const SEL_LISTINGS='0xde74e57b';
+let marketScanned=false, totalMintedCache=null;
+async function refreshMarket(){
+  try{
+    const totalHex=await rpcCall(NFT, SEL_TOTAL_MINTED);
+    if(totalHex===null) return;
+    const total=parseInt(totalHex,16);
+    totalMintedCache=total;
+    document.getElementById('marketLockProgress').textContent='Minted so far: '+total.toLocaleString('en-US')+' / 10,000 \u2014 market opens at 10,000.';
+    if(total>=MAX_SUPPLY){
+      document.getElementById('marketLocked').style.display='none';
+      document.getElementById('marketLive').style.display='block';
+      document.getElementById('marketTitle').textContent='Market \u2014 open';
+      if(!marketScanned){ marketScanned=true; loadMarket(); }
+    } else {
+      document.getElementById('marketLocked').style.display='block';
+      document.getElementById('marketLive').style.display='none';
+    }
+  }catch(e){}
+}
+setInterval(refreshMarket,15000);
+refreshMarket();
+function parseListing(hex){
+  if(!hex || hex.length<194) return null;
+  const seller='0x'+hex.slice(26,66);
+  const price=BigInt('0x'+hex.slice(66,130));
+  const active=hex.slice(130,194)==='0000000000000000000000000000000000000000000000000000000000000001';
+  return {seller:seller, price:price, active:active};
+}
+function bnb(wei){ return (Number(wei)/1e18).toFixed(5).replace(/0+$/,'').replace(/\.$/,'.0'); }
+async function loadMarket(){
+  const items=document.getElementById('marketItems');
+  const scan=document.getElementById('marketScan');
+  const stats=document.getElementById('marketStats');
+  const listings=[]; let checked=0;
+  const BATCH=20;
+  for(let start=1; start<=MAX_SUPPLY; start+=BATCH){
+    const ids=[]; for(let i=start;i<start+BATCH && i<=MAX_SUPPLY;i++) ids.push(i);
+    const results=await Promise.all(ids.map(async (id)=>{
+      const data=SEL_LISTINGS+id.toString(16).padStart(64,'0');
+      const hex=await rpcCall(MARKET, data);
+      return {id:id, l: hex?parseListing(hex):null};
+    }));
+    for(const r of results){ if(r.l && r.l.active) listings.push({id:r.id, seller:r.l.seller, price:r.l.price}); }
+    checked+=ids.length;
+    scan.textContent='Scanning market\u2026 '+checked.toLocaleString('en-US')+' / 10,000 checked \u2014 '+listings.length+' listings found so far. This is a progress count, not the final total.';
+  }
+  listings.sort((a,b)=> a.price<b.price?-1:1);
+  const floor=listings.length? bnb(listings[0].price)+' BNB' : '\u2014';
+  scan.textContent='Scan complete: '+listings.length+' active listings found of 10,000 checked.';
+  stats.textContent='Active listings: '+listings.length+' \u00b7 Floor: '+floor+' \u00b7 Market fee 5% \u00b7 Seller receives 95%';
+  items.innerHTML='';
+  for(const l of listings.slice(0,100)){
+    const d=document.createElement('div'); d.className='listing';
+    d.innerHTML='<img src="https://snakeid.xyz/snake-'+l.id+'.webp" alt="SnakeID #'+l.id+'" loading="lazy"><p class="mono">SnakeID #'+l.id+'</p><p class="price">'+bnb(l.price)+' BNB</p><p class="mono" style="word-break:break-all">'+l.seller+'</p>';
+    items.appendChild(d);
+  }
+  if(listings.length>100){ const p=document.createElement('p'); p.className='mono'; p.textContent='Showing the 100 cheapest of '+listings.length+' listings.'; items.appendChild(p); }
+}
+document.getElementById('copyListPrompt').addEventListener('click', function(){
+  const p='List my SnakeID NFT on the SnakeID Market on BNB Chain. NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7, market fee 5%, seller receives 95%, minimum listing 0.001 BNB. Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.';
+  copyText(p, document.getElementById('marketPromptCopied'));
+});
+document.getElementById('copyBuyPrompt').addEventListener('click', function(){
+  const p='Buy a SnakeID NFT from the SnakeID Market on BNB Chain. NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7, market fee 5%, seller receives 95%. Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.';
+  copyText(p, document.getElementById('marketPromptCopied'));
+});
+
+</script>
+</body></html>

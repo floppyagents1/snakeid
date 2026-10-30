@@ -6,7 +6,7 @@
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--cream);font-family:Georgia,serif}
 .mono{font-family:ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;font-size:11px}
 header{position:sticky;top:0;background:#070612;border-bottom:1px solid var(--line);padding:12px 16px;z-index:10} .toprow{display:flex;justify-content:space-between;align-items:center;gap:12px} header nav{margin-top:10px}
-header nav{display:flex;flex-wrap:wrap;gap:10px} header nav a{color:var(--grey);text-decoration:none;font-size:11px} header nav a:hover{color:var(--gold)}
+header nav{display:flex;flex-wrap:wrap;gap:18px} header nav a{color:var(--grey);text-decoration:none;font-size:16px;font-weight:bold;letter-spacing:.08em} header nav a:hover{color:var(--gold)}
 .btn{display:inline-block;background:var(--gold);color:#000;padding:12px 18px;text-decoration:none;font-family:ui-monospace,monospace;font-weight:bold;max-width:100%;cursor:pointer;border:0}
 .btn2{border:1px solid var(--line);color:var(--cream);padding:12px 18px;text-decoration:none;font-family:ui-monospace,monospace;cursor:pointer;background:transparent}
 .wrap{max-width:1020px;margin:0 auto;padding:24px 20px}
@@ -33,7 +33,6 @@ header nav a.active{color:var(--gold)}</style></head><body>
 <header><div class="toprow"><div><b>SnakeID</b></div><button class="btn2 mono" id="tradeAgentBtn" type="button">Trade via Agent</button></div><nav class="mono"><a href="/" class="active">Home</a><a href="/mint.html">Mint</a><a href="/market.html">Market</a></nav></header>
 <div class="wrap">
 <section class="hero">
-<div class="mono" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between"><span>SnakeID / Agents</span><span>Tokens 1-10000</span><span class="lime" id="heroStatus">● Live · Snake animation</span></div>
 <canvas id="snakeCanvas" width="1000" height="340"></canvas>
 <h1>Only snakes,<br><i>winding their way in.</i></h1>
 <p>10,000 snakes. One ID to collect them all. 12 shapes — straight, S-curved, spiral, zigzag, coiled and more. 12 colors. Real rarity, from Common to Legendary. Minted by agents, on BNB Chain. No wallet connection on this site — all minting and trading goes through your agent, with a transaction preview and your confirmation.</p>
@@ -80,7 +79,7 @@ async function refreshMint(){
     if(total>=MAX_SUPPLY){
       soldOut=true;
       btn.textContent='SOLD OUT \u00b7 10,000 / 10,000 \u2192';
-      st.textContent='\u25cf SOLD OUT';
+      if(st) st.textContent='\u25cf SOLD OUT';
     } else if(mintOpen){
       btn.textContent='MINT IS LIVE \u2192';
     } else {
@@ -88,7 +87,7 @@ async function refreshMint(){
     }
   }catch(e){}
 }
-setInterval(refreshMint,15000);
+setInterval(refreshMint,5000);
 refreshMint();
 
 </script>

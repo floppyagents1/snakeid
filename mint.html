@@ -6,7 +6,7 @@
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--cream);font-family:Georgia,serif}
 .mono{font-family:ui-monospace,Menlo,monospace;text-transform:uppercase;letter-spacing:.14em;font-size:11px}
 header{position:sticky;top:0;background:#070612;border-bottom:1px solid var(--line);padding:12px 16px;z-index:10} .toprow{display:flex;justify-content:space-between;align-items:center;gap:12px} header nav{margin-top:10px}
-header nav{display:flex;flex-wrap:wrap;gap:10px} header nav a{color:var(--grey);text-decoration:none;font-size:11px} header nav a:hover{color:var(--gold)}
+header nav{display:flex;flex-wrap:wrap;gap:18px} header nav a{color:var(--grey);text-decoration:none;font-size:16px;font-weight:bold;letter-spacing:.08em} header nav a:hover{color:var(--gold)}
 .btn{display:inline-block;background:var(--gold);color:#000;padding:12px 18px;text-decoration:none;font-family:ui-monospace,monospace;font-weight:bold;max-width:100%;cursor:pointer;border:0}
 .btn2{border:1px solid var(--line);color:var(--cream);padding:12px 18px;text-decoration:none;font-family:ui-monospace,monospace;cursor:pointer;background:transparent}
 .wrap{max-width:1020px;margin:0 auto;padding:24px 20px}
@@ -42,6 +42,7 @@ header nav a.active{color:var(--gold)}</style></head><body>
 <p><b>Supply:</b> 10,000 · <b>Minted so far:</b> <span id="mintProgressText">loading…</span></p>
 <div class="bar"><i id="mintProgressBar"></i></div>
 <p id="mintProgressPct" class="mono">0% minted</p>
+<p id="mintRemaining" class="mono">Remaining: 10,000 / 10,000</p>
 <p><b>Price:</b> 1st snake free per Agent ID wallet, then $1 ≈ 0.0014 BNB each, no max per wallet.</p>
 <p class="mono">NFT contract: <span class="addr" id="nftAddress">0xafc6bca0e191e396306343213b04ff9a8d717263</span></p>
 <p class="mono">Owner: <span class="addr">0x11b38f8854060515cd93f03f3f198ea675ad9c91</span> · Agent ID registry: <span class="addr">0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</span></p>
@@ -79,11 +80,21 @@ let soldOut=false, totalMintedCache=null;
 function pad(n){return String(n).padStart(2,'0');}
 function countdownText(){
   const now=Date.now(); let diff=MINT_OPEN_TS-now;
-  if(diff<=0) return 'Mint open time has passed \u2014 check the live minted count above.';
+  if(diff<=0) return 'MINT IS LIVE \u2014 mint is open now.';
   const d=Math.floor(diff/86400000); diff-=d*86400000;
   const h=Math.floor(diff/3600000); diff-=h*3600000;
   const m=Math.floor(diff/60000); const s=Math.floor((diff-m*60000)/1000);
   return 'Countdown to mint open: '+d+'d '+pad(h)+'h '+pad(m)+'m '+pad(s)+'s (Tue 3 Nov 2026, 16:00 UTC)';
+}
+function liveText(total){
+  if(total===null || total===undefined) return 'Mint is open \u2014 live count loading\u2026';
+  const remaining=MAX_SUPPLY-total;
+  return 'Mint is open \u2014 '+total.toLocaleString('en-US')+' / 10,000 minted so far \u00b7 '+remaining.toLocaleString('en-US')+' remaining.';
+}
+function applyLive(total){
+  document.getElementById('mintBadge').textContent='MINT IS LIVE';
+  document.getElementById('mintTitle').textContent='Mint is live.';
+  document.getElementById('mintCountdown').textContent=liveText(total);
 }
 function applySoldOut(){
   soldOut=true;
@@ -97,11 +108,10 @@ function applyMintState(total, mintOpen){
   document.getElementById('mintProgressText').textContent=total.toLocaleString('en-US')+' / 10,000';
   document.getElementById('mintProgressBar').style.width=(total/MAX_SUPPLY*100)+'%';
   document.getElementById('mintProgressPct').textContent=(total/MAX_SUPPLY*100).toFixed(1)+'% minted';
+  document.getElementById('mintRemaining').textContent='Remaining: '+(MAX_SUPPLY-total).toLocaleString('en-US')+' / 10,000';
   if(total>=MAX_SUPPLY){ applySoldOut(); return; }
-  if(mintOpen){
-    document.getElementById('mintBadge').textContent='MINT IS LIVE';
-    document.getElementById('mintTitle').textContent='Mint is live.';
-    document.getElementById('mintCountdown').textContent='Mint is open \u2014 '+total.toLocaleString('en-US')+' / 10,000 minted so far.';
+  if(mintOpen || Date.now()>=MINT_OPEN_TS){
+    applyLive(total);
   } else {
     document.getElementById('mintBadge').textContent='MINT NOT OPEN YET';
     document.getElementById('mintTitle').textContent='Mint is not open yet.';
@@ -121,13 +131,19 @@ async function refreshMint(){
 function tick(){
   if(soldOut) return; // never overwrite SOLD OUT
   const el=document.getElementById('mintCountdown');
-  if(el && totalMintedCache!==null && totalMintedCache<MAX_SUPPLY){
-    const badge=document.getElementById('mintBadge').textContent;
-    if(badge==='MINT NOT OPEN YET') el.textContent=countdownText();
+  if(!el) return;
+  if(Date.now()>=MINT_OPEN_TS){
+    // Countdown finished: show MINT IS LIVE immediately, even before the
+    // next on-chain refresh. Live count updates when refreshMint returns.
+    if(totalMintedCache!==null && totalMintedCache>=MAX_SUPPLY){ applySoldOut(); return; }
+    applyLive(totalMintedCache);
+    return;
   }
+  el.textContent=countdownText();
 }
+document.getElementById('mintCountdown').textContent=countdownText(); // show it immediately, don't wait for RPC
 setInterval(tick,1000);
-setInterval(refreshMint,15000);
+setInterval(refreshMint,5000); // on-chain count/progress refresh (1s would get rate-limited by the public RPC)
 refreshMint();
 document.getElementById('copyMintPrompt').addEventListener('click', function(){
   const p='Mint 1 SnakeID NFT on BNB Chain. NFT contract 0xafc6bca0e191e396306343213b04ff9a8d717263, Agent ID registry 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F. First mint per Agent ID wallet is free, further mints 0.0014 BNB each. Verify on-chain first (totalMinted, mintOpen, quote), show me a transaction preview, and wait for my confirmation before signing.';

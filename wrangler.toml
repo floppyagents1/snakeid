@@ -1,0 +1,4 @@
+# SnakeID — Cloudflare Pages project config (Free plan).
+# Lets `wrangler pages deploy` pick up the project name + compatibility date.
+name = "snakeid"
+compatibility_date = "2026-10-23"

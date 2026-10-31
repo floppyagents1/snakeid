@@ -1,0 +1,36 @@
+{
+  "note": "SAMPLE DATA — FOR TESTING ONLY. Replace with the real snapshot after mint sold out.",
+  "merkleRoot": "0x137a468dedb765bb5119675cdfd0fd432473004ae06a1625f26955dccd618846",
+  "totalAllocation": "40000000000000000000000",
+  "entries": [
+    {
+      "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "amount": "10000000000000000000000",
+      "amountSnake": 10000,
+      "source": "SnakeID NFT (1 NFT) — TEST DATA",
+      "proof": [
+        "0xcff4e45dd5639f3dfd41af88caba2e7e245000ed7323d5ccd90abc88579a2818"
+      ]
+    },
+    {
+      "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amount": "20000000000000000000000",
+      "amountSnake": 20000,
+      "source": "SnakeID NFT (2 NFTs) — TEST DATA",
+      "proof": [
+        "0xcf081754a79abba82ca436c271eaa8f9447bb6d05610760934f288594aee7f4c",
+        "0xd9eeddcd332dc4885933351186b041157577d198b4fff757ca88e4cd786ad6df"
+      ]
+    },
+    {
+      "address": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+      "amount": "10000000000000000000000",
+      "amountSnake": 10000,
+      "source": "Agent ID — TEST DATA",
+      "proof": [
+        "0x773630af6a386d564827cf5bdda3c76e6420b2a125fcb119ad77502606d68ae2",
+        "0xd9eeddcd332dc4885933351186b041157577d198b4fff757ca88e4cd786ad6df"
+      ]
+    }
+  ]
+}

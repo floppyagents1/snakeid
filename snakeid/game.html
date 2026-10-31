@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>SnakeID — Play Snake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #07071a;
+        --panel: #10102a;
+        --panel-line: #26264a;
+        --ink: #f2f0e6;
+        --muted: #a5a2c4;
+        --gold: #f7c948;
+        --lime: #a3e635;
+        --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background-color: var(--bg);
+        background-image: url("snake-bg.jpg");
+        background-size: cover;
+        background-position: 72% 38%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: var(--ink);
+        font-family: var(--sans);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      /* Dark overlay over the fixed snake photo only — keeps every existing
+         panel and line of text readable while the snake stays visible. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(4, 4, 14, 0.66) 0%, rgba(4, 4, 14, 0.58) 42%, rgba(4, 4, 14, 0.74) 100%);
+      }
+      .wrap { position: relative; z-index: 2; max-width: 1060px; margin: 0 auto; padding: 0 20px 56px; }
+      header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 10px; }
+      .wordmark { font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: 0.2px; color: var(--ink); text-decoration: none; }
+      .wordmark span { color: var(--lime); }
+      .trade-btn { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--ink); border: 1px solid var(--panel-line); background: rgba(16, 16, 42, 0.75); padding: 13px 18px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+      nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 6px 0 14px; border-bottom: 1px solid var(--panel-line); }
+      nav a { font-family: var(--mono); font-size: 16px; font-weight: 600; letter-spacing: 3px; color: var(--muted); padding: 6px 2px; text-decoration: none; }
+      nav a[aria-current="page"] { color: var(--gold); }
+      nav a:hover { color: var(--ink); }
+      nav a:focus-visible, .btn:focus-visible, .trade-btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+      main { padding-top: 34px; }
+      h1 { font-family: var(--serif); font-weight: 900; font-size: clamp(42px, 8.5vw, 76px); line-height: 1.04; margin: 10px 0 18px; }
+      h1 em { color: var(--gold); font-style: italic; font-weight: 700; }
+      h2 { font-family: var(--serif); font-weight: 900; font-size: clamp(30px, 6vw, 46px); line-height: 1.1; margin: 0 0 14px; }
+      .lede { color: var(--muted); font-size: 17px; line-height: 1.65; max-width: 620px; margin: 0 0 26px; }
+      .status-line { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--lime); display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+      .status-line::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); flex: none; }
+      .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+      .btn { display: inline-block; font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: 1.6px; text-decoration: none; cursor: pointer; border: 1px solid var(--panel-line); background: rgba(16, 16, 42, 0.8); color: var(--ink); padding: 15px 20px; }
+      .btn.gold { background: var(--gold); border-color: var(--gold); color: #191304; }
+      .btn:hover { filter: brightness(1.1); }
+      .card { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 22px; margin-top: 30px; }
+      .card h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--gold); margin: 0 0 12px; font-weight: 600; }
+      .card p, .card li { color: var(--muted); font-size: 15px; line-height: 1.65; }
+      .card p { margin: 0; }
+      .card ol { margin: 0; padding-left: 20px; }
+      .card li { margin: 4px 0; }
+      .card a { color: var(--ink); }
+      .addr { font-family: var(--mono); font-size: 12px; word-break: break-all; color: var(--ink); }
+      .mono { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); }
+      .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 26px; }
+      .stat { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 18px; }
+      .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
+      .stat .v { font-size: 22px; font-weight: 700; }
+      .countdown { font-family: var(--mono); font-weight: 600; font-size: clamp(30px, 7.5vw, 58px); letter-spacing: 1px; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
+      .count-label { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--muted); }
+      .live-badge { display: none; font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 6vw, 44px); color: var(--lime); letter-spacing: 2px; margin: 8px 0 4px; }
+      .bar { height: 12px; background: #1b1b3a; border: 1px solid var(--panel-line); margin: 14px 0 8px; overflow: hidden; }
+      .bar > div { height: 100%; width: 0%; background: var(--lime); transition: width 0.6s ease; }
+      .bar-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .price-rows { margin-top: 6px; }
+      .price-rows .pr { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--panel-line); font-size: 15px; }
+      .price-rows .pr:last-child { border-bottom: 0; }
+      .price-rows .pr span:first-child { color: var(--muted); }
+      .price-rows .pr span:last-child { font-family: var(--mono); font-weight: 600; }
+      .locked { text-align: center; padding: 44px 22px; }
+      .locked .lock-ico { width: 44px; height: 44px; margin-bottom: 14px; }
+      .locked h2 { margin-bottom: 10px; }
+      .locked p { max-width: 520px; margin: 0 auto; }
+      .listing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+      .listing { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 10px; }
+      .listing img { width: 100%; height: auto; display: block; }
+      .listing .price { color: var(--gold); font-family: var(--mono); font-size: 13px; }
+      .game-hud { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 14px; }
+      .game-hud .hud { flex: 1 1 110px; background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 12px 14px; }
+      .game-hud .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 6px; }
+      .game-hud .v { font-family: var(--mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .game-hud .v.lime { color: var(--lime); }
+      .game-hud .v.gold { color: var(--gold); font-size: 16px; letter-spacing: 1px; padding-top: 4px; }
+      .board-wrap { position: relative; max-width: 540px; margin: 0 auto; background: #0a0a24; border: 1px solid var(--panel-line); box-shadow: 0 0 0 4px rgba(16, 16, 42, 0.55); }
+      #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; touch-action: none; background: #0a0a24; }
+      .game-over { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; background: rgba(7, 7, 26, 0.82); padding: 20px; }
+      .game-over.show { display: flex; }
+      .game-over .go-title { font-family: var(--serif); font-weight: 900; font-size: clamp(32px, 8vw, 46px); color: var(--gold); margin: 0 0 8px; }
+      .game-over .go-score { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; color: var(--ink); margin: 0 0 18px; font-variant-numeric: tabular-nums; }
+      .game-hint { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); text-align: center; margin: 12px auto 0; max-width: 540px; line-height: 1.7; }
+      .game-hint strong { color: var(--lime); font-weight: 600; }
+      .dpad { display: grid; grid-template-columns: repeat(3, 68px); grid-template-rows: repeat(3, 68px); gap: 8px; justify-content: center; margin: 18px auto 4px; }
+      .dpad button { appearance: none; cursor: pointer; background: rgba(27, 27, 58, 0.92); border: 1px solid var(--panel-line); color: var(--ink); font-size: 26px; line-height: 1; min-width: 68px; min-height: 68px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+      .dpad button:active { background: var(--lime); color: #131a04; }
+      .dpad button:focus-visible, .game-actions .btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+      .dpad .up { grid-column: 2; grid-row: 1; }
+      .dpad .left { grid-column: 1; grid-row: 2; }
+      .dpad .mid { grid-column: 2; grid-row: 2; border: 1px solid var(--panel-line); background: rgba(13, 13, 34, 0.6); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+      .dpad .right { grid-column: 3; grid-row: 2; }
+      .dpad .down { grid-column: 2; grid-row: 3; }
+      .game-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 16px; }
+      footer { position: relative; z-index: 2; border-top: 1px solid var(--panel-line); margin-top: 54px; padding: 24px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      footer a { color: var(--ink); }
+      footer .contracts { font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px; word-break: break-all; margin-top: 10px; }
+      @media (max-width: 560px) {
+        .dpad { grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 64px); }
+        .dpad button { min-width: 64px; min-height: 64px; }
+        .trade-btn { padding: 11px 12px; letter-spacing: 1.6px; }
+        .wordmark { font-size: 22px; }
+        nav { gap: 20px; }
+      }
+      @media (max-width: 700px) {
+        body { background-attachment: scroll; background-position: 68% 18%; }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html" aria-current="page">PLAY</a></nav>
+      <main>
+
+        <div class="status-line">THE CLASSIC SNAKE GAME &middot; AUTO-PLAYS UNTIL YOU TAKE OVER</div>
+        <h2>Play the snake.</h2>
+        <p class="lede">The blocky snake game you remember &mdash; eat the gold dot, grow longer, and don&rsquo;t run into the walls or your own tail. When this page opens the snake plays itself, like someone is already playing. Tap an arrow, swipe on the board, or press a direction key and the game is yours.</p>
+        <div class="game-hud" aria-live="polite">
+          <div class="hud"><div class="k">SCORE</div><div class="v lime" id="gameScore">0</div></div>
+          <div class="hud"><div class="k">BEST</div><div class="v" id="gameBest">0</div></div>
+          <div class="hud"><div class="k">LENGTH</div><div class="v" id="gameLen">5</div></div>
+          <div class="hud"><div class="k">MODE</div><div class="v gold" id="gameMode">AUTO-PLAY</div></div>
+        </div>
+        <div class="board-wrap">
+          <canvas id="gameCanvas" width="600" height="600" aria-label="Snake game board"></canvas>
+          <div class="game-over" id="gameOver">
+            <div>
+              <p class="go-title">Game Over</p>
+              <p class="go-score" id="gameFinal">SCORE 0 &middot; LENGTH 5</p>
+              <button class="btn gold" type="button" id="gameAgain">&#8635; PLAY AGAIN</button>
+            </div>
+          </div>
+        </div>
+        <p class="game-hint" id="gameHint"><strong>AUTO-PLAYING&hellip;</strong> tap an arrow below, swipe the board, or use arrow keys / WASD to take control.</p>
+        <div class="dpad" role="group" aria-label="Snake direction controls">
+          <button type="button" class="up" data-dir="up" aria-label="Move up">&uarr;</button>
+          <button type="button" class="left" data-dir="left" aria-label="Move left">&larr;</button>
+          <div class="mid" aria-hidden="true"><span style="display:block;width:18px;height:18px;background:var(--lime)"></span></div>
+          <button type="button" class="right" data-dir="right" aria-label="Move right">&rarr;</button>
+          <button type="button" class="down" data-dir="down" aria-label="Move down">&darr;</button>
+        </div>
+        <div class="game-actions">
+          <button class="btn" type="button" id="gameAuto">&#8634; BACK TO AUTO-PLAY</button>
+          <button class="btn" type="button" id="gamePause">PAUSE</button>
+          <button class="btn" type="button" id="gameRestart">RESTART</button>
+        </div>
+        <div class="card">
+          <h3>HOW TO PLAY</h3>
+          <ol>
+            <li><strong style="color:var(--ink)">On your phone:</strong> tap the big arrows above, or swipe on the board in the direction you want.</li>
+            <li><strong style="color:var(--ink)">On desktop:</strong> use the arrow keys or W A S D.</li>
+            <li>Every gold dot is +10 points and one block longer. Hit a wall or your own body and it&rsquo;s game over.</li>
+            <li>Changed your mind? &ldquo;Back to auto-play&rdquo; hands control back to the snake &mdash; it goes back to playing itself.</li>
+          </ol>
+        </div>
+        <div class="card" id="agentFlow">
+          <h3>TRADE VIA AGENT &mdash; HOW IT WORKS</h3>
+
+          <ol>
+            <li>Copy the mint / buy / list prompt on the Mint or Market page.</li>
+            <li>Paste it to your agent (e.g. Binance AI Pro).</li>
+            <li>Your agent verifies the contracts on-chain and shows a transaction preview.</li>
+            <li>You confirm in your wallet, then sign. This site never asks you to connect a wallet and never asks for a seed phrase or private key.</li>
+          </ol>
+
+        </div>
+
+      </main>
+
+      <footer>
+        <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a></div>
+        <div class="contracts">&copy; 2026 SNAKEID &middot; NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7</div>
+      </footer>
+
+    </div>
+
+    <script>
+      var NFT = "0xafc6bca0e191e396306343213b04ff9a8d717263";
+      var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
+      var MAX_SUPPLY = 10000;
+      var MINT_OPEN_TS = Date.UTC(2026, 10, 3, 16, 0, 0);
+      var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
+      async function rpcCall(to, data) {
+        for (var i = 0; i < RPCS.length; i++) {
+          try {
+            var ctrl = new AbortController();
+            var timer = setTimeout(function () { ctrl.abort(); }, 8000);
+            var r = await fetch(RPCS[i], { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", method: "eth_call", params: [{ to: to, data: data }, "latest"], id: 1 }), signal: ctrl.signal });
+            clearTimeout(timer);
+            var j = await r.json();
+            if (j && j.result) return j.result;
+          } catch (e) {}
+        }
+        return null;
+      }
+      function copyText(t, el) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t).then(function () { el.textContent = "COPIED \u2713"; });
+        } else { el.textContent = "Copy failed \u2014 select the prompt manually."; }
+      }
+      document.getElementById("tradeAgentBtn").addEventListener("click", function () {
+        var el = document.getElementById("agentFlow");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      });
+    </script>
+
+    <script>
+      (function () {
+        "use strict";
+        var COLS = 20, ROWS = 20;
+        var gc = document.getElementById("gameCanvas");
+        var gtx = null;
+        try { gtx = gc.getContext("2d"); } catch (e) { gtx = null; }
+        var scoreEl = document.getElementById("gameScore");
+        var bestEl = document.getElementById("gameBest");
+        var lenEl = document.getElementById("gameLen");
+        var modeEl = document.getElementById("gameMode");
+        var hintEl = document.getElementById("gameHint");
+        var overEl = document.getElementById("gameOver");
+        var finalEl = document.getElementById("gameFinal");
+        var pauseBtn = document.getElementById("gamePause");
+        var gSnake = [], gDir = { x: 1, y: 0 }, gNext = { x: 1, y: 0 };
+        var gFood = null, gScore = 0, gBest = 0;
+        var gAlive = true, gMode = "auto", gPaused = false;
+        var gRaf = null, gLast = 0;
+        var STEP = 128;
+        try { gBest = parseInt(window.localStorage.getItem("snakeid-best") || "0", 10) || 0; } catch (e) { gBest = 0; }
+        function saveBest() { try { window.localStorage.setItem("snakeid-best", String(gBest)); } catch (e) {} }
+        function gOccupied(x, y, ignoreTail) {
+          var n = gSnake.length - (ignoreTail ? 1 : 0);
+          for (var i = 0; i < n; i++) if (gSnake[i].x === x && gSnake[i].y === y) return true;
+          return false;
+        }
+        function gPlaceFood() {
+          for (var t = 0; t < 300; t++) {
+            var fx = Math.floor(Math.random() * COLS), fy = Math.floor(Math.random() * ROWS);
+            if (!gOccupied(fx, fy, false)) { gFood = { x: fx, y: fy }; return; }
+          }
+          gFood = { x: 0, y: 0 };
+        }
+        function gUpdateHud() {
+          scoreEl.textContent = gScore;
+          bestEl.textContent = gBest;
+          lenEl.textContent = gSnake.length;
+          modeEl.textContent = gMode === "auto" ? "AUTO-PLAY" : "YOU'RE PLAYING";
+          if (pauseBtn) pauseBtn.textContent = gPaused ? "RESUME" : "PAUSE";
+        }
+        function gReset(mode) {
+          var sx = Math.floor(COLS / 2), sy = Math.floor(ROWS / 2);
+          gSnake = [];
+          for (var i = 0; i < 5; i++) gSnake.push({ x: sx - i, y: sy });
+          gDir = { x: 1, y: 0 }; gNext = { x: 1, y: 0 };
+          gScore = 0; gAlive = true; gMode = mode || "auto"; gPaused = false;
+          gPlaceFood();
+          overEl.classList.remove("show");
+          hintEl.innerHTML = gMode === "auto"
+            ? "<strong>AUTO-PLAYING&hellip;</strong> tap an arrow below, swipe the board, or use arrow keys / WASD to take control."
+            : "<strong>YOU'RE IN CONTROL.</strong> Eat the gold dots \u2014 don't hit the walls or yourself.";
+          gUpdateHud();
+          gDraw(0);
+        }
+        function gBfs(target) {
+          var head = gSnake[0];
+          var key = function (x, y) { return y * COLS + x; };
+          var seen = {}, prev = {}, q = [{ x: head.x, y: head.y }];
+          seen[key(head.x, head.y)] = true;
+          var dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+          while (q.length) {
+            var cur = q.shift();
+            if (cur.x === target.x && cur.y === target.y) {
+              var path = [], node = cur;
+              while (!(node.x === head.x && node.y === head.y)) { path.unshift(node); node = prev[key(node.x, node.y)]; }
+              return path;
+            }
+            for (var i = 0; i < 4; i++) {
+              var nx = cur.x + dirs[i].x, ny = cur.y + dirs[i].y;
+              if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
+              var k = key(nx, ny);
+              if (seen[k]) continue;
+              if (gOccupied(nx, ny, true) && !(nx === target.x && ny === target.y)) continue;
+              seen[k] = true; prev[k] = cur; q.push({ x: nx, y: ny });
+            }
+          }
+          return null;
+        }
+        function gFlood(sx, sy) {
+          var key = function (x, y) { return y * COLS + x; };
+          var seen = {}, q = [{ x: sx, y: sy }], count = 0;
+          seen[key(sx, sy)] = true;
+          var dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+          while (q.length && count < 420) {
+            var cur = q.shift(); count++;
+            for (var i = 0; i < 4; i++) {
+              var nx = cur.x + dirs[i].x, ny = cur.y + dirs[i].y;
+              if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
+              var k = key(nx, ny);
+              if (seen[k] || gOccupied(nx, ny, true)) continue;
+              seen[k] = true; q.push({ x: nx, y: ny });
+            }
+          }
+          return count;
+        }
+        function gAutoDir() {
+          var head = gSnake[0];
+          var path = gFood ? gBfs(gFood) : null;
+          if (path && path.length) {
+            var s = path[0];
+            if (gFlood(s.x, s.y) > gSnake.length) return { x: s.x - head.x, y: s.y - head.y };
+          }
+          var tail = gSnake[gSnake.length - 1];
+          var tp = gBfs(tail);
+          if (tp && tp.length) { var t = tp[0]; return { x: t.x - head.x, y: t.y - head.y }; }
+          var dirs = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+          var best = null, bestSpace = -1;
+          for (var i = 0; i < 4; i++) {
+            var nx = head.x + dirs[i].x, ny = head.y + dirs[i].y;
+            if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
+            if (gOccupied(nx, ny, true)) continue;
+            if (dirs[i].x === -gDir.x && dirs[i].y === -gDir.y) continue;
+            var sp = gFlood(nx, ny);
+            if (sp > bestSpace) { bestSpace = sp; best = dirs[i]; }
+          }
+          return best;
+        }
+        function gGameOver() {
+          gAlive = false;
+          if (gScore > gBest) { gBest = gScore; saveBest(); }
+          finalEl.textContent = "SCORE " + gScore + " \u00b7 LENGTH " + gSnake.length + " \u00b7 BEST " + gBest;
+          overEl.classList.add("show");
+          gUpdateHud();
+        }
+        function gStep() {
+          if (!gAlive || gPaused) return;
+          if (gMode === "auto") {
+            var nd = gAutoDir();
+            if (!nd) { gGameOver(); return; }
+            gNext = nd;
+          }
+          gDir = gNext;
+          var head = { x: gSnake[0].x + gDir.x, y: gSnake[0].y + gDir.y };
+          if (head.x < 0 || head.y < 0 || head.x >= COLS || head.y >= ROWS) { gGameOver(); return; }
+          var willEat = gFood && head.x === gFood.x && head.y === gFood.y;
+          var checkLen = willEat ? gSnake.length : gSnake.length - 1;
+          for (var ci = 0; ci < checkLen; ci++) {
+            if (gSnake[ci].x === head.x && gSnake[ci].y === head.y) { gGameOver(); return; }
+          }
+          gSnake.unshift(head);
+          if (willEat) { gScore += 10; gPlaceFood(); }
+          else gSnake.pop();
+          gUpdateHud();
+        }
+        function gDraw(now) {
+          if (!gtx) return;
+          var W = gc.width, H = gc.height, cw = W / COLS, ch = H / ROWS;
+          gtx.clearRect(0, 0, W, H);
+          gtx.fillStyle = "#0a0a24";
+          gtx.fillRect(0, 0, W, H);
+          gtx.fillStyle = "rgba(163,230,53,0.07)";
+          for (var gx = 0; gx < COLS; gx++) for (var gy = 0; gy < ROWS; gy++)
+            gtx.fillRect(gx * cw + cw / 2 - 1.5, gy * ch + ch / 2 - 1.5, 3, 3);
+          if (gFood) {
+            var pulse = 1 + 0.2 * Math.sin(now / 200);
+            var fs = cw * 0.42 * pulse, cx = gFood.x * cw + cw / 2, cy = gFood.y * ch + ch / 2;
+            gtx.fillStyle = "#f7c948";
+            gtx.fillRect(cx - fs / 2, cy - fs / 2, fs, fs);
+            gtx.fillRect(cx - 3, cy - fs / 2 - 5, 6, 5);
+          }
+          var blink = !gAlive && Math.floor(now / 180) % 2 === 0;
+          for (var i = gSnake.length - 1; i >= 0; i--) {
+            var seg = gSnake[i], x = seg.x * cw, y = seg.y * ch;
+            if (i === 0) gtx.fillStyle = blink ? "#3f6212" : "#d9f99d";
+            else {
+              var t = i / Math.max(1, gSnake.length);
+              gtx.fillStyle = blink ? "#365314" : "rgb(" + Math.round(163 - 60 * t) + "," + Math.round(230 - 70 * t) + "," + Math.round(53 - 20 * t) + ")";
+            }
+            gtx.fillRect(x + 2, y + 2, cw - 4, ch - 4);
+            if (i === 0) {
+              gtx.fillStyle = "#0a0f04";
+              var ex = x + cw / 2, ey = y + ch / 2;
+              var ox = gDir.x * 5, oy = gDir.y * 5;
+              var px = gDir.y !== 0 ? 6 : 0, py = gDir.x !== 0 ? 6 : 0;
+              gtx.fillRect(ex + ox + px - 2.5, ey + oy + py - 2.5, 5, 5);
+              gtx.fillRect(ex + ox - px - 2.5, ey + oy - py - 2.5, 5, 5);
+            }
+          }
+        }
+        function gLoop(now) {
+          gRaf = requestAnimationFrame(gLoop);
+          if (now - gLast >= STEP) { gLast = now; gStep(); }
+          gDraw(now);
+        }
+        function gStart() {
+          if (!gRaf) { gLast = 0; gRaf = requestAnimationFrame(gLoop); }
+        }
+        function gStop() {
+          if (gRaf) cancelAnimationFrame(gRaf);
+          gRaf = null;
+        }
+        function gTakeControl(nx, ny) {
+          if (!gAlive || gPaused) return;
+          if (gMode === "manual") {
+            if (nx === -gDir.x && ny === -gDir.y) return;
+            if (nx === -gNext.x && ny === -gNext.y) return;
+          } else {
+            if (gSnake.length > 1 && nx === -gDir.x && ny === -gDir.y) return;
+            gMode = "manual";
+            hintEl.innerHTML = "<strong>YOU'RE IN CONTROL.</strong> Eat the gold dots \u2014 don't hit the walls or yourself.";
+          }
+          gNext = { x: nx, y: ny };
+          gUpdateHud();
+        }
+        function gSetAuto(v) {
+          if (v) {
+            if (!gAlive) { gReset("auto"); }
+            else { gMode = "auto"; hintEl.innerHTML = "<strong>AUTO-PLAYING&hellip;</strong> tap an arrow below, swipe the board, or use arrow keys / WASD to take control."; gUpdateHud(); }
+          } else {
+            gMode = "manual"; gUpdateHud();
+          }
+        }
+        function gTogglePause() {
+          if (!gAlive) return;
+          gPaused = !gPaused;
+          gUpdateHud();
+        }
+        var DIRS = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+        document.querySelectorAll(".dpad button[data-dir]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var d = DIRS[b.getAttribute("data-dir")];
+            if (d) gTakeControl(d.x, d.y);
+          });
+        });
+        var tsX = null, tsY = null;
+        gc.addEventListener("touchstart", function (e) {
+          if (e.touches.length === 1) { tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; }
+        }, { passive: true });
+        gc.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+        gc.addEventListener("touchend", function (e) {
+          if (tsX === null) return;
+          var dx = e.changedTouches[0].clientX - tsX, dy = e.changedTouches[0].clientY - tsY;
+          tsX = tsY = null;
+          if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+          if (Math.abs(dx) > Math.abs(dy)) gTakeControl(dx > 0 ? 1 : -1, 0);
+          else gTakeControl(0, dy > 0 ? 1 : -1);
+        });
+        document.addEventListener("keydown", function (e) {
+          var k = e.key, d = null;
+          if (k === "ArrowUp" || k === "w" || k === "W") d = DIRS.up;
+          else if (k === "ArrowDown" || k === "s" || k === "S") d = DIRS.down;
+          else if (k === "ArrowLeft" || k === "a" || k === "A") d = DIRS.left;
+          else if (k === "ArrowRight" || k === "d" || k === "D") d = DIRS.right;
+          else if (k === " ") { e.preventDefault(); gTogglePause(); return; }
+          if (d) { e.preventDefault(); gTakeControl(d.x, d.y); }
+        });
+        document.getElementById("gameAgain").addEventListener("click", function () { gReset("manual"); });
+        document.getElementById("gameRestart").addEventListener("click", function () { gReset(gMode); });
+        document.getElementById("gameAuto").addEventListener("click", function () { gSetAuto(true); });
+        if (pauseBtn) pauseBtn.addEventListener("click", function () { gTogglePause(); });
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) gStop();
+          else gStart();
+        });
+        window.__snakeGame = {
+          step: gStep, reset: gReset, draw: gDraw,
+          setDir: function (x, y) { gTakeControl(x, y); },
+          setAuto: gSetAuto, togglePause: gTogglePause,
+          state: function () { return { snake: gSnake.slice(), food: gFood ? { x: gFood.x, y: gFood.y } : null, score: gScore, best: gBest, dead: !gAlive, auto: gMode === "auto", paused: gPaused, cols: COLS, rows: ROWS }; },
+          _setFood: function (x, y) { gFood = { x: x, y: y }; },
+          _setSnake: function (s, d) { gSnake = s.map(function (p) { return { x: p[0], y: p[1] }; }); if (d) { gDir = { x: d[0], y: d[1] }; gNext = { x: d[0], y: d[1] }; } }
+        };
+        gReset("auto");
+        gStart();
+      })();
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>SnakeID — Market</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #07071a;
+        --panel: #10102a;
+        --panel-line: #26264a;
+        --ink: #f2f0e6;
+        --muted: #a5a2c4;
+        --gold: #f7c948;
+        --lime: #a3e635;
+        --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+        --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background-color: var(--bg);
+        background-image: url("snake-bg.jpg");
+        background-size: cover;
+        background-position: 72% 38%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        color: var(--ink);
+        font-family: var(--sans);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      /* Dark overlay over the fixed snake photo only — keeps every existing
+         panel and line of text readable while the snake stays visible. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(4, 4, 14, 0.66) 0%, rgba(4, 4, 14, 0.58) 42%, rgba(4, 4, 14, 0.74) 100%);
+      }
+      .wrap { position: relative; z-index: 2; max-width: 1060px; margin: 0 auto; padding: 0 20px 56px; }
+      header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 10px; }
+      .wordmark { font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: 0.2px; color: var(--ink); text-decoration: none; }
+      .wordmark span { color: var(--lime); }
+      .trade-btn { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--ink); border: 1px solid var(--panel-line); background: rgba(16, 16, 42, 0.75); padding: 13px 18px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+      nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 6px 0 14px; border-bottom: 1px solid var(--panel-line); }
+      nav a { font-family: var(--mono); font-size: 16px; font-weight: 600; letter-spacing: 3px; color: var(--muted); padding: 6px 2px; text-decoration: none; }
+      nav a[aria-current="page"] { color: var(--gold); }
+      nav a:hover { color: var(--ink); }
+      nav a:focus-visible, .btn:focus-visible, .trade-btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+      main { padding-top: 34px; }
+      h1 { font-family: var(--serif); font-weight: 900; font-size: clamp(42px, 8.5vw, 76px); line-height: 1.04; margin: 10px 0 18px; }
+      h1 em { color: var(--gold); font-style: italic; font-weight: 700; }
+      h2 { font-family: var(--serif); font-weight: 900; font-size: clamp(30px, 6vw, 46px); line-height: 1.1; margin: 0 0 14px; }
+      .lede { color: var(--muted); font-size: 17px; line-height: 1.65; max-width: 620px; margin: 0 0 26px; }
+      .status-line { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--lime); display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+      .status-line::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); flex: none; }
+      .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+      .btn { display: inline-block; font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: 1.6px; text-decoration: none; cursor: pointer; border: 1px solid var(--panel-line); background: rgba(16, 16, 42, 0.8); color: var(--ink); padding: 15px 20px; }
+      .btn.gold { background: var(--gold); border-color: var(--gold); color: #191304; }
+      .btn:hover { filter: brightness(1.1); }
+      .card { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 22px; margin-top: 30px; }
+      .card h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--gold); margin: 0 0 12px; font-weight: 600; }
+      .card p, .card li { color: var(--muted); font-size: 15px; line-height: 1.65; }
+      .card p { margin: 0; }
+      .card ol { margin: 0; padding-left: 20px; }
+      .card li { margin: 4px 0; }
+      .card a { color: var(--ink); }
+      .addr { font-family: var(--mono); font-size: 12px; word-break: break-all; color: var(--ink); }
+      .mono { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); }
+      .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 26px; }
+      .stat { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 18px; }
+      .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
+      .stat .v { font-size: 22px; font-weight: 700; }
+      .countdown { font-family: var(--mono); font-weight: 600; font-size: clamp(30px, 7.5vw, 58px); letter-spacing: 1px; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
+      .count-label { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--muted); }
+      .live-badge { display: none; font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 6vw, 44px); color: var(--lime); letter-spacing: 2px; margin: 8px 0 4px; }
+      .bar { height: 12px; background: #1b1b3a; border: 1px solid var(--panel-line); margin: 14px 0 8px; overflow: hidden; }
+      .bar > div { height: 100%; width: 0%; background: var(--lime); transition: width 0.6s ease; }
+      .bar-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .price-rows { margin-top: 6px; }
+      .price-rows .pr { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--panel-line); font-size: 15px; }
+      .price-rows .pr:last-child { border-bottom: 0; }
+      .price-rows .pr span:first-child { color: var(--muted); }
+      .price-rows .pr span:last-child { font-family: var(--mono); font-weight: 600; }
+      .locked { text-align: center; padding: 44px 22px; }
+      .locked .lock-ico { width: 44px; height: 44px; margin-bottom: 14px; }
+      .locked h2 { margin-bottom: 10px; }
+      .locked p { max-width: 520px; margin: 0 auto; }
+      .listing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+      .listing { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 10px; }
+      .listing img { width: 100%; height: auto; display: block; }
+      .listing .price { color: var(--gold); font-family: var(--mono); font-size: 13px; }
+      .game-hud { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 14px; }
+      .game-hud .hud { flex: 1 1 110px; background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 12px 14px; }
+      .game-hud .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 6px; }
+      .game-hud .v { font-family: var(--mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+      .game-hud .v.lime { color: var(--lime); }
+      .game-hud .v.gold { color: var(--gold); font-size: 16px; letter-spacing: 1px; padding-top: 4px; }
+      .board-wrap { position: relative; max-width: 540px; margin: 0 auto; background: #0a0a24; border: 1px solid var(--panel-line); box-shadow: 0 0 0 4px rgba(16, 16, 42, 0.55); }
+      #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; touch-action: none; background: #0a0a24; }
+      .game-over { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; background: rgba(7, 7, 26, 0.82); padding: 20px; }
+      .game-over.show { display: flex; }
+      .game-over .go-title { font-family: var(--serif); font-weight: 900; font-size: clamp(32px, 8vw, 46px); color: var(--gold); margin: 0 0 8px; }
+      .game-over .go-score { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; color: var(--ink); margin: 0 0 18px; font-variant-numeric: tabular-nums; }
+      .game-hint { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); text-align: center; margin: 12px auto 0; max-width: 540px; line-height: 1.7; }
+      .game-hint strong { color: var(--lime); font-weight: 600; }
+      .dpad { display: grid; grid-template-columns: repeat(3, 68px); grid-template-rows: repeat(3, 68px); gap: 8px; justify-content: center; margin: 18px auto 4px; }
+      .dpad button { appearance: none; cursor: pointer; background: rgba(27, 27, 58, 0.92); border: 1px solid var(--panel-line); color: var(--ink); font-size: 26px; line-height: 1; min-width: 68px; min-height: 68px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+      .dpad button:active { background: var(--lime); color: #131a04; }
+      .dpad button:focus-visible, .game-actions .btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+      .dpad .up { grid-column: 2; grid-row: 1; }
+      .dpad .left { grid-column: 1; grid-row: 2; }
+      .dpad .mid { grid-column: 2; grid-row: 2; border: 1px solid var(--panel-line); background: rgba(13, 13, 34, 0.6); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+      .dpad .right { grid-column: 3; grid-row: 2; }
+      .dpad .down { grid-column: 2; grid-row: 3; }
+      .game-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 16px; }
+      footer { position: relative; z-index: 2; border-top: 1px solid var(--panel-line); margin-top: 54px; padding: 24px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      footer a { color: var(--ink); }
+      footer .contracts { font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px; word-break: break-all; margin-top: 10px; }
+      @media (max-width: 560px) {
+        .dpad { grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 64px); }
+        .dpad button { min-width: 64px; min-height: 64px; }
+        .trade-btn { padding: 11px 12px; letter-spacing: 1.6px; }
+        .wordmark { font-size: 22px; }
+        nav { gap: 20px; }
+      }
+      @media (max-width: 700px) {
+        body { background-attachment: scroll; background-position: 68% 18%; }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html" aria-current="page">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
+      <main>
+
+        <div class="status-line">MARKET FEE 5% &middot; SELLER RECEIVES 95%</div>
+        <h2 id="marketTitle">Market</h2>
+        <div class="card locked" id="marketLocked">
+          <svg class="lock-ico" viewBox="0 0 24 24" fill="none" stroke="#f7c948" stroke-width="1.6" aria-hidden="true">
+            <rect x="4" y="10" width="16" height="10" rx="1.5"></rect>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+            <circle cx="12" cy="15" r="1.6" fill="#f7c948" stroke="none"></circle>
+          </svg>
+          <h2>Market locked</h2>
+          <p>The market opens automatically when all 10,000 SnakeID are minted (sold out) &mdash; the same moment minting closes. Until then there are no listings, and any &ldquo;SnakeID for sale&rdquo; elsewhere is not this collection.</p>
+          <p class="mono" id="marketLockProgress" style="margin-top: 14px">Minted so far: loading&hellip;</p>
+        </div>
+        <div class="card" id="marketLive" style="display: none">
+          <h3>MARKET IS OPEN</h3>
+          <p>All 10,000 snakes are minted. Listings below are read live from the market contract on BNB Chain.</p>
+          <p class="mono" id="marketScan" style="margin-top: 12px">Scanning market&hellip;</p>
+          <p class="mono" id="marketStats"></p>
+          <div class="listing-grid" id="marketItems"></div>
+          <div class="row" style="margin-top: 16px">
+            <button class="btn" type="button" id="copyListPrompt">COPY LIST PROMPT</button>
+            <button class="btn" type="button" id="copyBuyPrompt">COPY BUY PROMPT</button>
+            <span id="marketPromptCopied" style="font-family: var(--mono); font-size: 12px; color: var(--lime)"></span>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="k">MARKET FEE</div><div class="v">5%</div></div>
+          <div class="stat"><div class="k">SELLER RECEIVES</div><div class="v">95%</div></div>
+          <div class="stat"><div class="k">MINIMUM LISTING</div><div class="v">0.001 BNB</div></div>
+          <div class="stat"><div class="k">OPENS AT</div><div class="v">10,000 minted</div></div>
+        </div>
+        <div class="card" id="agentFlow">
+          <h3>TRADE VIA AGENT &mdash; HOW IT WORKS</h3>
+
+          <ol>
+            <li>Copy the mint / buy / list prompt on the Mint or Market page.</li>
+            <li>Paste it to your agent (e.g. Binance AI Pro).</li>
+            <li>Your agent verifies the contracts on-chain and shows a transaction preview.</li>
+            <li>You confirm in your wallet, then sign. This site never asks you to connect a wallet and never asks for a seed phrase or private key.</li>
+          </ol>
+
+        </div>
+        <div class="card">
+          <h3>MARKET CONTRACT</h3>
+          <p>Market contract<br /><span class="addr">0x0a5e8d61230241312a623e17d61540d0dff2feb7</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">View Market contract on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
+        </div>
+
+      </main>
+
+      <footer>
+        <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a></div>
+        <div class="contracts">&copy; 2026 SNAKEID &middot; NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7</div>
+      </footer>
+
+    </div>
+
+    <script>
+      var NFT = "0xafc6bca0e191e396306343213b04ff9a8d717263";
+      var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
+      var MAX_SUPPLY = 10000;
+      var MINT_OPEN_TS = Date.UTC(2026, 10, 3, 16, 0, 0);
+      var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
+      async function rpcCall(to, data) {
+        for (var i = 0; i < RPCS.length; i++) {
+          try {
+            var ctrl = new AbortController();
+            var timer = setTimeout(function () { ctrl.abort(); }, 8000);
+            var r = await fetch(RPCS[i], { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", method: "eth_call", params: [{ to: to, data: data }, "latest"], id: 1 }), signal: ctrl.signal });
+            clearTimeout(timer);
+            var j = await r.json();
+            if (j && j.result) return j.result;
+          } catch (e) {}
+        }
+        return null;
+      }
+      function copyText(t, el) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t).then(function () { el.textContent = "COPIED \u2713"; });
+        } else { el.textContent = "Copy failed \u2014 select the prompt manually."; }
+      }
+      document.getElementById("tradeAgentBtn").addEventListener("click", function () {
+        var el = document.getElementById("agentFlow");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      });
+    </script>
+
+    <script>
+      var SEL_TOTAL_MINTED = "0xa2309ff8";
+      var SEL_LISTINGS = "0xde74e57b";
+      var marketScanned = false;
+      async function refreshMarket() {
+        try {
+          var totalHex = await rpcCall(NFT, SEL_TOTAL_MINTED);
+          if (totalHex === null) return;
+          var total = parseInt(totalHex, 16);
+          document.getElementById("marketLockProgress").textContent = "Minted so far: " + total.toLocaleString("en-US") + " / 10,000 \u2014 market opens at 10,000.";
+          if (total >= MAX_SUPPLY) {
+            document.getElementById("marketLocked").style.display = "none";
+            document.getElementById("marketLive").style.display = "block";
+            document.getElementById("marketTitle").textContent = "Market \u2014 open";
+            if (!marketScanned) { marketScanned = true; loadMarket(); }
+          } else {
+            document.getElementById("marketLocked").style.display = "block";
+            document.getElementById("marketLive").style.display = "none";
+          }
+        } catch (e) {}
+      }
+      setInterval(refreshMarket, 5000);
+      refreshMarket();
+      function parseListing(hex) {
+        if (!hex || hex.length < 194) return null;
+        var seller = "0x" + hex.slice(26, 66);
+        var price = BigInt("0x" + hex.slice(66, 130));
+        var active = hex.slice(130, 194) === "0000000000000000000000000000000000000000000000000000000000000001";
+        return { seller: seller, price: price, active: active };
+      }
+      function bnb(wei) { return (Number(wei) / 1e18).toFixed(5).replace(/0+$/, "").replace(/\.$/, ".0"); }
+      async function loadMarket() {
+        var items = document.getElementById("marketItems");
+        var scan = document.getElementById("marketScan");
+        var stats = document.getElementById("marketStats");
+        var listings = [], checked = 0, BATCH = 20;
+        for (var start = 1; start <= MAX_SUPPLY; start += BATCH) {
+          var ids = [];
+          for (var i = start; i < start + BATCH && i <= MAX_SUPPLY; i++) ids.push(i);
+          var results = await Promise.all(ids.map(async function (id) {
+            var data = SEL_LISTINGS + id.toString(16).padStart(64, "0");
+            var hex = await rpcCall(MARKET, data);
+            return { id: id, l: hex ? parseListing(hex) : null };
+          }));
+          for (var k = 0; k < results.length; k++) {
+            if (results[k].l && results[k].l.active) listings.push({ id: results[k].id, seller: results[k].l.seller, price: results[k].l.price });
+          }
+          checked += ids.length;
+          scan.textContent = "Scanning market\u2026 " + checked.toLocaleString("en-US") + " / 10,000 checked \u2014 " + listings.length + " listings found so far. This is a progress count, not the final total.";
+        }
+        listings.sort(function (a, b) { return a.price < b.price ? -1 : 1; });
+        var floor = listings.length ? bnb(listings[0].price) + " BNB" : "\u2014";
+        scan.textContent = "Scan complete: " + listings.length + " active listings found of 10,000 checked.";
+        stats.textContent = "Active listings: " + listings.length + " \u00b7 Floor: " + floor + " \u00b7 Market fee 5% \u00b7 Seller receives 95%";
+        items.innerHTML = "";
+        for (var n = 0; n < Math.min(listings.length, 100); n++) {
+          var l = listings[n];
+          var d = document.createElement("div"); d.className = "listing";
+          d.innerHTML = "<img src=\"https://snakeid.xyz/snake-" + l.id + ".webp\" alt=\"SnakeID #" + l.id + "\" loading=\"lazy\"><p class=\"mono\">SnakeID #" + l.id + "</p><p class=\"price\">" + bnb(l.price) + " BNB</p><p class=\"mono\" style=\"word-break:break-all\">" + l.seller + "</p>";
+          items.appendChild(d);
+        }
+        if (listings.length > 100) {
+          var p = document.createElement("p"); p.className = "mono";
+          p.textContent = "Showing the 100 cheapest of " + listings.length + " listings.";
+          items.appendChild(p);
+        }
+      }
+      document.getElementById("copyListPrompt").addEventListener("click", function () {
+        var p = "List my SnakeID NFT on the SnakeID Market on BNB Chain. NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7, market fee 5%, seller receives 95%, minimum listing 0.001 BNB. Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
+        copyText(p, document.getElementById("marketPromptCopied"));
+      });
+      document.getElementById("copyBuyPrompt").addEventListener("click", function () {
+        var p = "Buy a SnakeID NFT from the SnakeID Market on BNB Chain. NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7, market fee 5%, seller receives 95%. Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
+        copyText(p, document.getElementById("marketPromptCopied"));
+      });
+    </script>
+
+  </body>
+</html>

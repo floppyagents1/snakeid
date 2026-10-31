@@ -26,13 +26,25 @@
       html, body { margin: 0; padding: 0; }
       body {
         background-color: var(--bg);
-        background-image: radial-gradient(circle, rgba(163, 230, 53, 0.09) 1.2px, transparent 1.3px);
-        background-size: 26px 26px;
-        background-position: center top;
+        background-image: url("snake-bg.jpg");
+        background-size: cover;
+        background-position: 72% 38%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         color: var(--ink);
         font-family: var(--sans);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+      /* Dark overlay over the fixed snake photo only — keeps every existing
+         panel and line of text readable while the snake stays visible. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(4, 4, 14, 0.66) 0%, rgba(4, 4, 14, 0.58) 42%, rgba(4, 4, 14, 0.74) 100%);
       }
       .wrap { position: relative; z-index: 2; max-width: 1060px; margin: 0 auto; padding: 0 20px 56px; }
       header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 10px; }
@@ -121,6 +133,9 @@
         .wordmark { font-size: 22px; }
         nav { gap: 20px; }
       }
+      @media (max-width: 700px) {
+        body { background-attachment: scroll; background-position: 68% 18%; }
+      }
 
     </style>
   </head>
@@ -133,7 +148,7 @@
         <h1>Only snakes,<br /><em>winding their way in.</em></h1>
         <p class="lede">10,000 snakes. One ID to collect them all. 12 shapes &mdash; straight, S-curved, spiral, zigzag, coiled and more. 12 colors. Real rarity, from Common to Legendary. Minted by agents, on BNB Chain. No wallet connection on this site &mdash; all minting and trading goes through your agent, with a transaction preview and your confirmation.</p>
         <div class="row">
-          <a class="btn gold" href="/mint.html" id="heroMintBtn">MINT OPENS 16:00 UTC &middot; TUE 3 NOV 2026 &rarr;</a>
+          <a class="btn gold" href="/mint.html" id="heroMintBtn">MINT NOW &rarr;</a>
           <a class="btn" href="/market.html">Explore market</a>
         </div>
         <div class="card" id="agentFlow">
@@ -167,7 +182,6 @@
       var NFT = "0xafc6bca0e191e396306343213b04ff9a8d717263";
       var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
       var MAX_SUPPLY = 10000;
-      var MINT_OPEN_TS = Date.UTC(2026, 10, 3, 16, 0, 0);
       var RPCS = ["https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org"];
       async function rpcCall(to, data) {
         for (var i = 0; i < RPCS.length; i++) {
@@ -202,8 +216,8 @@
           var mintOpen = openHex ? parseInt(openHex, 16) === 1 : false;
           var btn = document.getElementById("heroMintBtn");
           if (total >= MAX_SUPPLY) { btn.textContent = "SOLD OUT \u00b7 10,000 / 10,000 \u2192"; }
-          else if (mintOpen || Date.now() >= MINT_OPEN_TS) { btn.textContent = "MINT IS LIVE \u2192"; }
-          else { btn.textContent = "MINT OPENS 16:00 UTC \u00b7 TUE 3 NOV 2026 \u2192"; }
+          else if (mintOpen) { btn.textContent = "MINT IS LIVE \u2192"; }
+          else { btn.textContent = "MINT NOW \u2192"; }
         } catch (e) {}
       }
       setInterval(refreshMint, 5000);

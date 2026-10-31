@@ -26,13 +26,25 @@
       html, body { margin: 0; padding: 0; }
       body {
         background-color: var(--bg);
-        background-image: radial-gradient(circle, rgba(163, 230, 53, 0.09) 1.2px, transparent 1.3px);
-        background-size: 26px 26px;
-        background-position: center top;
+        background-image: url("snake-bg.jpg");
+        background-size: cover;
+        background-position: 72% 38%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         color: var(--ink);
         font-family: var(--sans);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+      /* Dark overlay over the fixed snake photo only — keeps every existing
+         panel and line of text readable while the snake stays visible. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(4, 4, 14, 0.66) 0%, rgba(4, 4, 14, 0.58) 42%, rgba(4, 4, 14, 0.74) 100%);
       }
       .wrap { position: relative; z-index: 2; max-width: 1060px; margin: 0 auto; padding: 0 20px 56px; }
       header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 10px; }
@@ -121,6 +133,9 @@
         .wordmark { font-size: 22px; }
         nav { gap: 20px; }
       }
+      @media (max-width: 700px) {
+        body { background-attachment: scroll; background-position: 68% 18%; }
+      }
 
     </style>
   </head>
@@ -145,12 +160,11 @@
           <div class="price-rows">
             <div class="pr"><span>1st mint per Agent ID wallet</span><span>FREE</span></div>
             <div class="pr"><span>Further mints (no per-wallet limit)</span><span>0.0014 BNB</span></div>
-            <div class="pr"><span>Mint opens</span><span>Tue 3 Nov 2026 &middot; 16:00 UTC</span></div>
           </div>
         </div>
         <div class="card" id="agentFlow">
           <h3>MINT VIA AGENT</h3>
-          <p>Copy the prompt below, paste it to your agent, check the transaction preview, and confirm in your wallet. Minting opens at 16:00 UTC on Tuesday 3 November 2026 &mdash; before that, your agent will find the mint still closed on-chain.</p>
+          <p>Copy the prompt below, paste it to your agent, check the transaction preview, and confirm in your wallet.</p>
           <div class="row" style="margin-top: 16px">
             <button class="btn gold" type="button" id="copyMintPrompt">COPY MINT PROMPT</button>
             <span id="mintPromptCopied" style="font-family: var(--mono); font-size: 12px; color: var(--lime)"></span>
@@ -202,7 +216,7 @@
     <script>
       var SEL_TOTAL_MINTED = "0xa2309ff8";
       var SEL_MINT_OPEN = "0x24bbd049";
-      var soldOut = false, totalMintedCache = null;
+      var soldOut = false, totalMintedCache = null, mintLive = false;
       function pad(n) { return String(n).padStart(2, "0"); }
       function countdownText() {
         var diff = MINT_OPEN_TS - Date.now();
@@ -245,8 +259,8 @@
         document.getElementById("mintProgressPct").textContent = (total / MAX_SUPPLY * 100).toFixed(1) + "% minted";
         document.getElementById("mintRemaining").textContent = "Remaining: " + (MAX_SUPPLY - total).toLocaleString("en-US") + " / 10,000";
         if (total >= MAX_SUPPLY) { applySoldOut(); return; }
-        if (mintOpen || Date.now() >= MINT_OPEN_TS) { showLive(); }
-        else { showPreOpen(); }
+        if (mintOpen) { mintLive = true; showLive(); }
+        else { mintLive = false; showPreOpen(); }
       }
       async function refreshMint() {
         try {
@@ -259,12 +273,7 @@
         } catch (e) {}
       }
       function tick() {
-        if (soldOut) return;
-        if (Date.now() >= MINT_OPEN_TS) {
-          if (totalMintedCache !== null && totalMintedCache >= MAX_SUPPLY) { applySoldOut(); return; }
-          showLive();
-          return;
-        }
+        if (soldOut || mintLive) return;
         document.getElementById("mintCountdown").textContent = countdownText();
       }
       document.getElementById("mintCountdown").textContent = countdownText();

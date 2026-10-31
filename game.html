@@ -26,13 +26,25 @@
       html, body { margin: 0; padding: 0; }
       body {
         background-color: var(--bg);
-        background-image: radial-gradient(circle, rgba(163, 230, 53, 0.09) 1.2px, transparent 1.3px);
-        background-size: 26px 26px;
-        background-position: center top;
+        background-image: url("snake-bg.jpg");
+        background-size: cover;
+        background-position: 72% 38%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
         color: var(--ink);
         font-family: var(--sans);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+      /* Dark overlay over the fixed snake photo only — keeps every existing
+         panel and line of text readable while the snake stays visible. */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(4, 4, 14, 0.66) 0%, rgba(4, 4, 14, 0.58) 42%, rgba(4, 4, 14, 0.74) 100%);
       }
       .wrap { position: relative; z-index: 2; max-width: 1060px; margin: 0 auto; padding: 0 20px 56px; }
       header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 10px; }
@@ -120,6 +132,9 @@
         .trade-btn { padding: 11px 12px; letter-spacing: 1.6px; }
         .wordmark { font-size: 22px; }
         nav { gap: 20px; }
+      }
+      @media (max-width: 700px) {
+        body { background-attachment: scroll; background-position: 68% 18%; }
       }
 
     </style>

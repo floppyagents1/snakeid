@@ -205,11 +205,14 @@
       var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
       var MAX_SUPPLY = 10000;
       var MINT_OPEN_TS = Date.UTC(2026, 10, 3, 16, 0, 0);
-      var RPCS = ["https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org"];
+      var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
       async function rpcCall(to, data) {
         for (var i = 0; i < RPCS.length; i++) {
           try {
-            var r = await fetch(RPCS[i], { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", method: "eth_call", params: [{ to: to, data: data }, "latest"], id: 1 }) });
+            var ctrl = new AbortController();
+            var timer = setTimeout(function () { ctrl.abort(); }, 8000);
+            var r = await fetch(RPCS[i], { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", method: "eth_call", params: [{ to: to, data: data }, "latest"], id: 1 }), signal: ctrl.signal });
+            clearTimeout(timer);
             var j = await r.json();
             if (j && j.result) return j.result;
           } catch (e) {}

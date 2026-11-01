@@ -150,7 +150,7 @@
   </head>
   <body>
     <div class="wrap">
-      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html" aria-current="page">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
+      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html" aria-current="page">CLAIM</a><a href="/game.html">PLAY</a></nav>
       <main>
 
         <div class="status-line">SNAKE TOKEN CLAIM &middot; BNB CHAIN</div>
@@ -188,6 +188,17 @@
               <span id="claimPromptCopied" style="font-family: var(--mono); font-size: 12px; color: var(--lime)"></span>
             </div>
             <p class="mono note" id="claimNotDeployed" style="margin-top: 14px">Claim contract not deployed yet &mdash; the claim button appears after deployment. Your allocation is reserved in the list above.</p>
+          </div>
+          <div class="card" id="claimProgressCard">
+            <h3>CLAIM PROGRESS &middot; <span style="color: var(--lime)">LIVE</span></h3>
+            <div class="stat-grid" style="margin-top: 14px">
+              <div class="stat"><div class="k">CLAIMED SO FAR</div><div class="v" id="claimedSoFar">loading&hellip;</div></div>
+              <div class="stat"><div class="k">REMAINING ALLOCATION</div><div class="v" id="remainingAlloc">loading&hellip;</div></div>
+            </div>
+            <div class="bar"><div id="claimProgressBar"></div></div>
+            <div class="bar-meta"><span id="claimProgressMeta">loading&hellip;</span><span id="claimProgressUpdated"></span></div>
+            <p class="mono" style="margin-top: 14px" id="claimProgressNote">Allocated to the claim list: loading&hellip;</p>
+            <p class="mono" style="margin-top: 8px">Updates automatically every 10 seconds &mdash; no page refresh needed.</p>
           </div>
         </div>
 
@@ -394,6 +405,56 @@
         var p = "Claim my SNAKE tokens from the SnakeID MerkleClaim contract on BNB Chain. Claim contract " + CLAIM_CONTRACT_ADDRESS + ", SNAKE token " + TOKEN_CONTRACT_ADDRESS + ", my wallet " + currentWallet + ", my allocation " + fmtSnake(currentEntry.amount) + " SNAKE (" + currentEntry.amount + " wei), merkle proof " + proofStr + ", claim fee 0.0001 BNB. Verify on-chain first (merkle root, my claimed status, claim fee), show me a transaction preview, and wait for my confirmation before signing.";
         copyText(p, document.getElementById("claimPromptCopied"));
       });
+      // ===================== CLAIM PROGRESS (live, no refresh needed) =====================
+      // Claimed so far = 600,000,000 SNAKE funded in the claim contract minus its
+      // current SNAKE balance. Total allocation = sum of the claim list (proofs.json).
+      // Polls the chain every 10 seconds and updates the numbers + bar in place.
+      var CLAIM_FUNDED_WEI = 600000000n * (10n ** 18n);
+      var totalAllocatedWei = null;
+      var totalWallets = 0;
+      function fmtSnakeWhole(wei) {
+        try { return (wei / 1000000000000000000n).toLocaleString("en-US"); }
+        catch (e) { return "?"; }
+      }
+      async function refreshProgress() {
+        var meta = document.getElementById("claimProgressMeta");
+        if (!meta) return;
+        if (!CLAIM_DEPLOYED || !TOKEN_DEPLOYED) {
+          meta.textContent = "Claim contract not deployed yet.";
+          return;
+        }
+        try {
+          if (totalAllocatedWei === null) {
+            var proofs = await loadProofs();
+            var sum = 0n;
+            for (var i = 0; i < proofs.entries.length; i++) sum += BigInt(proofs.entries[i].amount);
+            totalAllocatedWei = sum;
+            totalWallets = proofs.entries.length;
+          }
+          var balHex = await rpcCall(TOKEN_CONTRACT_ADDRESS, SEL_BALANCE_OF + pad64(CLAIM_CONTRACT_ADDRESS));
+          if (balHex === null) {
+            meta.textContent = "Could not reach the chain \u2014 retrying\u2026";
+            return;
+          }
+          var claimedWei = CLAIM_FUNDED_WEI - BigInt(balHex);
+          if (claimedWei < 0n) claimedWei = 0n;
+          var remainingWei = totalAllocatedWei - claimedWei;
+          if (remainingWei < 0n) remainingWei = 0n;
+          var pct = totalAllocatedWei > 0n ? Number(claimedWei * 10000n / totalAllocatedWei) / 100 : 0;
+          document.getElementById("claimedSoFar").textContent = fmtSnakeWhole(claimedWei) + " SNAKE";
+          document.getElementById("remainingAlloc").textContent = fmtSnakeWhole(remainingWei) + " SNAKE";
+          document.getElementById("claimProgressBar").style.width = Math.min(pct, 100) + "%";
+          meta.textContent = pct.toFixed(2) + "% claimed \u00b7 " + totalWallets.toLocaleString("en-US") + " wallets in the claim list";
+          var unallocWei = CLAIM_FUNDED_WEI - totalAllocatedWei;
+          document.getElementById("claimProgressNote").textContent = "Allocated to the claim list: " + fmtSnakeWhole(totalAllocatedWei) + " SNAKE \u00b7 Funded in the claim contract: 600,000,000 SNAKE \u00b7 Not allocated (" + fmtSnakeWhole(unallocWei) + " SNAKE) returns to liquidity after the claim deadline (30 Nov 2026).";
+          var now = new Date();
+          document.getElementById("claimProgressUpdated").textContent = "Updated " + now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        } catch (e) {
+          meta.textContent = "Could not load claim progress \u2014 retrying\u2026";
+        }
+      }
+      setInterval(refreshProgress, 10000);
+      refreshProgress();
     </script>
 
   </body>

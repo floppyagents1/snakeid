@@ -150,12 +150,12 @@
   </head>
   <body>
     <div class="wrap">
-      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html" aria-current="page">CLAIM</a><a href="/game.html">PLAY</a></nav>
+      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html" aria-current="page">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
       <main>
 
         <div class="status-line">SNAKE TOKEN CLAIM &middot; BNB CHAIN</div>
         <h2 id="claimTitle">Claim your SNAKE.</h2>
-        <p class="lede">600,000,000 SNAKE reserved for the community that built SnakeID. SnakeID NFT holders and Agent ID holders claim their share &mdash; one claim per wallet, 0.0001 BNB claim fee. No wallet connection on this site &mdash; check your allocation below, copy the claim prompt, and claim through your agent, with a transaction preview and your confirmation.</p>
+        <p class="lede">194,790,000 SNAKE reserved for the community that built SnakeID. SnakeID NFT holders and Agent ID holders claim their share &mdash; one claim per wallet, 0.0001 BNB claim fee. No wallet connection on this site &mdash; check your allocation below, copy the claim prompt, and claim through your agent, with a transaction preview and your confirmation.</p>
 
         <div class="card locked" id="claimLocked">
           <svg class="lock-ico" viewBox="0 0 24 24" fill="none" stroke="#f7c948" stroke-width="1.6" aria-hidden="true">
@@ -194,6 +194,7 @@
             <div class="stat-grid" style="margin-top: 14px">
               <div class="stat"><div class="k">CLAIMED SO FAR</div><div class="v" id="claimedSoFar">loading&hellip;</div></div>
               <div class="stat"><div class="k">REMAINING ALLOCATION</div><div class="v" id="remainingAlloc">loading&hellip;</div></div>
+              <div class="stat"><div class="k">TO LIQUIDITY</div><div class="v" id="toLiquidity">loading&hellip;</div></div>
             </div>
             <div class="bar"><div id="claimProgressBar"></div></div>
             <div class="bar-meta"><span id="claimProgressMeta">loading&hellip;</span><span id="claimProgressUpdated"></span></div>
@@ -206,7 +207,7 @@
           <div class="stat"><div class="k">CLAIM FEE</div><div class="v">0.0001 BNB</div></div>
           <div class="stat"><div class="k">PER SNAKEID NFT</div><div class="v">10,000 SNAKE</div></div>
           <div class="stat"><div class="k">PER AGENT ID</div><div class="v">10,000 SNAKE</div></div>
-          <div class="stat"><div class="k">CLAIM ALLOCATION</div><div class="v">600,000,000</div></div>
+          <div class="stat"><div class="k">CLAIM ALLOCATION</div><div class="v">194,790,000</div></div>
         </div>
         <div class="card" id="agentFlow">
           <h3>CLAIM VIA AGENT &mdash; HOW IT WORKS</h3>
@@ -443,10 +444,11 @@
           var pct = totalAllocatedWei > 0n ? Number(claimedWei * 10000n / totalAllocatedWei) / 100 : 0;
           document.getElementById("claimedSoFar").textContent = fmtSnakeWhole(claimedWei) + " SNAKE";
           document.getElementById("remainingAlloc").textContent = fmtSnakeWhole(remainingWei) + " SNAKE";
+          var unallocWei = CLAIM_FUNDED_WEI - totalAllocatedWei;
+          document.getElementById("toLiquidity").textContent = fmtSnakeWhole(unallocWei) + " SNAKE";
           document.getElementById("claimProgressBar").style.width = Math.min(pct, 100) + "%";
           meta.textContent = pct.toFixed(2) + "% claimed \u00b7 " + totalWallets.toLocaleString("en-US") + " wallets in the claim list";
-          var unallocWei = CLAIM_FUNDED_WEI - totalAllocatedWei;
-          document.getElementById("claimProgressNote").textContent = "Allocated to the claim list: " + fmtSnakeWhole(totalAllocatedWei) + " SNAKE \u00b7 Funded in the claim contract: 600,000,000 SNAKE \u00b7 Not allocated (" + fmtSnakeWhole(unallocWei) + " SNAKE) returns to liquidity after the claim deadline (30 Nov 2026).";
+          document.getElementById("claimProgressNote").textContent = "Claimed (" + fmtSnakeWhole(claimedWei) + ") + remaining (" + fmtSnakeWhole(remainingWei) + ") = 194,790,000 SNAKE allocated to the claim list. The claim contract also holds unallocated SNAKE that was never assigned to anyone \u2014 it goes into the PancakeSwap pool after the claim deadline (30 Nov 2026), not to the team.";
           var now = new Date();
           document.getElementById("claimProgressUpdated").textContent = "Updated " + now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
         } catch (e) {

@@ -164,7 +164,7 @@
 
         <div class="status-line">SNAKE TOKEN CLAIM &middot; BNB CHAIN</div>
         <h2 id="claimTitle">Claim your SNAKE.</h2>
-        <p class="lede">194,790,000 SNAKE reserved for the community that built SnakeID. SnakeID NFT holders and Agent ID holders claim their share &mdash; one claim per wallet, 0.0001 BNB claim fee. No wallet connection on this site &mdash; check your allocation below, copy the claim prompt, and claim through your agent, with a transaction preview and your confirmation.</p>
+        <p class="lede">194,790,000 SNAKE reserved for the community that built SnakeID. SnakeID NFT holders and Agent ID holders claim their share. No wallet connection on this site &mdash; check your allocation below, copy the claim prompt, and claim through your agent, with a transaction preview and your confirmation.</p>
 
         <div class="card locked" id="claimLocked">
           <svg class="lock-ico" viewBox="0 0 24 24" fill="none" stroke="#39ff14" stroke-width="1.6" aria-hidden="true">
@@ -174,7 +174,7 @@
           </svg>
           <h2>COMING SOON</h2>
           <p>The SNAKE token claim is for <strong style="color: var(--ink)">SnakeID NFT holders &amp; Agent ID holders</strong>. It opens automatically when all 10,000 SnakeID are minted (sold out) &mdash; the same moment minting closes and the market opens.</p>
-          <p style="margin-top: 12px">10,000 SNAKE per SnakeID NFT held &middot; 10,000 SNAKE per Agent ID wallet &middot; one claim per wallet &middot; 0.0001 BNB claim fee.</p>
+          <p style="margin-top: 12px">10,000 SNAKE per SnakeID NFT held &middot; 10,000 SNAKE per Agent ID wallet.</p>
           <p class="mono" id="claimLockProgress" style="margin-top: 14px">Minted so far: loading&hellip;</p>
         </div>
 
@@ -212,7 +212,6 @@
         </div>
 
         <div class="stat-grid">
-          <div class="stat"><div class="k">CLAIM FEE</div><div class="v">0.0001 BNB</div></div>
           <div class="stat"><div class="k">PER SNAKEID NFT</div><div class="v">10,000 SNAKE</div></div>
           <div class="stat"><div class="k">PER AGENT ID</div><div class="v">10,000 SNAKE</div></div>
           <div class="stat"><div class="k">CLAIM ALLOCATION</div><div class="v">194,790,000</div></div>
@@ -383,10 +382,8 @@
           var html = "<p class=\"ok\">ELIGIBLE \u2713</p><div class=\"big-amount\">" + fmtSnake(entry.amount) + " SNAKE</div><p>" + entry.source + "</p><p class=\"mono\" style=\"margin-top: 10px\">Wallet: " + wallet + "</p>";
           if (CLAIM_DEPLOYED) {
             var claimedHex = await rpcCall(CLAIM_CONTRACT_ADDRESS, SEL_CLAIMED + pad64(wallet));
-            var feeHex = await rpcCall(CLAIM_CONTRACT_ADDRESS, SEL_CLAIM_FEE);
             var already = claimedHex ? parseInt(claimedHex, 16) === 1 : false;
-            var feeText = feeHex ? fmtFeeWei(feeHex) : "0.0001 BNB";
-            html += "<p class=\"mono\" style=\"margin-top: 10px\">Claim fee: " + feeText + " &middot; Status: " + (already ? "already claimed" : "not claimed yet") + "</p>";
+            html += "<p class=\"mono\" style=\"margin-top: 10px\">Status: " + (already ? "already claimed" : "not claimed yet") + "</p>";
             if (TOKEN_DEPLOYED) {
               var balHex = await rpcCall(TOKEN_CONTRACT_ADDRESS, SEL_BALANCE_OF + pad64(wallet));
               if (balHex) html += "<p class=\"mono\" style=\"margin-top: 6px\">Your SNAKE balance: " + fmtSnake(BigInt(balHex).toString()) + " SNAKE</p>";
@@ -394,7 +391,7 @@
             if (!already) {
               actionCard.style.display = "block";
               copyBtn.disabled = false;
-              document.getElementById("claimActionText").textContent = "You can claim " + fmtSnake(entry.amount) + " SNAKE for a " + feeText + " claim fee. Copy the prompt below, paste it to your agent, check the transaction preview, and confirm in your wallet.";
+              document.getElementById("claimActionText").textContent = "You can claim " + fmtSnake(entry.amount) + " SNAKE. Copy the prompt below, paste it to your agent, check the transaction preview, and confirm in your wallet.";
             } else {
               html += "<p class=\"note\">Already claimed &mdash; one claim per wallet. No second claim is possible.</p>";
             }

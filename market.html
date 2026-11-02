@@ -206,7 +206,6 @@
           <div class="stat"><div class="k">ACTIVE LISTINGS</div><div class="v" id="stActive">&hellip;</div></div>
           <div class="stat"><div class="k">TOTAL MARKET TXS</div><div class="v" id="stTxs">&hellip;</div></div>
         </div>
-        <p class="mono" id="statusLine" style="margin-top:12px">Updated just now</p>
         <div id="loadError" style="display:none">
           <div class="error-box" id="loadErrorText"></div>
           <div class="row" style="margin-top:12px"><button class="btn" type="button" id="retryBtn">RETRY</button></div>
@@ -265,7 +264,7 @@
 
         <!-- ACTIVITY -->
         <section class="tab-panel" id="panel-activity" role="tabpanel" aria-labelledby="tab-activity">
-          <p class="mono" style="margin-top:18px">Newest first. Minted, Listed, Sold, Cancelled and Price Updated — all read from on-chain events.</p>
+          <p class="mono" style="margin-top:18px">Newest first. Minted, Listed, Sold, Cancelled and Price change — all read from on-chain events.</p>
           <div class="feed" id="activityFeed"></div>
           <div class="empty" id="activityEmpty" style="display:none">
             <h3>No market activity yet</h3>
@@ -370,25 +369,26 @@
       var MAX_SUPPLY = 10000;
       var EVENTS_START_BLOCK = 131070000;
       var PAGE_SIZE = 24;
-      var CHUNK = 100;
-      var RECENT_WINDOW = 900; // dRPC free plan only serves eth_getLogs for roughly the last ~1000 blocks (verified live: 1000 back OK, 2000 back rejected) — never ask for older ranges
+      var CHUNK = 50; // 1RPC caps eth_getLogs at 50-block ranges; dRPC also handles 50
+      var RECENT_WINDOW = 900; // live fetches stay inside the recent window so page loads stay fast — full history comes from the shipped market-events.json snapshot, not from live log calls
       var SNAPSHOT_URL = "listings.json";
       var TICK_MS = 1000;
       var REFRESH_MS = 60000;
-      // Event-log endpoint (dRPC, free plan): eth_getLogs only. Its real range
-      // limit is ~100 blocks, so CHUNK stays at 100, and it only serves
-      // roughly the last ~1000 blocks, so live fetches stay inside
-      // RECENT_WINDOW. eth_call traffic keeps using the free public RPCs
-      // above and never touches this endpoint.
+      // Event-log endpoints (free): 1RPC serves eth_getLogs on historical
+      // blocks (capped at 50-block ranges, and rate-limited, so live fetches
+      // stay inside RECENT_WINDOW). dRPC is the fallback for the same calls.
+      // eth_call traffic keeps using the free public RPCs above and never
+      // touches these endpoints.
+      var LOGS_RPC_1RPC = "https://1rpc.io/bnb";
       var LOGS_RPC = "https://lb.drpc.org/bsc/ApggRhCQgkomqjM_X4y0glQUxNgY1moR8aGQ3h3f2IgU";
       var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
       var SEL_TOTAL_MINTED = "0xa2309ff8";
       var SEL_LISTINGS = "0xde74e57b";
       var SEL_AGGREGATE3 = "0x82ad56cb";
-      var TOPIC_LISTED = "0xe7f66b633ecf5d18b7762e9e4d53cf7299420dba09e5fd637ecf75c2c9265514";
-      var TOPIC_CANCELLED = "0x96de24c9fa2b449484b6cb4b2adbe7140b6199ac9969c0aea2461b8e7b68c6ac";
-      var TOPIC_SOLD = "0xf2e017f1bc3fc447b18989c76c1ca62641bf98e5ba4651a59cc4b8601ce89cac";
-      var TOPIC_TRANSFER = "0x0a76faa3e4a8e735fa18537e9b5fad4e9b3c238a0f328a1a9791620994d98a56";
+      var TOPIC_LISTED = "0x6e16e8064e3c8254cef11e01e152416398602d7e8785f743f1c2f93a9a15ff35";
+      var TOPIC_CANCELLED = "0x36ea5cd5608625e789af0282eecdb4eae1cb7c1cf6d0ec3f9a84f35be850260b";
+      var TOPIC_SOLD = "0x16dd16959a056953a63cf14bf427881e762e54f03d86b864efea8238dd3b822f";
+      var TOPIC_TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
       var ZERO = "0x0000000000000000000000000000000000000000";
       var CACHE_EVENTS = "snakeid-market-events-v1";
       var CACHE_TIMES = "snakeid-block-times-v1";
@@ -408,11 +408,12 @@
       var eventsUnavailable = false; // true when every eth_getLogs chunk failed (public RPC rate limit) and no cached events exist — sales stats must show "—", never 0
       var eventsPartial = false;     // true when the loaded events start after EVENTS_START_BLOCK (recent window only) — lifetime totals would be incomplete, so they show "—" too
       var eventsCoverageStart = EVENTS_START_BLOCK; // first block the loaded events cover
+      var soldComplete = false;    // true when the loaded snapshot authoritatively covers ALL Sold events from market open — Total Sold + volumes are real even if Listed/Cancelled history is not
+      var listedComplete = false;  // true only when the loaded snapshot covers the FULL Listed+Sold+Cancelled history — Total Market Txs needs this
       var blockTimes = {};     // blockNumber -> unix seconds
       var activityShown = 50;
       var snapshotAt = 0;      // ms epoch of the loaded listings snapshot
       var snapshotBlock = 0;   // latest block the listings snapshot covers
-      var lastRefreshAt = 0;   // ms epoch of the last listings load / refresh
       var refreshing = false;  // a silent background listings refresh is running
       var tickBusy = false;    // a 1-second block poll is in flight
       var dirty = false;       // in-memory listings changed — re-render grids on next tick
@@ -446,9 +447,9 @@
         if (!ts) return "";
         var s = Math.floor(Date.now() / 1000) - ts;
         if (s < 60) return "just now";
-        if (s < 3600) return Math.floor(s / 60) + "m ago";
-        if (s < 86400) return Math.floor(s / 3600) + "h ago";
-        return Math.floor(s / 86400) + "d ago";
+        if (s < 3600) return Math.floor(s / 60) + "m";
+        if (s < 86400) return Math.floor(s / 3600) + "h";
+        return Math.floor(s / 86400) + "d";
       }
       function loadCache(key) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
       function saveCache(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
@@ -476,7 +477,9 @@
       }
       function getLogs(address, topics, fromBlock, toBlock) {
         var params = [{ address: address, topics: topics, fromBlock: hex(fromBlock), toBlock: hex(toBlock) }];
-        return rpcOnce(LOGS_RPC, "eth_getLogs", params).catch(function () {
+        return rpcOnce(LOGS_RPC_1RPC, "eth_getLogs", params).catch(function () {
+          return rpcOnce(LOGS_RPC, "eth_getLogs", params);
+        }).catch(function () {
           return rpc("eth_getLogs", params);
         });
       }
@@ -562,7 +565,7 @@
         var sorted = marketEvents.slice().sort(sortEvents);
         // Tracks which tokens are listed according to the events replayed so
         // far (independent of the snapshot) — a second Listed for the same
-        // token is a "Price Updated", a Listed after a Cancelled is a fresh
+        // token is a "Price change", a Listed after a Cancelled is a fresh
         // "Listed" again.
         var seenListed = {};
         sorted.forEach(function (e) {
@@ -576,7 +579,7 @@
             if (e.block > snapshotBlock) {
               activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
             }
-            activity.push({ kind: isUpdate ? "Price Updated" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            activity.push({ kind: isUpdate ? "Price change" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
           } else if (e.type === "Cancelled") {
             if (e.block > snapshotBlock) delete activeListings[e.tokenId];
             delete seenListed[e.tokenId];
@@ -608,20 +611,15 @@
         // or when the loaded events only cover a recent window (the free
         // plan cannot serve full history), show "—" — never 0, because 0
         // would falsely claim no sales ever happened.
+        // Exception: the Sold history can be authoritatively complete even
+        // when Listed/Cancelled history is not (soldComplete) — then Total
+        // Sold and the volumes are real, while Total Market Txs stays "—"
+        // because the Listed/Cancelled counts are still unknown.
         var eventsIncomplete = eventsUnavailable || eventsPartial;
-        if (eventsIncomplete) {
-          setStat("stSold", "—");
-          setStat("stTxs", "—");
-          setStat("stVolume", "—");
-          setStat("anVolume", "—");
-          setStat("anSold", "—");
-          setStat("stVolume24h", "—");
-          setStat("anVolume24h", "—");
-        } else {
-          setStat("stSold", dataReady ? fmtInt(sales.length) : "…");
-          setStat("stTxs", dataReady ? fmtInt(marketEvents.length) : "…");
-        }
-        if (dataReady && !eventsIncomplete) {
+        var soldReady = soldComplete || !eventsIncomplete;
+        setStat("stSold", soldReady ? (dataReady ? fmtInt(sales.length) : "…") : "—");
+        setStat("stTxs", (eventsIncomplete || !listedComplete) ? "—" : (dataReady ? fmtInt(marketEvents.length) : "…"));
+        if (dataReady && soldReady) {
           var vol = sales.reduce(function (acc, s) { return acc + s.priceWei; }, 0n);
           setStat("stVolume", fmtBNB(vol) + " BNB");
           setStat("anVolume", fmtBNB(vol) + " BNB");
@@ -630,6 +628,12 @@
           var vol24 = sales.filter(function (s) { return s.block >= cutoff; }).reduce(function (acc, s) { return acc + s.priceWei; }, 0n);
           setStat("stVolume24h", fmtBNB(vol24) + " BNB");
           setStat("anVolume24h", fmtBNB(vol24) + " BNB");
+        } else if (dataReady && !soldReady) {
+          setStat("stVolume", "—");
+          setStat("anVolume", "—");
+          setStat("anSold", "—");
+          setStat("stVolume24h", "—");
+          setStat("anVolume24h", "—");
         }
         // Floor price comes from the listings() check, not
         // from events — so it is shown even when the event load is unavailable.
@@ -647,14 +651,14 @@
       /* ============ Events (silent background load) ============ */
       // Event history loads in the background with no progress text anywhere.
       // First it seeds from the per-device cache, then from market-events.json
-      // (a snapshot of past events shipped with the site), then it fetches only
-      // the new blocks since that point via eth_getLogs. If every log call
-      // fails and there are no events at all, the history sections render as
-      // "unavailable" — never as 0 sales. The free log endpoint only serves
-      // roughly the last ~1000 blocks, so live fetches are clamped to the
-      // recent window; events older than that simply cannot be fetched, and
-      // the lifetime stats then show "—" (partial coverage) instead of a
-      // misleading partial total.
+      // (a snapshot of past events shipped with the site — its soldComplete /
+      // listedComplete flags say which histories it authoritatively covers:
+      // Sold may be complete from market open while Listed/Cancelled are
+      // not yet), then it fetches only the new blocks since that point via
+      // eth_getLogs. If every log call fails and there are no events at all,
+      // the history sections render as "unavailable" — never as 0 sales.
+      // Live fetches are clamped to the recent window so page loads stay
+      // fast; events older than that come from the snapshot.
       async function loadEvents() {
         var cached = loadCache(CACHE_EVENTS);
         var fromBlock = EVENTS_START_BLOCK;
@@ -665,6 +669,8 @@
           mintEvents = Array.isArray(cached.mints) ? cached.mints : [];
           fromBlock = cached.toBlock + 1;
           coverageStart = (typeof cached.fromBlock === "number") ? cached.fromBlock : EVENTS_START_BLOCK;
+          soldComplete = cached.soldComplete === true;
+          listedComplete = cached.listedComplete === true;
           haveSource = true;
         } else {
           try {
@@ -676,6 +682,8 @@
                 mintEvents = Array.isArray(snap.mints) ? snap.mints : [];
                 fromBlock = snap.toBlock + 1;
                 coverageStart = (typeof snap.fromBlock === "number") ? snap.fromBlock : EVENTS_START_BLOCK;
+                soldComplete = snap.soldComplete === true;
+                listedComplete = snap.listedComplete === true;
                 haveSource = true;
               }
             }
@@ -713,7 +721,7 @@
           eventsUnavailable = true;
         }
         marketEvents.sort(sortEvents);
-        saveCache(CACHE_EVENTS, { v: 1, fromBlock: eventsCoverageStart, toBlock: latestBlock, market: marketEvents, mints: mintEvents });
+        saveCache(CACHE_EVENTS, { v: 1, fromBlock: eventsCoverageStart, toBlock: latestBlock, market: marketEvents, mints: mintEvents, soldComplete: soldComplete, listedComplete: listedComplete });
         replayEvents();
         dirty = true;
         renderExplore();
@@ -836,10 +844,8 @@
           });
         }
         listingsChecked = true;
-        lastRefreshAt = Date.now();
         dirty = true;
         refreshing = false;
-        updateStatusLine();
         updateStats();
         renderExplore();
         renderListed();
@@ -962,7 +968,7 @@
           : a.kind === "Minted" ? "To " + shortAddr(a.buyer)
           : a.seller ? "By " + shortAddr(a.seller) : "";
         var ts = blockTimes[a.block];
-        var time = ts ? fmtRel(ts) + " \u00b7 " + fmtTime(ts) : "Block " + fmtInt(a.block);
+        var time = ts ? fmtRel(ts) + " \u00b7 " + fmtTime(ts) : "#" + fmtInt(a.block);
         return '<div class="feed-row">' +
           '<img src="https://snakeid.xyz/snake-' + a.tokenId + '.webp" alt="SnakeID #' + a.tokenId + '" loading="lazy" onerror="this.outerHTML=\'<div class=\\\'thumb-fallback-sm\\\'>#' + a.tokenId + '</div>\'">' +
           '<div class="body"><span class="badge ' + badgeCls + '">' + badgeTxt + '</span>' +
@@ -1218,20 +1224,13 @@
       // The grid renders instantly from listings.json (a snapshot of the live
       // listings, shipped with the site) — the page never waits for a chain
       // read before showing content. Afterwards the data stays live: a
-      // 1-second tick updates the "Updated … ago" line and the relative times
-      // on the cards and polls the latest block, while a silent 60-second
-      // background refresh re-checks the listings on-chain and pulls in any
-      // new market events. A full listings re-check every second would hammer
-      // the public RPCs into rate-limiting, so the 1-second tick is UI + block
-      // polling only; the heavy re-check runs every 60 seconds, silently.
-      function updateStatusLine() {
-        var el = $("statusLine");
-        if (!el) return;
-        var ago = Math.floor((Date.now() - lastRefreshAt) / 1000);
-        var txt = ago < 2 ? "Updated just now" : "Updated " + ago + "s ago";
-        if (latestBlock) txt += " \u00b7 Block " + fmtInt(latestBlock);
-        el.textContent = txt;
-      }
+      // 1-second tick refreshes the relative times on the cards and polls
+      // the latest block, while a silent 60-second background refresh
+      // re-checks the listings on-chain and pulls in any new market events.
+      // A full listings re-check every second would hammer the public RPCs
+      // into rate-limiting, so the 1-second tick is UI + block polling only;
+      // the heavy re-check runs every 60 seconds, silently. There is no
+      // visible update/status line anywhere on the page.
       async function loadSnapshot() {
         try {
           var res = await fetch(SNAPSHOT_URL, { cache: "no-store" });
@@ -1247,10 +1246,8 @@
           if (typeof snap.latestBlock === "number" && !latestBlock) latestBlock = snap.latestBlock;
           snapshotAt = snap.generatedAt ? Date.parse(snap.generatedAt) : Date.now();
           snapshotBlock = typeof snap.latestBlock === "number" ? snap.latestBlock : 0;
-          lastRefreshAt = Date.now();
           listingsChecked = true;
           dataReady = true;
-          updateStatusLine();
           updateStats();
           renderExplore();
           renderListed();
@@ -1258,7 +1255,6 @@
         } catch (e) { return false; }
       }
       async function tick() {
-        updateStatusLine();
         // Refresh the relative times on the cards in place — the grid itself
         // is only rebuilt when the underlying data changes (see `dirty`), so
         // a tap on a BUY NOW button is never lost to a rebuild mid-tap.
@@ -1277,14 +1273,13 @@
         try {
           var bn = await rpc("eth_blockNumber", []);
           var n = parseInt(bn, 16);
-          if (n && n !== latestBlock) { latestBlock = n; updateStatusLine(); }
+          if (n && n !== latestBlock) { latestBlock = n; }
         } catch (e) { /* silent — the next tick retries */ }
         tickBusy = false;
       }
       function startLiveRefresh() {
         if (liveStarted) return;
         liveStarted = true;
-        updateStatusLine();
         setInterval(tick, TICK_MS);
         setInterval(function () {
           if (document.hidden || refreshing) return;

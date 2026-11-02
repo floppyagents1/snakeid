@@ -197,9 +197,8 @@
     <div class="bg-veil" aria-hidden="true"></div>
     <div class="wrap">
       <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header>
-      <nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">LAUNCHPAD</a><a href="/market.html" aria-current="page">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
+      <nav aria-label="Pages"><a href="/">HOME</a><a href="/launchpad.html">LAUNCHPAD</a><a href="/market.html" aria-current="page">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
       <main>
-        <div class="status-line">MARKET FEE 5% &middot; SELLER RECEIVES 95% &middot; SNAKEID + AGENT PANDA</div>
         <h1>Market <em>live</em></h1>
         <p class="lede">Every listing, sale and price below is read live from the SnakeID and Agent Panda Market contracts on BNB Chain. Nothing here is a guess &mdash; if a number cannot be read on-chain, it shows as &ldquo;&mdash;&rdquo;.</p>
 
@@ -263,7 +262,7 @@
             <div class="listing-grid" id="exploreGrid"></div>
             <div class="empty" id="exploreEmpty" style="display:none">
               <h3>No listings yet</h3>
-              <p>Be the first to list yours. Market fee 5%, seller receives 95%. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
+              <p>Be the first to list yours. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
               <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
             </div>
             <div class="empty" id="searchEmpty" style="display:none">
@@ -280,7 +279,7 @@
           <div class="listing-grid" id="listedGrid"></div>
           <div class="empty" id="listedEmpty" style="display:none">
             <h3>No listings yet</h3>
-            <p>Be the first to list yours. Market fee 5%, seller receives 95%. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
+            <p>Be the first to list yours. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
           </div>
           <div class="pagination" id="listedPagination"></div>
@@ -334,7 +333,7 @@
         <div class="card" id="tradePanel">
           <h3>TRADE VIA AGENT &mdash; BUY &amp; SELL</h3>
           <p>This site never connects a wallet and never asks for a seed phrase or private key. Copy a prompt, paste it to your agent (e.g. Binance AI Pro), your agent verifies everything on-chain first, shows a transaction preview, and waits for your confirmation before anything is signed.</p>
-          <p style="margin-top:10px">Market fee 5% &middot; Seller receives 95% &middot; Minimum listing: SnakeID 0.001 BNB &middot; Agent Panda 0.0001 BNB.</p>
+          <p style="margin-top:10px">Minimum listing: SnakeID 0.001 BNB &middot; Agent Panda 0.0001 BNB.</p>
           <div class="row" id="tradeChipsRow" style="margin-top:16px"><!-- Trade chips are built from COLLECTIONS at load — one collection, one chip. --></div>
           <div class="row" style="margin-top:16px">
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
@@ -625,12 +624,12 @@
       function promptList(tokenId, coll) {
         var C = COLLECTIONS[coll || tradeColl];
         var t = tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT";
-        return "List" + t + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ", market fee 5%, seller receives 95%, minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
+        return "List" + t + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ", minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
       }
       function promptBuy(tokenId, seller, priceWei, coll) {
         var C = COLLECTIONS[coll || tradeColl];
         var detail = tokenId ? " " + C.name + " #" + tokenId + (seller ? " from seller " + seller : "") + (priceWei !== undefined && priceWei !== null ? " at " + fmtBNB(priceWei) + " BNB" : "") + "." : " a " + C.name + " NFT.";
-        return "Buy" + detail + " NFT " + C.nft + ", Market " + C.market + ", market fee 5%, seller receives 95%. Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
+        return "Buy" + detail + " NFT " + C.nft + ", Market " + C.market + ". Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
       }
       function promptCancel(tokenId, coll) {
         var C = COLLECTIONS[coll || tradeColl];

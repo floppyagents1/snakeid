@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href="data:," />
-    <title>SnakeID — Mint</title>
+    <title>SnakeID — Launchpad</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -86,55 +86,25 @@
       .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
       .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
       .stat .v { font-size: 22px; font-weight: 700; }
-      .countdown { font-family: var(--mono); font-weight: 600; font-size: clamp(30px, 7.5vw, 58px); letter-spacing: 1px; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
-      .count-label { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--muted); }
-      .live-badge { display: none; font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 6vw, 44px); color: var(--neon); letter-spacing: 2px; margin: 8px 0 4px; }
-      .bar { height: 12px; background: rgba(57, 255, 20, .12); border: 1px solid var(--line); margin: 14px 0 8px; overflow: hidden; }
-      .bar > div { height: 100%; width: 0%; background: var(--neon); transition: width 0.6s ease; }
-      .bar-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-      .price-rows { margin-top: 6px; }
-      .price-rows .pr { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
-      .price-rows .pr:last-child { border-bottom: 0; }
-      .price-rows .pr span:first-child { color: var(--muted); }
-      .price-rows .pr span:last-child { font-family: var(--mono); font-weight: 600; color: var(--neon); }
-      .locked { text-align: center; padding: 44px 22px; }
-      .locked .lock-ico { width: 44px; height: 44px; margin-bottom: 14px; }
-      .locked h2 { margin-bottom: 10px; }
-      .locked p { max-width: 520px; margin: 0 auto; }
-      .listing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
-      .listing { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
-      .listing img { width: 100%; height: auto; display: block; }
-      .listing .price { color: var(--neon); font-family: var(--mono); font-size: 13px; }
-      .game-hud { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 14px; }
-      .game-hud .hud { flex: 1 1 110px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
-      .game-hud .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 6px; }
-      .game-hud .v { font-family: var(--mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
-      .game-hud .v.neon { color: var(--neon); }
-      .game-hud .v.accent { color: var(--neon); font-size: 16px; letter-spacing: 1px; padding-top: 4px; }
-      .board-wrap { position: relative; max-width: 540px; margin: 0 auto; background: #03130a; border: 1px solid var(--line); box-shadow: 0 0 0 4px rgba(57, 255, 20, .18); }
-      #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; touch-action: none; background: #03130a; }
-      .game-over { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; background: rgba(2, 10, 3, .82); padding: 20px; }
-      .game-over.show { display: flex; }
-      .game-over .go-title { font-family: var(--display); font-weight: 400; font-size: clamp(20px, 5vw, 28px); line-height: 1.4; color: var(--neon); margin: 0 0 8px; }
-      .game-over .go-score { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; color: var(--ink); margin: 0 0 18px; font-variant-numeric: tabular-nums; }
-      .game-hint { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); text-align: center; margin: 12px auto 0; max-width: 540px; line-height: 1.7; }
-      .game-hint strong { color: var(--neon); font-weight: 600; }
-      .dpad { display: grid; grid-template-columns: repeat(3, 68px); grid-template-rows: repeat(3, 68px); gap: 8px; justify-content: center; margin: 18px auto 4px; }
-      .dpad button { appearance: none; cursor: pointer; background: rgba(2, 14, 4, .85); border: 1px solid var(--line); color: var(--ink); font-size: 26px; line-height: 1; min-width: 68px; min-height: 68px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
-      .dpad button:active { background: var(--neon); color: #021003; }
-      .dpad button:focus-visible, .game-actions .btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
-      .dpad .up { grid-column: 2; grid-row: 1; }
-      .dpad .left { grid-column: 1; grid-row: 2; }
-      .dpad .mid { grid-column: 2; grid-row: 2; border: 1px solid var(--line); background: rgba(2, 14, 4, .6); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-      .dpad .right { grid-column: 3; grid-row: 2; }
-      .dpad .down { grid-column: 2; grid-row: 3; }
-      .game-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 16px; }
+      .launch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 18px; }
+      .launch-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+      .launch-card h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--neon); margin: 0 0 12px; font-weight: 600; }
+      .launch-card p { color: #c9e8c4; font-size: 15px; line-height: 1.65; margin: 0; }
+      .launch-card .launch-name { font-family: var(--display); font-size: 18px; line-height: 1.5; color: #fff; margin: 0 0 10px; }
+      .launch-card .launch-stats { margin-top: 16px; }
+      .launch-card .launch-stats .pr { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+      .launch-card .launch-stats .pr:last-child { border-bottom: 0; }
+      .launch-card .launch-stats .pr span:first-child { color: var(--muted); }
+      .launch-card .launch-stats .pr span:last-child { font-family: var(--mono); font-weight: 600; color: var(--neon); }
+      .launch-card a { color: var(--neon); }
+      .launch-card.soon { border-style: dashed; }
+      .launch-card.soon .launch-name { color: var(--muted); }
+      .launch-card.soon p { color: var(--muted); }
+      .section-title { margin-top: 44px; }
       footer { position: relative; z-index: 2; border-top: 1px solid rgba(57, 255, 20, .25); margin-top: 54px; padding: 24px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
       footer a { color: var(--neon); }
       footer .contracts { font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px; word-break: break-all; margin-top: 10px; }
       @media (max-width: 560px) {
-        .dpad { grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 64px); }
-        .dpad button { min-width: 64px; min-height: 64px; }
         .trade-btn { padding: 6px 11px; }
         .wordmark { font-size: 15px; }
         nav { gap: 20px; }
@@ -142,6 +112,7 @@
       @media (max-width: 700px) {
         main { padding-top: 24px; }
         .card { padding: 18px 16px; }
+        .launch-card { padding: 18px 16px; }
       }
 
     </style>
@@ -150,40 +121,70 @@
     <div class="bg" aria-hidden="true"></div>
     <div class="bg-veil" aria-hidden="true"></div>
     <div class="wrap">
-      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html" aria-current="page">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
+      <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html" aria-current="page">LAUNCHPAD</a><a href="/market.html">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
       <main>
 
-        <div class="status-line" id="mintStatus">MINT NOT OPEN YET</div>
-        <h2 id="mintTitle">Mint is not open yet.</h2>
-        <div class="count-label" id="countLabel">COUNTDOWN TO MINT OPEN</div>
-        <div class="countdown" id="mintCountdown">4d 03h 52m 38s</div>
-        <div class="live-badge" id="liveBadge">MINT IS LIVE</div>
-        <div class="card" style="margin-top: 22px">
-          <h3>MINT PROGRESS</h3>
-          <div class="bar"><div id="mintProgressBar"></div></div>
-          <div class="bar-meta">
-            <span id="mintProgressText">0 / 10,000 minted</span>
-            <span id="mintProgressPct">0.0% minted</span>
-            <span id="mintRemaining">Remaining: 10,000 / 10,000</span>
+        <div class="status-line">SNAKEID &times; AGENT PANDA</div>
+        <h1>Snake x Panda <em>Launchpad</em></h1>
+        <p class="lede">Curated NFT launches from the SnakeID and Agent Panda teams. New collections apply, the team picks the best, and collectors mint through their AI agent &mdash; no wallet connect, no seed phrase, ever.</p>
+
+        <div class="card">
+          <h3>HOW IT WORKS</h3>
+          <ol>
+            <li><strong>Apply</strong> &mdash; A project applies to launch, sharing its website, X account and contract.</li>
+            <li><strong>Curated</strong> &mdash; The SnakeID + Agent Panda team reviews every application and picks the launches.</li>
+            <li><strong>Launch</strong> &mdash; Approved collections get a launch slot on this page, with their mint rules.</li>
+            <li><strong>Mint via agent</strong> &mdash; Collectors copy the mint prompt, paste it to their AI agent, check the transaction preview, and confirm.</li>
+          </ol>
+        </div>
+
+        <h2 class="section-title">Launches</h2>
+        <div class="launch-grid">
+          <div class="launch-card" id="flagshipCard">
+            <h3>FLAGSHIP &middot; COMPLETED</h3>
+            <div class="launch-name">SnakeID</div>
+            <p>The first launch on this pad. 10,000 snakes, sold out in one day, now trading on the SnakeID market.</p>
+            <div class="launch-stats">
+              <div class="pr"><span>Supply</span><span>10,000</span></div>
+              <div class="pr"><span>Minted</span><span id="snakeMinted">10,000 / 10,000</span></div>
+              <div class="pr"><span>Sold on market</span><span>117</span></div>
+              <div class="pr"><span>Market volume</span><span>0.117 BNB</span></div>
+            </div>
+            <p style="margin-top: 16px"><a href="/market.html">View live market &rarr;</a> &middot; <a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">BscScan &nearr;</a></p>
           </div>
-          <div class="price-rows">
-            <div class="pr"><span>1st mint per Agent ID wallet</span><span>FREE</span></div>
-            <div class="pr"><span>Further mints (no per-wallet limit)</span><span>0.0014 BNB</span></div>
+          <div class="launch-card soon">
+            <h3>SLOT 02 &middot; COMING SOON</h3>
+            <div class="launch-name">Coming soon</div>
+            <p>The next launch will be announced here.</p>
+          </div>
+          <div class="launch-card soon">
+            <h3>SLOT 03 &middot; COMING SOON</h3>
+            <div class="launch-name">Coming soon</div>
+            <p>The next launch will be announced here.</p>
           </div>
         </div>
-        <div class="card" id="agentFlow">
-          <h3>MINT VIA AGENT</h3>
-          <p>Copy the prompt below, paste it to your agent, check the transaction preview, and confirm in your wallet.</p>
+
+        <div class="card" id="applyCard">
+          <h3>APPLY TO LAUNCH</h3>
+          <p>Want your collection on the launchpad? Copy the prompt below, fill in your project details, and paste it to your agent.</p>
+          <p style="margin-top: 12px">What the team looks for:</p>
+          <ol style="margin-top: 6px">
+            <li>An official website for the project.</li>
+            <li>An active X account.</li>
+            <li>A verified contract, or a clear plan for one.</li>
+            <li>Clear mint rules: supply, mint price, and per-wallet limit.</li>
+          </ol>
           <div class="row" style="margin-top: 16px">
-            <button class="btn btn-primary" type="button" id="copyMintPrompt">COPY MINT PROMPT</button>
-            <span id="mintPromptCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
+            <button class="btn btn-primary" type="button" id="copyApplyPrompt">COPY APPLY PROMPT</button>
+            <span id="applyPromptCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
           </div>
         </div>
+
         <div class="card">
           <h3>CONTRACTS</h3>
-          <p>NFT contract<br /><span class="addr">0xafc6bca0e191e396306343213b04ff9a8d717263</span></p>
-          <p style="margin-top: 10px">Owner<br /><span class="addr">0x11b38f8854060515cd93f03f3f198ea675ad9c91</span><br />Agent ID registry<br /><span class="addr">0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</span></p>
-          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">View NFT contract on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
+          <p>SnakeID NFT<br /><span class="addr">0xafc6bca0e191e396306343213b04ff9a8d717263</span></p>
+          <p style="margin-top: 10px">Agent Panda NFT<br /><span class="addr">0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">SnakeID on BscScan &nearr;</a> &middot; <a href="https://bscscan.com/address/0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e" target="_blank" rel="noopener">Agent Panda on BscScan &nearr;</a> &middot; <a href="https://agentpandabnb.xyz/" target="_blank" rel="noopener">agentpandabnb.xyz &nearr;</a></p>
         </div>
 
       </main>
@@ -197,9 +198,7 @@
 
     <script>
       var NFT = "0xafc6bca0e191e396306343213b04ff9a8d717263";
-      var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
       var MAX_SUPPLY = 10000;
-      var MINT_OPEN_TS = Date.UTC(2026, 10, 3, 16, 0, 0);
       var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
       async function rpcCall(to, data) {
         for (var i = 0; i < RPCS.length; i++) {
@@ -220,81 +219,26 @@
         } else { el.textContent = "Copy failed \u2014 select the prompt manually."; }
       }
       document.getElementById("tradeAgentBtn").addEventListener("click", function () {
-        var el = document.getElementById("agentFlow");
+        var el = document.getElementById("applyCard");
         if (el) el.scrollIntoView({ behavior: "smooth" });
       });
     </script>
 
     <script>
       var SEL_TOTAL_MINTED = "0xa2309ff8";
-      var SEL_MINT_OPEN = "0x24bbd049";
-      var soldOut = false, totalMintedCache = null, mintLive = false;
-      function pad(n) { return String(n).padStart(2, "0"); }
-      function countdownText() {
-        var diff = MINT_OPEN_TS - Date.now();
-        var s = Math.max(0, Math.floor(diff / 1000));
-        var d = Math.floor(s / 86400); s -= d * 86400;
-        var h = Math.floor(s / 3600); s -= h * 3600;
-        var m = Math.floor(s / 60); s -= m * 60;
-        return d + "d " + pad(h) + "h " + pad(m) + "m " + pad(s) + "s";
-      }
-      function showLive() {
-        document.getElementById("mintStatus").textContent = "MINT IS LIVE";
-        document.getElementById("mintTitle").textContent = "Mint is live.";
-        document.getElementById("countLabel").style.display = "none";
-        document.getElementById("mintCountdown").style.display = "none";
-        document.getElementById("liveBadge").style.display = "block";
-      }
-      function showPreOpen() {
-        document.getElementById("mintStatus").textContent = "MINT NOT OPEN YET";
-        document.getElementById("mintTitle").textContent = "Mint is not open yet.";
-        document.getElementById("countLabel").style.display = "";
-        document.getElementById("mintCountdown").style.display = "";
-        document.getElementById("liveBadge").style.display = "none";
-        document.getElementById("mintCountdown").textContent = countdownText();
-      }
-      function applySoldOut() {
-        soldOut = true;
-        document.getElementById("mintStatus").textContent = "SOLD OUT \u00b7 10,000 SUPPLY";
-        document.getElementById("mintTitle").textContent = "SOLD OUT.";
-        document.getElementById("countLabel").style.display = "none";
-        document.getElementById("liveBadge").style.display = "none";
-        var cd = document.getElementById("mintCountdown");
-        cd.style.display = "";
-        cd.textContent = "Mint is sold out \u2014 10,000 / 10,000 minted. No more minting.";
-        document.getElementById("copyMintPrompt").style.display = "none";
-      }
-      function applyMintState(total, mintOpen) {
-        totalMintedCache = total;
-        document.getElementById("mintProgressText").textContent = total.toLocaleString("en-US") + " / 10,000 minted";
-        document.getElementById("mintProgressBar").style.width = (total / MAX_SUPPLY * 100) + "%";
-        document.getElementById("mintProgressPct").textContent = (total / MAX_SUPPLY * 100).toFixed(1) + "% minted";
-        document.getElementById("mintRemaining").textContent = "Remaining: " + (MAX_SUPPLY - total).toLocaleString("en-US") + " / 10,000";
-        if (total >= MAX_SUPPLY) { applySoldOut(); return; }
-        if (mintOpen) { mintLive = true; showLive(); }
-        else { mintLive = false; showPreOpen(); }
-      }
-      async function refreshMint() {
+      async function refreshSnakeMinted() {
         try {
           var totalHex = await rpcCall(NFT, SEL_TOTAL_MINTED);
-          var openHex = await rpcCall(NFT, SEL_MINT_OPEN);
           if (totalHex === null) return;
           var total = parseInt(totalHex, 16);
-          var mintOpen = openHex ? parseInt(openHex, 16) === 1 : false;
-          applyMintState(total, mintOpen);
+          document.getElementById("snakeMinted").textContent = total.toLocaleString("en-US") + " / 10,000";
         } catch (e) {}
       }
-      function tick() {
-        if (soldOut || mintLive) return;
-        document.getElementById("mintCountdown").textContent = countdownText();
-      }
-      document.getElementById("mintCountdown").textContent = countdownText();
-      setInterval(tick, 1000);
-      setInterval(refreshMint, 5000);
-      refreshMint();
-      document.getElementById("copyMintPrompt").addEventListener("click", function () {
-        var p = "Mint 1 SnakeID NFT on BNB Chain. NFT contract 0xafc6bca0e191e396306343213b04ff9a8d717263, Agent ID registry 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F. First mint per Agent ID wallet is free, further mints 0.0014 BNB each. Verify on-chain first (totalMinted, mintOpen, quote), show me a transaction preview, and wait for my confirmation before signing.";
-        copyText(p, document.getElementById("mintPromptCopied"));
+      refreshSnakeMinted();
+      setInterval(refreshSnakeMinted, 30000);
+      document.getElementById("copyApplyPrompt").addEventListener("click", function () {
+        var p = "I want to apply to launch my NFT collection on the Snake x Panda Launchpad. Here are my project details: Project name: ___ / Website: ___ / X account: ___ / Contract address (if deployed): ___ / Supply: ___ / Mint price (BNB): ___ / Per-wallet limit: ___ / One-line description: ___. Please check the project first (official website, X account, verified contract), then prepare my launch application for the SnakeID + Agent Panda team.";
+        copyText(p, document.getElementById("applyPromptCopied"));
       });
     </script>
 

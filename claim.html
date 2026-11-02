@@ -239,7 +239,7 @@
       </main>
 
       <footer>
-        <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a></div>
+        <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a> &middot; <a href="/whitepaper.pdf" target="_blank" rel="noopener">Whitepaper</a></div>
         <div class="contracts">&copy; 2026 SNAKEID &middot; NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7</div>
       </footer>
 
@@ -251,7 +251,7 @@
       // These are the real addresses — nothing else changes.
       var CLAIM_CONTRACT_ADDRESS = "0x99e0a14e53993a1eeb253e5451d40113d58a6a59"; // MerkleClaim — DEPLOYED, Sourcify exact match
       var TOKEN_CONTRACT_ADDRESS = "0x3396fc5052e0eb56363a70c6aeeda3446fa7fade"; // SnakeToken (SNAKE) — DEPLOYED, Sourcify exact match
-      var CLAIM_FEE_WEI = "100000000000000"; // 0.0001 BNB per claim (locked)
+      var CLAIM_FEE_WEI = "100000000000000"; // locked fee, in wei
       var PROOFS_URL = "proofs.json"; // static merkle proofs file served with the site
       // Test-only URL overrides (used by local testing, harmless in production):
       //   claim.html?claim=0x...&token=0x...&proofs=proofs.json
@@ -408,7 +408,7 @@
       document.getElementById("copyClaimPrompt").addEventListener("click", function () {
         if (!currentEntry || !currentWallet) return;
         var proofStr = JSON.stringify(currentEntry.proof);
-        var p = "Claim my SNAKE tokens from the SnakeID MerkleClaim contract on BNB Chain. Claim contract " + CLAIM_CONTRACT_ADDRESS + ", SNAKE token " + TOKEN_CONTRACT_ADDRESS + ", my wallet " + currentWallet + ", my allocation " + fmtSnake(currentEntry.amount) + " SNAKE (" + currentEntry.amount + " wei), merkle proof " + proofStr + ", claim fee 0.0001 BNB. Verify on-chain first (merkle root, my claimed status, claim fee), show me a transaction preview, and wait for my confirmation before signing.";
+        var p = "Claim my SNAKE tokens from the SnakeID MerkleClaim contract on BNB Chain. Claim contract " + CLAIM_CONTRACT_ADDRESS + ", SNAKE token " + TOKEN_CONTRACT_ADDRESS + ", my wallet " + currentWallet + ", my allocation " + fmtSnake(currentEntry.amount) + " SNAKE (" + currentEntry.amount + " wei), merkle proof " + proofStr + ". Verify on-chain first (merkle root, my claimed status, claim fee), show me a transaction preview, and wait for my confirmation before signing.";
         copyText(p, document.getElementById("claimPromptCopied"));
       });
       // ===================== CLAIM PROGRESS (live, no refresh needed) =====================

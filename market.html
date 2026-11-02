@@ -38,7 +38,7 @@
       /* Background layer: the pixel-snake image, fixed full-screen (approved new design). */
       .bg {
         position: fixed; inset: 0; z-index: -2;
-        background-image: url("snake-bg.jpg");
+        background-image: url("snake-bg.jpg?v=2");
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
@@ -164,7 +164,6 @@
       .my-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
       .copied-note { font-family: var(--mono); font-size: 12px; color: var(--neon); }
       .error-box { background: rgba(60, 10, 10, 0.7); border: 1px solid #7f1d1d; color: #fca5a5; font-family: var(--mono); font-size: 12px; line-height: 1.7; padding: 14px; margin-top: 14px; word-break: break-word; }
-      .scan-line { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); margin-top: 12px; line-height: 1.7; word-break: break-word; }
       footer { position: relative; z-index: 2; border-top: 1px solid rgba(57, 255, 20, .25); margin-top: 54px; padding: 24px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
       footer a { color: var(--neon); }
       footer .contracts { font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px; word-break: break-all; margin-top: 10px; }
@@ -207,14 +206,10 @@
           <div class="stat"><div class="k">ACTIVE LISTINGS</div><div class="v" id="stActive">&hellip;</div></div>
           <div class="stat"><div class="k">TOTAL MARKET TXS</div><div class="v" id="stTxs">&hellip;</div></div>
         </div>
-        <p class="scan-line" id="scanLine">Connecting to BNB Chain&hellip;</p>
-        <div class="progress-wrap" id="indexProgress" style="display:none">
-          <div class="bar"><div id="indexBar"></div></div>
-          <p class="mono" id="indexText" style="margin:0">Indexing market activity&hellip;</p>
-        </div>
-        <div id="scanError" style="display:none">
-          <div class="error-box" id="scanErrorText"></div>
-          <div class="row" style="margin-top:12px"><button class="btn" type="button" id="retryScanBtn">RETRY SCAN</button></div>
+        <p class="mono" id="statusLine" style="margin-top:12px">Updated just now</p>
+        <div id="loadError" style="display:none">
+          <div class="error-box" id="loadErrorText"></div>
+          <div class="row" style="margin-top:12px"><button class="btn" type="button" id="retryBtn">RETRY</button></div>
         </div>
 
         <div class="tabs" role="tablist" aria-label="Market sections">
@@ -274,7 +269,7 @@
           <div class="feed" id="activityFeed"></div>
           <div class="empty" id="activityEmpty" style="display:none">
             <h3>No market activity yet</h3>
-            <p>No Listed, Sold, Cancelled or Mint events have been found on-chain in the scanned range.</p>
+            <p>No Listed, Sold, Cancelled or Mint events have been found on-chain yet.</p>
           </div>
           <div class="row" style="margin-top:16px"><button class="btn small" type="button" id="loadMoreActivityBtn">LOAD MORE ACTIVITY</button></div>
         </section>
@@ -328,16 +323,16 @@
         <!-- MY NFTS -->
         <div class="card" id="myNfts">
           <h3>MY NFTS &mdash; LOOK UP BY WALLET ADDRESS</h3>
-          <p>Paste any wallet address. The page finds that wallet&rsquo;s SnakeID tokens by scanning NFT Transfer events on BNB Chain (the contract has no per-owner enumeration), then shows each token&rsquo;s status: LISTED at its price, or NOT LISTED. Results are cached on this device.</p>
+          <p>Paste any wallet address. The page finds that wallet&rsquo;s SnakeID tokens by reading NFT Transfer events on BNB Chain (the contract has no per-owner enumeration), then shows each token&rsquo;s status: LISTED at its price, or NOT LISTED. Results are cached on this device.</p>
           <div class="lookup-row">
             <input type="text" id="walletInput" placeholder="0x..." autocomplete="off" spellcheck="false" aria-label="Wallet address" />
             <button class="btn btn-primary" type="button" id="lookupBtn">LOOK UP</button>
           </div>
-          <p class="scan-line" id="lookupLine"></p>
+          <p class="mono" id="lookupLine" style="margin-top:12px"></p>
           <div class="my-grid" id="myGrid"></div>
           <div class="empty" id="myEmpty" style="display:none">
             <h3>No SnakeID found</h3>
-            <p id="myEmptyText">That wallet holds no SnakeID tokens (or none were found in the scanned Transfer events).</p>
+            <p id="myEmptyText">That wallet holds no SnakeID tokens (or none were found in the Transfer events).</p>
           </div>
         </div>
 
@@ -373,9 +368,19 @@
       var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
       var MULTICALL = "0xcA11bde05977b3631167028862bE2a173976CA11";
       var MAX_SUPPLY = 10000;
-      var SCAN_START_BLOCK = 131070000;
+      var EVENTS_START_BLOCK = 131070000;
       var PAGE_SIZE = 24;
-      var CHUNK = 2000;
+      var CHUNK = 100;
+      var RECENT_WINDOW = 900; // dRPC free plan only serves eth_getLogs for roughly the last ~1000 blocks (verified live: 1000 back OK, 2000 back rejected) — never ask for older ranges
+      var SNAPSHOT_URL = "listings.json";
+      var TICK_MS = 1000;
+      var REFRESH_MS = 60000;
+      // Event-log endpoint (dRPC, free plan): eth_getLogs only. Its real range
+      // limit is ~100 blocks, so CHUNK stays at 100, and it only serves
+      // roughly the last ~1000 blocks, so live fetches stay inside
+      // RECENT_WINDOW. eth_call traffic keeps using the free public RPCs
+      // above and never touches this endpoint.
+      var LOGS_RPC = "https://lb.drpc.org/bsc/ApggRhCQgkomqjM_X4y0glQUxNgY1moR8aGQ3h3f2IgU";
       var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
       var SEL_TOTAL_MINTED = "0xa2309ff8";
       var SEL_LISTINGS = "0xde74e57b";
@@ -398,12 +403,20 @@
       var soldMap = {};        // tokenId -> latest sale {seller, buyer, priceWei, block, tx, logIndex}
       var sales = [];          // all Sold events, newest first
       var activity = [];       // unified feed, newest first
-      var listingsVerified = false;
-      var scanDone = false;
-      var scanFailed = null;
+      var listingsChecked = false;
+      var dataReady = false;
       var eventsUnavailable = false; // true when every eth_getLogs chunk failed (public RPC rate limit) and no cached events exist — sales stats must show "—", never 0
+      var eventsPartial = false;     // true when the loaded events start after EVENTS_START_BLOCK (recent window only) — lifetime totals would be incomplete, so they show "—" too
+      var eventsCoverageStart = EVENTS_START_BLOCK; // first block the loaded events cover
       var blockTimes = {};     // blockNumber -> unix seconds
       var activityShown = 50;
+      var snapshotAt = 0;      // ms epoch of the loaded listings snapshot
+      var snapshotBlock = 0;   // latest block the listings snapshot covers
+      var lastRefreshAt = 0;   // ms epoch of the last listings load / refresh
+      var refreshing = false;  // a silent background listings refresh is running
+      var tickBusy = false;    // a 1-second block poll is in flight
+      var dirty = false;       // in-memory listings changed — re-render grids on next tick
+      var liveStarted = false; // 1s tick + 60s refresh intervals started once
 
       /* ============ Small helpers ============ */
       function $(id) { return document.getElementById(id); }
@@ -462,7 +475,10 @@
         return rpc("eth_call", [{ to: to, data: data }, blockTag || "latest"]);
       }
       function getLogs(address, topics, fromBlock, toBlock) {
-        return rpc("eth_getLogs", [{ address: address, topics: topics, fromBlock: hex(fromBlock), toBlock: hex(toBlock) }]);
+        var params = [{ address: address, topics: topics, fromBlock: hex(fromBlock), toBlock: hex(toBlock) }];
+        return rpcOnce(LOGS_RPC, "eth_getLogs", params).catch(function () {
+          return rpc("eth_getLogs", params);
+        });
       }
       async function getBlockTimestamp(blockNumber) {
         if (blockTimes[blockNumber]) return blockTimes[blockNumber];
@@ -516,6 +532,13 @@
         var note = $("tradeCopied");
         copyText(text, note);
         if (note) setTimeout(function () { note.textContent = ""; }, 4000);
+        // Immediate feedback on the button that was actually tapped: a BUY NOW
+        // tap must visibly do something right where the finger is, otherwise
+        // the button looks dead even when the copy worked.
+        var orig = btn.textContent;
+        btn.textContent = "COPIED \u2713";
+        btn.disabled = true;
+        setTimeout(function () { btn.textContent = orig; btn.disabled = false; }, 2000);
       });
 
       /* ============ Event parsing ============ */
@@ -535,18 +558,32 @@
 
       /* Replay market events in block order to derive listings / sales / price updates. */
       function replayEvents() {
-        activeListings = {}; soldMap = {}; sales = []; activity = [];
+        soldMap = {}; sales = []; activity = [];
         var sorted = marketEvents.slice().sort(sortEvents);
+        // Tracks which tokens are listed according to the events replayed so
+        // far (independent of the snapshot) — a second Listed for the same
+        // token is a "Price Updated", a Listed after a Cancelled is a fresh
+        // "Listed" again.
+        var seenListed = {};
         sorted.forEach(function (e) {
+          // activeListings is owned by the listings snapshot + the Multicall
+          // refresh. Events only adjust it for blocks NEWER than the snapshot
+          // (older events are already reflected in the snapshot) — and never
+          // wipe it, so a failed event load can never erase the live grid.
           if (e.type === "Listed") {
-            var isUpdate = !!activeListings[e.tokenId];
-            activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
+            var isUpdate = !!seenListed[e.tokenId];
+            seenListed[e.tokenId] = true;
+            if (e.block > snapshotBlock) {
+              activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
+            }
             activity.push({ kind: isUpdate ? "Price Updated" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
           } else if (e.type === "Cancelled") {
-            delete activeListings[e.tokenId];
+            if (e.block > snapshotBlock) delete activeListings[e.tokenId];
+            delete seenListed[e.tokenId];
             activity.push({ kind: "Cancelled", tokenId: e.tokenId, seller: e.seller, price: null, block: e.block, tx: e.tx, logIndex: e.logIndex });
           } else if (e.type === "Sold") {
-            delete activeListings[e.tokenId];
+            if (e.block > snapshotBlock) delete activeListings[e.tokenId];
+            delete seenListed[e.tokenId];
             var sale = { seller: e.seller, buyer: e.buyer, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
             soldMap[e.tokenId] = sale;
             sales.push({ tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, priceWei: sale.priceWei, block: e.block, tx: e.tx, logIndex: e.logIndex });
@@ -565,12 +602,14 @@
       function updateStats() {
         setStat("stTotalMinted", totalMinted === null ? "—" : fmtInt(totalMinted));
         var activeCount = Object.keys(activeListings).length;
-        setStat("stListed", scanDone ? fmtInt(activeCount) : "…");
-        setStat("stActive", scanDone ? fmtInt(activeCount) : "…");
-        // Event-derived stats: when the event scan could not load at all
-        // (public RPCs rate-limit eth_getLogs), show "—" — never 0, because
-        // 0 would falsely claim no sales ever happened.
-        if (eventsUnavailable) {
+        setStat("stListed", dataReady ? fmtInt(activeCount) : "…");
+        setStat("stActive", dataReady ? fmtInt(activeCount) : "…");
+        // Event-derived stats: when the event load could not complete at all,
+        // or when the loaded events only cover a recent window (the free
+        // plan cannot serve full history), show "—" — never 0, because 0
+        // would falsely claim no sales ever happened.
+        var eventsIncomplete = eventsUnavailable || eventsPartial;
+        if (eventsIncomplete) {
           setStat("stSold", "—");
           setStat("stTxs", "—");
           setStat("stVolume", "—");
@@ -579,10 +618,10 @@
           setStat("stVolume24h", "—");
           setStat("anVolume24h", "—");
         } else {
-          setStat("stSold", scanDone ? fmtInt(sales.length) : "…");
-          setStat("stTxs", scanDone ? fmtInt(marketEvents.length) : "…");
+          setStat("stSold", dataReady ? fmtInt(sales.length) : "…");
+          setStat("stTxs", dataReady ? fmtInt(marketEvents.length) : "…");
         }
-        if (scanDone && !eventsUnavailable) {
+        if (dataReady && !eventsIncomplete) {
           var vol = sales.reduce(function (acc, s) { return acc + s.priceWei; }, 0n);
           setStat("stVolume", fmtBNB(vol) + " BNB");
           setStat("anVolume", fmtBNB(vol) + " BNB");
@@ -592,9 +631,9 @@
           setStat("stVolume24h", fmtBNB(vol24) + " BNB");
           setStat("anVolume24h", fmtBNB(vol24) + " BNB");
         }
-        // Floor price comes from the live listings() verification scan, not
-        // from events — so it is shown even when the event scan is unavailable.
-        if (scanDone) {
+        // Floor price comes from the listings() check, not
+        // from events — so it is shown even when the event load is unavailable.
+        if (dataReady) {
           var floor = null;
           Object.keys(activeListings).forEach(function (id) {
             var p = activeListings[id].priceWei;
@@ -605,56 +644,80 @@
         }
       }
 
-      /* ============ Scanning ============ */
-      function showIndexProgress(pct, text) {
-        $("indexProgress").style.display = "block";
-        $("indexBar").style.width = Math.max(0, Math.min(100, pct)) + "%";
-        $("indexText").textContent = text;
-      }
-      function hideIndexProgress() { $("indexProgress").style.display = "none"; }
-
-      async function scanEvents() {
+      /* ============ Events (silent background load) ============ */
+      // Event history loads in the background with no progress text anywhere.
+      // First it seeds from the per-device cache, then from market-events.json
+      // (a snapshot of past events shipped with the site), then it fetches only
+      // the new blocks since that point via eth_getLogs. If every log call
+      // fails and there are no events at all, the history sections render as
+      // "unavailable" — never as 0 sales. The free log endpoint only serves
+      // roughly the last ~1000 blocks, so live fetches are clamped to the
+      // recent window; events older than that simply cannot be fetched, and
+      // the lifetime stats then show "—" (partial coverage) instead of a
+      // misleading partial total.
+      async function loadEvents() {
         var cached = loadCache(CACHE_EVENTS);
-        var fromBlock = SCAN_START_BLOCK;
-        if (cached && cached.toBlock && cached.toBlock >= SCAN_START_BLOCK && Array.isArray(cached.market)) {
+        var fromBlock = EVENTS_START_BLOCK;
+        var coverageStart = EVENTS_START_BLOCK;
+        var haveSource = false;
+        if (cached && cached.toBlock && cached.toBlock >= EVENTS_START_BLOCK && Array.isArray(cached.market)) {
           marketEvents = cached.market;
           mintEvents = Array.isArray(cached.mints) ? cached.mints : [];
           fromBlock = cached.toBlock + 1;
+          coverageStart = (typeof cached.fromBlock === "number") ? cached.fromBlock : EVENTS_START_BLOCK;
+          haveSource = true;
+        } else {
+          try {
+            var res = await fetch("market-events.json", { cache: "no-store" });
+            if (res.ok) {
+              var snap = await res.json();
+              if (snap && Array.isArray(snap.market) && typeof snap.toBlock === "number" && snap.toBlock >= EVENTS_START_BLOCK) {
+                marketEvents = snap.market;
+                mintEvents = Array.isArray(snap.mints) ? snap.mints : [];
+                fromBlock = snap.toBlock + 1;
+                coverageStart = (typeof snap.fromBlock === "number") ? snap.fromBlock : EVENTS_START_BLOCK;
+                haveSource = true;
+              }
+            }
+          } catch (e) { /* no snapshot seed — fall through to the live log calls */ }
         }
-        if (fromBlock > latestBlock) { replayEvents(); return; }
-        var total = latestBlock - fromBlock + 1;
-        var done = 0;
+        // Clamp the live fetch to the recent window the free plan serves.
+        // Already-loaded events are unaffected; only the new fetch is limited.
+        if (fromBlock < latestBlock - RECENT_WINDOW) fromBlock = latestBlock - RECENT_WINDOW;
+        if (!haveSource) coverageStart = fromBlock;
+        eventsCoverageStart = coverageStart;
+        eventsPartial = eventsCoverageStart > EVENTS_START_BLOCK;
+        if (fromBlock > latestBlock) { replayEvents(); renderExplore(); renderListed(); return; }
         var marketChunks = 0, marketChunkFails = 0;
         var hadCachedEvents = marketEvents.length > 0;
         for (var from = fromBlock; from <= latestBlock; from += CHUNK) {
           var to = Math.min(from + CHUNK - 1, latestBlock);
-          showIndexProgress(total ? (done / total) * 100 : 100, "Indexing market activity… " + Math.round(total ? (done / total) * 100 : 100) + "% (scanning blocks " + fmtInt(from) + "–" + fmtInt(to) + ")");
           marketChunks++;
           try {
             var logs = await getLogs(MARKET, null, from, to);
             logs.forEach(function (l) { var e = parseMarketLog(l); if (e) marketEvents.push(e); });
-          } catch (e) { marketChunkFails++; /* one chunk failing must not kill the whole scan; it is retried on the next visit */ }
+          } catch (e) { marketChunkFails++; /* one chunk failing must not kill the whole load; it is retried on the next visit */ }
           try {
             var mlogs = await getLogs(NFT, [TOPIC_TRANSFER, padAddr(ZERO), null], from, to);
             mlogs.forEach(function (l) {
               mintEvents.push([l.blockNumber, l.transactionHash, l.logIndex, topicAddr(l.topics[2]), parseInt(l.topics[3], 16)]);
             });
           } catch (e) {}
-          done += (to - from + 1);
           replayEvents();
           updateStats();
         }
         // If every market-log chunk failed and we have no events at all (not
-        // even cached ones), the sales/activity data is UNAVAILABLE — it must
-        // render as "—", never as 0 sales / 0 volume.
+        // even cached or snapshot ones), the sales/activity data is UNAVAILABLE
+        // — it must render as "—", never as 0 sales / 0 volume.
         if (marketChunks > 0 && marketChunkFails >= marketChunks && marketEvents.length === 0 && !hadCachedEvents) {
           eventsUnavailable = true;
-          $("scanLine").textContent = "Market history (sales & activity) is temporarily unavailable — public BSC RPCs are rate-limiting event queries. Active listings above are still verified live from the market contract. Use RETRY SCAN to try again.";
         }
         marketEvents.sort(sortEvents);
-        saveCache(CACHE_EVENTS, { v: 1, toBlock: latestBlock, market: marketEvents, mints: mintEvents });
-        hideIndexProgress();
+        saveCache(CACHE_EVENTS, { v: 1, fromBlock: eventsCoverageStart, toBlock: latestBlock, market: marketEvents, mints: mintEvents });
         replayEvents();
+        dirty = true;
+        renderExplore();
+        renderListed();
       }
 
       function parseListingHex(hexData) {
@@ -716,24 +779,27 @@
         } catch (e) {}
         return out;
       }
-      async function verifyListings() {
+      // Silent background refresh of the active listings, straight from the
+      // market contract (Multicall listings(), free public RPCs). No text, no
+      // spinner, no visible state anywhere — when it finishes, the grid and
+      // the stats simply update. Runs on page load only as a fallback and
+      // then every 60 seconds.
+      async function refreshListings() {
+        if (refreshing) return;
+        refreshing = true;
         var found = 0;
-        var checked = 0;
         var failures = 0;
         var foundIds = {};
         var BATCH = 400;
-        var usedMulticall = false;
         for (var start = 1; start <= MAX_SUPPLY; start += BATCH) {
           var ids = [];
           for (var i = start; i < start + BATCH && i <= MAX_SUPPLY; i++) ids.push(i);
-          $("scanLine").textContent = "Scanning listings\u2026 " + fmtInt(checked) + " / 10,000";
           var results = null;
           try {
             var calls = ids.map(function (id) { return { target: MARKET, allowFailure: true, callData: SEL_LISTINGS + encodeUint256(id) }; });
             var mcHex = await ethCall(MULTICALL, encodeAggregate3(calls));
             var decoded = decodeAggregate3(mcHex);
             if (decoded.length === ids.length) {
-              usedMulticall = true;
               results = decoded.map(function (d, k) { if (!d.success) failures++; return d.success ? parseListingHex(d.returnData) : null; });
             }
           } catch (e) { results = null; }
@@ -760,9 +826,8 @@
               }
             }
           });
-          checked += ids.length;
         }
-        // Prune event-derived listings the contract no longer shows as active —
+        // Prune listings the contract no longer shows as active —
         // but only if every single listings() call succeeded (a failed call must
         // never be mistaken for "not listed").
         if (failures === 0) {
@@ -770,10 +835,14 @@
             if (!foundIds[id]) delete activeListings[id];
           });
         }
-        listingsVerified = true;
-        $("scanLine").textContent = "Scan complete: " + fmtInt(found) + " active listings verified on-chain of 10,000 checked" + (usedMulticall ? " (Multicall)." : " (batched calls).") + " Last block " + fmtInt(latestBlock) + ".";
+        listingsChecked = true;
+        lastRefreshAt = Date.now();
+        dirty = true;
+        refreshing = false;
+        updateStatusLine();
         updateStats();
-        renderAll();
+        renderExplore();
+        renderListed();
       }
 
       /* ============ Rendering: grids ============ */
@@ -786,7 +855,7 @@
         var badge = isSold ? '<span class="badge sold">SOLD</span>' : '<span class="badge listed">LISTED</span>';
         var sellerLine = l.seller ? '<p class="seller">Seller ' + esc(shortAddr(l.seller)) + '</p>' : "";
         var buyerLine = isSold && l.buyer ? '<p class="seller">Buyer ' + esc(shortAddr(l.buyer)) + '</p>' : "";
-        var timeLine = l.block && blockTimes[l.block] ? '<p class="listed-at">' + esc(fmtRel(blockTimes[l.block])) + ' \u00b7 ' + esc(fmtTime(blockTimes[l.block])) + '</p>' : "";
+        var timeLine = l.block && blockTimes[l.block] ? '<p class="listed-at" data-block="' + l.block + '">' + esc(fmtRel(blockTimes[l.block])) + ' \u00b7 ' + esc(fmtTime(blockTimes[l.block])) + '</p>' : "";
         var action = isSold
           ? '<button class="btn small" type="button" disabled>SOLD</button>'
           : '<button class="btn small btn-primary" type="button" data-copy="buy" data-token="' + l.id + '" data-seller="' + esc(l.seller || "") + '" data-price="' + l.priceWei.toString() + '">BUY NOW</button>';
@@ -862,11 +931,11 @@
         if (exploreState.page > totalPages) exploreState.page = totalPages;
         var pageItems = filtered.slice((exploreState.page - 1) * PAGE_SIZE, exploreState.page * PAGE_SIZE);
         grid.innerHTML = pageItems.map(function (x) { return listingCard(x, x.status); }).join("");
-        var showEmpty = scanDone && filtered.length === 0 && exploreState.filter !== "sold";
+        var showEmpty = dataReady && filtered.length === 0 && exploreState.filter !== "sold";
         empty.style.display = showEmpty ? "block" : "none";
-        if (scanDone && filtered.length === 0 && exploreState.filter === "sold") {
+        if (dataReady && filtered.length === 0 && exploreState.filter === "sold") {
           grid.innerHTML = "";
-          $("searchEmptyText").textContent = eventsUnavailable ? "Sales history is unavailable right now (public RPCs are rate-limiting event queries), so sold tokens cannot be listed. Use RETRY SCAN to try again." : "No SnakeID has sold yet — nothing to show under SOLD.";
+          $("searchEmptyText").textContent = eventsUnavailable ? "Sales history is unavailable right now (public RPCs are rate-limiting event queries), so sold tokens cannot be listed." : eventsPartial ? "No sales found in the recent blocks loaded so far — earlier sales are not included in this view." : "No SnakeID has sold yet — nothing to show under SOLD.";
           searchEmpty.style.display = "block";
         } else if (!showEmpty) {
           searchEmpty.style.display = "none";
@@ -880,7 +949,7 @@
         if (listedState.page > totalPages) listedState.page = totalPages;
         var pageItems = items.slice((listedState.page - 1) * PAGE_SIZE, listedState.page * PAGE_SIZE);
         $("listedGrid").innerHTML = pageItems.map(function (x) { return listingCard(x, "LISTED"); }).join("");
-        $("listedEmpty").style.display = scanDone && items.length === 0 ? "block" : "none";
+        $("listedEmpty").style.display = dataReady && items.length === 0 ? "block" : "none";
         renderPagination($("listedPagination"), listedState.page, totalPages, function (p) { listedState.page = p; renderListed(); });
       }
 
@@ -910,10 +979,13 @@
         feed.innerHTML = shown.map(activityRow).join("");
         var empty = $("activityEmpty");
         if (eventsUnavailable) {
-          empty.innerHTML = "<h3>Activity history unavailable</h3><p>Public BSC RPCs are currently rate-limiting event queries, so past activity could not be loaded. Active listings are still verified live from the market contract. Use RETRY SCAN to try again.</p>";
+          empty.innerHTML = "<h3>Activity history unavailable</h3><p>Public BSC RPCs are currently rate-limiting event queries, so past activity could not be loaded. Active listings are still shown from the market contract.</p>";
+          empty.style.display = "block";
+        } else if (eventsPartial && activity.length === 0) {
+          empty.innerHTML = "<h3>No recent activity</h3><p>Only the most recent blocks could be loaded, so older activity is not shown here. New activity will appear as it happens.</p>";
           empty.style.display = "block";
         } else {
-          empty.style.display = scanDone && activity.length === 0 ? "block" : "none";
+          empty.style.display = dataReady && activity.length === 0 ? "block" : "none";
         }
         $("loadMoreActivityBtn").style.display = activity.length > activityShown ? "inline-block" : "none";
       }
@@ -927,10 +999,13 @@
         }).join("");
         var empty = $("salesEmpty");
         if (eventsUnavailable) {
-          empty.innerHTML = "<h3>Sales history unavailable</h3><p>Public BSC RPCs are currently rate-limiting event queries, so past sales could not be loaded. This does not mean there were no sales — the history is simply unreachable right now. Use RETRY SCAN to try again.</p>";
+          empty.innerHTML = "<h3>Sales history unavailable</h3><p>Public BSC RPCs are currently rate-limiting event queries, so past sales could not be loaded. This does not mean there were no sales — the history is simply unreachable right now.</p>";
+          empty.style.display = "block";
+        } else if (eventsPartial && sales.length === 0) {
+          empty.innerHTML = "<h3>No recent sales</h3><p>Only the most recent blocks could be loaded, so earlier sales are not shown here. New sales will appear as they happen.</p>";
           empty.style.display = "block";
         } else {
-          empty.style.display = scanDone && sales.length === 0 ? "block" : "none";
+          empty.style.display = dataReady && sales.length === 0 ? "block" : "none";
         }
       }
 
@@ -938,7 +1013,7 @@
       var chartRange = "24h";
       function renderChart() {
         var wrap = $("chartWrap");
-        if (!scanDone) { wrap.innerHTML = '<p class="mono">Loading sales data\u2026</p>'; return; }
+        if (!dataReady) { wrap.innerHTML = '<p class="mono">Loading sales data\u2026</p>'; return; }
         var now = Math.floor(Date.now() / 1000);
         var bucketSec, bucketCount, label;
         if (chartRange === "24h") { bucketSec = 3600; bucketCount = 24; label = "hourly"; }
@@ -959,13 +1034,18 @@
           inWindow++;
         });
         if (eventsUnavailable) {
-          wrap.innerHTML = '<div class="empty"><h3>Volume chart unavailable</h3><p>Sales history could not be loaded — public BSC RPCs are rate-limiting event queries. The chart shows nothing rather than a made-up curve. Use RETRY SCAN to try again.</p></div>';
+          wrap.innerHTML = '<div class="empty"><h3>Volume chart unavailable</h3><p>Sales history could not be loaded — public BSC RPCs are rate-limiting event queries. The chart shows nothing rather than a made-up curve.</p></div>';
           $("chartNote").textContent = "Sales data unavailable \u00b7 data comes only from on-chain Sold events.";
           return;
         }
         if (inWindow === 0) {
-          wrap.innerHTML = '<div class="empty"><h3>No sales in this period</h3><p>No SnakeID sold in the selected ' + (chartRange === "all" ? "all-time" : chartRange.toUpperCase()) + ' window. The chart stays empty rather than showing a made-up curve.</p></div>';
-          $("chartNote").textContent = "0 sales in this window \u00b7 buckets are " + label + " \u00b7 data from on-chain Sold events only.";
+          if (eventsPartial) {
+            wrap.innerHTML = '<div class="empty"><h3>No recent sales</h3><p>Only the most recent blocks could be loaded, so this chart covers recent sales only — earlier sales are not included.</p></div>';
+            $("chartNote").textContent = "Recent blocks only \u00b7 data from on-chain Sold events.";
+          } else {
+            wrap.innerHTML = '<div class="empty"><h3>No sales in this period</h3><p>No SnakeID sold in the selected ' + (chartRange === "all" ? "all-time" : chartRange.toUpperCase()) + ' window. The chart stays empty rather than showing a made-up curve.</p></div>';
+            $("chartNote").textContent = "0 sales in this window \u00b7 buckets are " + label + " \u00b7 data from on-chain Sold events only.";
+          }
           return;
         }
         var W = 640, H = 240, PAD = 34;
@@ -990,7 +1070,7 @@
           '</svg>';
         wrap.innerHTML = svg;
         var totalVol = vols.reduce(function (a, b) { return a + b; }, 0);
-        $("chartNote").textContent = inWindow + " sale(s) in this window \u00b7 " + totalVol.toFixed(5) + " BNB total \u00b7 buckets are " + label + " \u00b7 data from on-chain Sold events only.";
+        $("chartNote").textContent = inWindow + " sale(s) in this window \u00b7 " + totalVol.toFixed(5) + " BNB total \u00b7 buckets are " + label + " \u00b7 data from on-chain Sold events only" + (eventsPartial ? " \u00b7 recent blocks only." : ".");
       }
 
       function renderAll() {
@@ -1058,44 +1138,54 @@
         if (!/^0x[0-9a-fA-F]{40}$/.test(a)) return null;
         return a.toLowerCase();
       }
+      var SEL_OWNEROF = "0x6352211e";
       async function lookupWallet() {
         var wallet = parseWallet($("walletInput").value);
         var line = $("lookupLine"), grid = $("myGrid"), empty = $("myEmpty");
         grid.innerHTML = ""; empty.style.display = "none";
         if (!wallet) { line.textContent = "Enter a valid wallet address (0x followed by 40 hex characters)."; return; }
-        line.textContent = "Scanning NFT Transfer events for " + shortAddr(wallet) + "\u2026";
+        line.textContent = "Looking up tokens for " + shortAddr(wallet) + "\u2026";
         var cache = loadCache(CACHE_WALLET) || {};
         var owned = null;
         if (cache[wallet] && cache[wallet].toBlock >= latestBlock - 600) {
           owned = cache[wallet].tokens;
-          line.textContent = "Loaded from this device's cache (scanned to block " + fmtInt(cache[wallet].toBlock) + ").";
+          line.textContent = "Loaded from this device's cache (checked to block " + fmtInt(cache[wallet].toBlock) + ").";
         } else {
           try {
-            var received = {}, sent = {};
-            for (var from = SCAN_START_BLOCK; from <= latestBlock; from += CHUNK) {
-              var to = Math.min(from + CHUNK - 1, latestBlock);
-              line.textContent = "Scanning Transfer events\u2026 blocks " + fmtInt(from) + "\u2013" + fmtInt(to);
-              var inLogs = await getLogs(NFT, [TOPIC_TRANSFER, null, padAddr(wallet)], from, to);
-              inLogs.forEach(function (l) { received[parseInt(l.topics[3], 16)] = true; });
-              var outLogs = await getLogs(NFT, [TOPIC_TRANSFER, padAddr(wallet), null], from, to);
-              outLogs.forEach(function (l) { sent[parseInt(l.topics[3], 16)] = true; });
+            // Ownership is read straight from the NFT contract (ownerOf for all
+            // 10,000 tokens via Multicall) — fast and exact. The old Transfer
+            // event walk would need ~2,000 log calls at the log endpoint's
+            // 100-block range limit, so it is no longer used.
+            owned = [];
+            var BATCH = 400;
+            for (var start = 1; start <= MAX_SUPPLY; start += BATCH) {
+              var ids = [];
+              for (var i = start; i < start + BATCH && i <= MAX_SUPPLY; i++) ids.push(i);
+              var calls = ids.map(function (id) { return { target: NFT, allowFailure: true, callData: SEL_OWNEROF + encodeUint256(id) }; });
+              var mcHex = await ethCall(MULTICALL, encodeAggregate3(calls));
+              var decoded = decodeAggregate3(mcHex);
+              if (decoded.length !== ids.length) throw new Error("unexpected Multicall result");
+              decoded.forEach(function (d, k) {
+                if (!d.success || !d.returnData || d.returnData.length < 66) return;
+                var owner = ("0x" + d.returnData.slice(26, 66)).toLowerCase();
+                if (owner === wallet) owned.push(ids[k]);
+              });
             }
-            owned = Object.keys(received).map(Number).filter(function (id) { return !sent[id]; }).sort(function (a, b) { return a - b; });
             cache[wallet] = { toBlock: latestBlock, tokens: owned };
             saveCache(CACHE_WALLET, cache);
-            line.textContent = "Scanned to block " + fmtInt(latestBlock) + ". Found " + owned.length + " SnakeID token(s).";
+            line.textContent = "Checked to block " + fmtInt(latestBlock) + ". Found " + owned.length + " SnakeID token(s).";
           } catch (e) {
             line.textContent = "Lookup failed: " + (e && e.message ? e.message : e) + " — check the address and try again.";
             return;
           }
         }
         if (!owned.length) { empty.style.display = "block"; return; }
-        // Confirm listing status live for each owned token (uses the verified scan when available)
+        // Confirm listing status live for each owned token (uses the checked listings when available)
         var cards = [];
         for (var i = 0; i < owned.length; i++) {
           var id = owned[i];
           var l = activeListings[id];
-          if (!l && listingsVerified) {
+          if (!l && listingsChecked) {
             cards.push({ id: id, status: "NOT LISTED" });
           } else if (!l) {
             try {
@@ -1124,51 +1214,126 @@
       $("lookupBtn").addEventListener("click", lookupWallet);
       $("walletInput").addEventListener("keydown", function (e) { if (e.key === "Enter") lookupWallet(); });
 
+      /* ============ Instant snapshot load + live refresh ============ */
+      // The grid renders instantly from listings.json (a snapshot of the live
+      // listings, shipped with the site) — the page never waits for a chain
+      // read before showing content. Afterwards the data stays live: a
+      // 1-second tick updates the "Updated … ago" line and the relative times
+      // on the cards and polls the latest block, while a silent 60-second
+      // background refresh re-checks the listings on-chain and pulls in any
+      // new market events. A full listings re-check every second would hammer
+      // the public RPCs into rate-limiting, so the 1-second tick is UI + block
+      // polling only; the heavy re-check runs every 60 seconds, silently.
+      function updateStatusLine() {
+        var el = $("statusLine");
+        if (!el) return;
+        var ago = Math.floor((Date.now() - lastRefreshAt) / 1000);
+        var txt = ago < 2 ? "Updated just now" : "Updated " + ago + "s ago";
+        if (latestBlock) txt += " \u00b7 Block " + fmtInt(latestBlock);
+        el.textContent = txt;
+      }
+      async function loadSnapshot() {
+        try {
+          var res = await fetch(SNAPSHOT_URL, { cache: "no-store" });
+          if (!res.ok) return false;
+          var snap = await res.json();
+          if (!snap || !Array.isArray(snap.listings)) return false;
+          activeListings = {};
+          snap.listings.forEach(function (l) {
+            if (!l || typeof l.tokenId !== "number" || !l.priceWei) return;
+            activeListings[l.tokenId] = { seller: (l.seller || "").toLowerCase(), priceWei: BigInt(l.priceWei), block: null, tx: null, logIndex: 0 };
+          });
+          if (typeof snap.totalMinted === "number") totalMinted = snap.totalMinted;
+          if (typeof snap.latestBlock === "number" && !latestBlock) latestBlock = snap.latestBlock;
+          snapshotAt = snap.generatedAt ? Date.parse(snap.generatedAt) : Date.now();
+          snapshotBlock = typeof snap.latestBlock === "number" ? snap.latestBlock : 0;
+          lastRefreshAt = Date.now();
+          listingsChecked = true;
+          dataReady = true;
+          updateStatusLine();
+          updateStats();
+          renderExplore();
+          renderListed();
+          return true;
+        } catch (e) { return false; }
+      }
+      async function tick() {
+        updateStatusLine();
+        // Refresh the relative times on the cards in place — the grid itself
+        // is only rebuilt when the underlying data changes (see `dirty`), so
+        // a tap on a BUY NOW button is never lost to a rebuild mid-tap.
+        document.querySelectorAll(".listed-at[data-block]").forEach(function (el) {
+          var b = parseInt(el.getAttribute("data-block"), 10);
+          var ts = blockTimes[b];
+          if (ts) el.textContent = fmtRel(ts) + " \u00b7 " + fmtTime(ts);
+        });
+        if (dirty) {
+          dirty = false;
+          renderExplore();
+          renderListed();
+        }
+        if (document.hidden || tickBusy) return;
+        tickBusy = true;
+        try {
+          var bn = await rpc("eth_blockNumber", []);
+          var n = parseInt(bn, 16);
+          if (n && n !== latestBlock) { latestBlock = n; updateStatusLine(); }
+        } catch (e) { /* silent — the next tick retries */ }
+        tickBusy = false;
+      }
+      function startLiveRefresh() {
+        if (liveStarted) return;
+        liveStarted = true;
+        updateStatusLine();
+        setInterval(tick, TICK_MS);
+        setInterval(function () {
+          if (document.hidden || refreshing) return;
+          refreshListings();
+          loadEvents().then(function () { updateStats(); renderActivity(); renderSales(); renderChart(); }).catch(function () {});
+        }, REFRESH_MS);
+      }
+
       /* ============ Init ============ */
       async function init() {
+        blockTimes = loadCache(CACHE_TIMES) || {};
         try {
-          blockTimes = loadCache(CACHE_TIMES) || {};
           var bn = await rpc("eth_blockNumber", []);
           latestBlock = parseInt(bn, 16);
-        } catch (e) {
-          $("scanLine").textContent = "Could not reach BNB Chain RPCs. Check your connection and retry.";
-          $("scanError").style.display = "block";
-          $("scanErrorText").textContent = "RPC error: " + (e && e.message ? e.message : e);
+        } catch (e) { /* RPC unreachable for now — the snapshot carries its own block number */ }
+        var snapshotOk = await loadSnapshot();
+        if (!snapshotOk) {
+          // Snapshot unreachable: fall back to a silent on-chain check so the
+          // page still works instead of showing an empty grid.
+          try { await refreshListings(); } catch (e) {}
+        }
+        if (!dataReady) {
+          $("loadError").style.display = "block";
+          $("loadErrorText").textContent = "Could not load listings. Check your connection and reload the page.";
           return;
         }
         try {
           var totalHex = await ethCall(NFT, SEL_TOTAL_MINTED);
           if (totalHex) totalMinted = parseInt(totalHex, 16);
-        } catch (e) { totalMinted = null; }
+        } catch (e) { /* the snapshot's totalMinted stands */ }
         if (totalMinted !== null && totalMinted < MAX_SUPPLY) {
           $("lockBanner").style.display = "block";
           $("lockText").textContent = "Minted so far: " + fmtInt(totalMinted) + " / 10,000 — the market opens automatically at 10,000 minted.";
         }
         updateStats();
-        try {
-          await scanEvents();
-          scanDone = true;
-          updateStats();
-          renderAll();
-        } catch (e) {
-          scanFailed = e;
-          $("scanError").style.display = "block";
-          $("scanErrorText").textContent = "Event scan failed: " + (e && e.message ? e.message : e) + " — no data was fabricated; the numbers above stay as \u201c\u2026\u201d or \u201c\u2014\u201d until a scan succeeds.";
-          return;
-        }
-        try {
-          await verifyListings();
-        } catch (e) {
-          $("scanLine").textContent = "Listings verification scan failed (" + (e && e.message ? e.message : e) + ") — listings shown come from market events only, not the full contract scan. Use RETRY SCAN to try again.";
-          $("scanError").style.display = "block";
-          $("scanErrorText").textContent = "Listings scan failed: " + (e && e.message ? e.message : e);
-        }
+        renderAll();
+        // Market events load silently in the background (snapshot seed first,
+        // then only the new blocks). No progress text anywhere.
+        loadEvents().then(function () { updateStats(); renderActivity(); renderSales(); renderChart(); }).catch(function () {});
+        startLiveRefresh();
       }
-      $("retryScanBtn").addEventListener("click", function () {
-        $("scanError").style.display = "none";
-        scanDone = false;
+      $("retryBtn").addEventListener("click", function () {
+        $("loadError").style.display = "none";
+        dataReady = false;
         init();
       });
+      // Test/debug hook (no wallet, no secrets): lets automated checks trigger
+      // the silent background refresh on demand.
+      window.__snakeidMarket = { refreshListings: refreshListings, loadEvents: loadEvents, loadSnapshot: loadSnapshot };
       init();
     })();
     </script>

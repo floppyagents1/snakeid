@@ -8,150 +8,159 @@
     <title>SnakeID — Play Snake</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --bg: #07071a;
-        --panel: #10102a;
-        --panel-line: #26264a;
-        --ink: #f2f0e6;
-        --muted: #a5a2c4;
-        --gold: #f7c948;
-        --lime: #a3e635;
+        --neon: #39ff14;
+        --neon-dim: #1db954;
+        --neon-soft: rgba(57, 255, 20, .16);
+        --ink: #eaffea;
+        --muted: #9fc49b;
+        --panel: rgba(2, 14, 4, .78);
+        --panel-solid: #04140a;
+        --line: rgba(57, 255, 20, .38);
+        --overlay: 0.58;
+        --bg: #020a03;
         --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-        --serif: "Playfair Display", Georgia, "Times New Roman", serif;
-        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --display: "Press Start 2P", monospace;
+        --sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
       }
       * { box-sizing: border-box; }
       html, body { margin: 0; padding: 0; }
       body {
-        background-color: var(--bg);
-        background-image: url("snake-bg.jpg");
-        background-size: cover;
-        background-position: 72% 38%;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
+        background-color: #020a03;
         color: var(--ink);
         font-family: var(--sans);
         min-height: 100vh;
         overflow-x: hidden;
       }
-      /* Dark overlay over the fixed snake photo only — keeps every existing
-         panel and line of text readable while the snake stays visible. */
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background: linear-gradient(180deg, rgba(4, 4, 14, 0.66) 0%, rgba(4, 4, 14, 0.58) 42%, rgba(4, 4, 14, 0.74) 100%);
+      /* Background layer: the pixel-snake image, fixed full-screen (approved new design). */
+      .bg {
+        position: fixed; inset: 0; z-index: -2;
+        background-image: url("snake-bg.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-color: #020a03;
       }
-      .wrap { position: relative; z-index: 2; max-width: 1060px; margin: 0 auto; padding: 0 20px 56px; }
+      /* Dark veil over the background so text stays readable (overlay 0.58). */
+      .bg-veil {
+        position: fixed; inset: 0; z-index: -1; pointer-events: none;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 10, 2, 0.58) 42%, rgba(0, 6, 1, 0.70) 100%);
+      }
+      .bg-veil::after {
+        content: ""; position: absolute; inset: 0;
+        background: radial-gradient(ellipse 90% 55% at 50% 18%, transparent 0%, rgba(0, 0, 0, .35) 100%);
+      }
+      .wrap { position: relative; z-index: 2; max-width: 1120px; margin: 0 auto; padding: 0 20px 56px; }
       header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0 10px; }
-      .wordmark { font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: 0.2px; color: var(--ink); text-decoration: none; }
-      .wordmark span { color: var(--lime); }
-      .trade-btn { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--ink); border: 1px solid var(--panel-line); background: rgba(16, 16, 42, 0.75); padding: 13px 18px; text-decoration: none; white-space: nowrap; cursor: pointer; }
-      nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 6px 0 14px; border-bottom: 1px solid var(--panel-line); }
-      nav a { font-family: var(--mono); font-size: 16px; font-weight: 600; letter-spacing: 3px; color: var(--muted); padding: 6px 2px; text-decoration: none; }
-      nav a[aria-current="page"] { color: var(--gold); }
-      nav a:hover { color: var(--ink); }
-      nav a:focus-visible, .btn:focus-visible, .trade-btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+      .wordmark { font-family: var(--display); font-weight: 400; font-size: 17px; letter-spacing: .02em; color: #fff; text-decoration: none; }
+      .wordmark span { color: var(--neon); }
+      .trade-btn { font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; background: rgba(2, 14, 4, .6); padding: 7px 13px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+      nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 6px 0 14px; border-bottom: 1px solid var(--line); }
+      nav a { font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: .02em; color: var(--ink); padding: 6px 2px; text-decoration: none; }
+      nav a[aria-current="page"] { color: var(--neon); }
+      nav a:hover { color: var(--neon); }
+      nav a:focus-visible, .btn:focus-visible, .trade-btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
       main { padding-top: 34px; }
-      h1 { font-family: var(--serif); font-weight: 900; font-size: clamp(42px, 8.5vw, 76px); line-height: 1.04; margin: 10px 0 18px; }
-      h1 em { color: var(--gold); font-style: italic; font-weight: 700; }
-      h2 { font-family: var(--serif); font-weight: 900; font-size: clamp(30px, 6vw, 46px); line-height: 1.1; margin: 0 0 14px; }
-      .lede { color: var(--muted); font-size: 17px; line-height: 1.65; max-width: 620px; margin: 0 0 26px; }
-      .status-line { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--lime); display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
-      .status-line::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); flex: none; }
+      h1 { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 6.2vw, 58px); line-height: 1.25; margin: 10px 0 18px; color: #fff; text-shadow: 0 0 26px rgba(57, 255, 20, .35); }
+      h1 em { color: var(--neon); font-style: normal; font-weight: 400; }
+      h2 { font-family: var(--display); font-weight: 400; font-size: clamp(20px, 4vw, 28px); line-height: 1.4; margin: 0 0 14px; color: #fff; }
+      .lede { color: #d8f5d3; font-size: 17px; line-height: 1.65; max-width: 620px; margin: 0 0 26px; }
+      .status-line { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--neon); display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+      .status-line::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--neon); box-shadow: 0 0 10px var(--neon); flex: none; }
       .row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-      .btn { display: inline-block; font-family: var(--mono); font-size: 13px; font-weight: 600; letter-spacing: 1.6px; text-decoration: none; cursor: pointer; border: 1px solid var(--panel-line); background: rgba(16, 16, 42, 0.8); color: var(--ink); padding: 15px 20px; }
-      .btn.gold { background: var(--gold); border-color: var(--gold); color: #191304; }
+      .btn { display: inline-block; font-family: var(--sans); font-size: 15px; font-weight: 700; letter-spacing: 0; text-decoration: none; cursor: pointer; border: 1px solid var(--line); border-radius: 10px; background: rgba(2, 14, 4, .7); color: var(--ink); padding: 13px 20px; }
+      .btn-primary { background: var(--neon); border-color: var(--neon); color: #021003; box-shadow: 0 0 24px rgba(57, 255, 20, .35); }
       .btn:hover { filter: brightness(1.1); }
-      .card { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 22px; margin-top: 30px; }
-      .card h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--gold); margin: 0 0 12px; font-weight: 600; }
-      .card p, .card li { color: var(--muted); font-size: 15px; line-height: 1.65; }
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-top: 30px; }
+      .card h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--neon); margin: 0 0 12px; font-weight: 600; }
+      .card p, .card li { color: #c9e8c4; font-size: 15px; line-height: 1.65; }
       .card p { margin: 0; }
       .card ol { margin: 0; padding-left: 20px; }
       .card li { margin: 4px 0; }
-      .card a { color: var(--ink); }
+      .card a { color: var(--neon); }
       .addr { font-family: var(--mono); font-size: 12px; word-break: break-all; color: var(--ink); }
       .mono { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); }
       .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 26px; }
-      .stat { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 18px; }
+      .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
       .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
       .stat .v { font-size: 22px; font-weight: 700; }
       .countdown { font-family: var(--mono); font-weight: 600; font-size: clamp(30px, 7.5vw, 58px); letter-spacing: 1px; margin: 8px 0 4px; font-variant-numeric: tabular-nums; }
       .count-label { font-family: var(--mono); font-size: 13px; letter-spacing: 2px; color: var(--muted); }
-      .live-badge { display: none; font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 6vw, 44px); color: var(--lime); letter-spacing: 2px; margin: 8px 0 4px; }
-      .bar { height: 12px; background: #1b1b3a; border: 1px solid var(--panel-line); margin: 14px 0 8px; overflow: hidden; }
-      .bar > div { height: 100%; width: 0%; background: var(--lime); transition: width 0.6s ease; }
+      .live-badge { display: none; font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 6vw, 44px); color: var(--neon); letter-spacing: 2px; margin: 8px 0 4px; }
+      .bar { height: 12px; background: rgba(57, 255, 20, .12); border: 1px solid var(--line); margin: 14px 0 8px; overflow: hidden; }
+      .bar > div { height: 100%; width: 0%; background: var(--neon); transition: width 0.6s ease; }
       .bar-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
       .price-rows { margin-top: 6px; }
-      .price-rows .pr { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--panel-line); font-size: 15px; }
+      .price-rows .pr { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
       .price-rows .pr:last-child { border-bottom: 0; }
       .price-rows .pr span:first-child { color: var(--muted); }
-      .price-rows .pr span:last-child { font-family: var(--mono); font-weight: 600; }
+      .price-rows .pr span:last-child { font-family: var(--mono); font-weight: 600; color: var(--neon); }
       .locked { text-align: center; padding: 44px 22px; }
       .locked .lock-ico { width: 44px; height: 44px; margin-bottom: 14px; }
       .locked h2 { margin-bottom: 10px; }
       .locked p { max-width: 520px; margin: 0 auto; }
       .listing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
-      .listing { background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 10px; }
+      .listing { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
       .listing img { width: 100%; height: auto; display: block; }
-      .listing .price { color: var(--gold); font-family: var(--mono); font-size: 13px; }
+      .listing .price { color: var(--neon); font-family: var(--mono); font-size: 13px; }
       .game-hud { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 14px; }
-      .game-hud .hud { flex: 1 1 110px; background: rgba(13, 13, 34, 0.88); border: 1px solid var(--panel-line); padding: 12px 14px; }
+      .game-hud .hud { flex: 1 1 110px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
       .game-hud .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 6px; }
       .game-hud .v { font-family: var(--mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
-      .game-hud .v.lime { color: var(--lime); }
-      .game-hud .v.gold { color: var(--gold); font-size: 16px; letter-spacing: 1px; padding-top: 4px; }
-      .board-wrap { position: relative; max-width: 540px; margin: 0 auto; background: #0a0a24; border: 1px solid var(--panel-line); box-shadow: 0 0 0 4px rgba(16, 16, 42, 0.55); }
-      #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; touch-action: none; background: #0a0a24; }
-      .game-over { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; background: rgba(7, 7, 26, 0.82); padding: 20px; }
+      .game-hud .v.neon { color: var(--neon); }
+      .game-hud .v.accent { color: var(--neon); font-size: 16px; letter-spacing: 1px; padding-top: 4px; }
+      .board-wrap { position: relative; max-width: 540px; margin: 0 auto; background: #03130a; border: 1px solid var(--line); box-shadow: 0 0 0 4px rgba(57, 255, 20, .18); }
+      #gameCanvas { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; touch-action: none; background: #03130a; }
+      .game-over { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; background: rgba(2, 10, 3, .82); padding: 20px; }
       .game-over.show { display: flex; }
-      .game-over .go-title { font-family: var(--serif); font-weight: 900; font-size: clamp(32px, 8vw, 46px); color: var(--gold); margin: 0 0 8px; }
+      .game-over .go-title { font-family: var(--display); font-weight: 400; font-size: clamp(20px, 5vw, 28px); line-height: 1.4; color: var(--neon); margin: 0 0 8px; }
       .game-over .go-score { font-family: var(--mono); font-size: 15px; letter-spacing: 1px; color: var(--ink); margin: 0 0 18px; font-variant-numeric: tabular-nums; }
       .game-hint { font-family: var(--mono); font-size: 12px; letter-spacing: 1px; color: var(--muted); text-align: center; margin: 12px auto 0; max-width: 540px; line-height: 1.7; }
-      .game-hint strong { color: var(--lime); font-weight: 600; }
+      .game-hint strong { color: var(--neon); font-weight: 600; }
       .dpad { display: grid; grid-template-columns: repeat(3, 68px); grid-template-rows: repeat(3, 68px); gap: 8px; justify-content: center; margin: 18px auto 4px; }
-      .dpad button { appearance: none; cursor: pointer; background: rgba(27, 27, 58, 0.92); border: 1px solid var(--panel-line); color: var(--ink); font-size: 26px; line-height: 1; min-width: 68px; min-height: 68px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
-      .dpad button:active { background: var(--lime); color: #131a04; }
-      .dpad button:focus-visible, .game-actions .btn:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+      .dpad button { appearance: none; cursor: pointer; background: rgba(2, 14, 4, .85); border: 1px solid var(--line); color: var(--ink); font-size: 26px; line-height: 1; min-width: 68px; min-height: 68px; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+      .dpad button:active { background: var(--neon); color: #021003; }
+      .dpad button:focus-visible, .game-actions .btn:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
       .dpad .up { grid-column: 2; grid-row: 1; }
       .dpad .left { grid-column: 1; grid-row: 2; }
-      .dpad .mid { grid-column: 2; grid-row: 2; border: 1px solid var(--panel-line); background: rgba(13, 13, 34, 0.6); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+      .dpad .mid { grid-column: 2; grid-row: 2; border: 1px solid var(--line); background: rgba(2, 14, 4, .6); display: flex; align-items: center; justify-content: center; font-size: 18px; }
       .dpad .right { grid-column: 3; grid-row: 2; }
       .dpad .down { grid-column: 2; grid-row: 3; }
       .game-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 16px; }
-      footer { position: relative; z-index: 2; border-top: 1px solid var(--panel-line); margin-top: 54px; padding: 24px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
-      footer a { color: var(--ink); }
+      footer { position: relative; z-index: 2; border-top: 1px solid rgba(57, 255, 20, .25); margin-top: 54px; padding: 24px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      footer a { color: var(--neon); }
       footer .contracts { font-family: var(--mono); font-size: 11px; letter-spacing: 0.4px; word-break: break-all; margin-top: 10px; }
       @media (max-width: 560px) {
         .dpad { grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 64px); }
         .dpad button { min-width: 64px; min-height: 64px; }
-        .trade-btn { padding: 11px 12px; letter-spacing: 1.6px; }
-        .wordmark { font-size: 22px; }
+        .trade-btn { padding: 6px 11px; }
+        .wordmark { font-size: 15px; }
         nav { gap: 20px; }
       }
       @media (max-width: 700px) {
-        body { background-attachment: scroll; background-position: 68% 18%; }
+        main { padding-top: 24px; }
+        .card { padding: 18px 16px; }
       }
 
     </style>
   </head>
   <body>
+    <div class="bg" aria-hidden="true"></div>
+    <div class="bg-veil" aria-hidden="true"></div>
     <div class="wrap">
       <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">MINT</a><a href="/market.html">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html" aria-current="page">PLAY</a></nav>
       <main>
 
         <div class="status-line">THE CLASSIC SNAKE GAME &middot; AUTO-PLAYS UNTIL YOU TAKE OVER</div>
         <h2>Play the snake.</h2>
-        <p class="lede">The blocky snake game you remember &mdash; eat the gold dot, grow longer, and don&rsquo;t run into the walls or your own tail. When this page opens the snake plays itself, like someone is already playing. Tap an arrow, swipe on the board, or press a direction key and the game is yours.</p>
+        <p class="lede">The blocky snake game you remember &mdash; eat the red apple, grow longer, and don&rsquo;t run into the walls or your own tail. When this page opens the snake plays itself, like someone is already playing. Tap an arrow, swipe on the board, or press a direction key and the game is yours.</p>
         <div class="game-hud" aria-live="polite">
-          <div class="hud"><div class="k">SCORE</div><div class="v lime" id="gameScore">0</div></div>
+          <div class="hud"><div class="k">SCORE</div><div class="v neon" id="gameScore">0</div></div>
           <div class="hud"><div class="k">BEST</div><div class="v" id="gameBest">0</div></div>
           <div class="hud"><div class="k">LENGTH</div><div class="v" id="gameLen">5</div></div>
-          <div class="hud"><div class="k">MODE</div><div class="v gold" id="gameMode">AUTO-PLAY</div></div>
+          <div class="hud"><div class="k">MODE</div><div class="v accent" id="gameMode">AUTO-PLAY</div></div>
         </div>
         <div class="board-wrap">
           <canvas id="gameCanvas" width="600" height="600" aria-label="Snake game board"></canvas>
@@ -159,7 +168,7 @@
             <div>
               <p class="go-title">Game Over</p>
               <p class="go-score" id="gameFinal">SCORE 0 &middot; LENGTH 5</p>
-              <button class="btn gold" type="button" id="gameAgain">&#8635; PLAY AGAIN</button>
+              <button class="btn btn-primary" type="button" id="gameAgain">&#8635; PLAY AGAIN</button>
             </div>
           </div>
         </div>
@@ -167,7 +176,7 @@
         <div class="dpad" role="group" aria-label="Snake direction controls">
           <button type="button" class="up" data-dir="up" aria-label="Move up">&uarr;</button>
           <button type="button" class="left" data-dir="left" aria-label="Move left">&larr;</button>
-          <div class="mid" aria-hidden="true"><span style="display:block;width:18px;height:18px;background:var(--lime)"></span></div>
+          <div class="mid" aria-hidden="true"><span style="display:block;width:18px;height:18px;background:var(--neon)"></span></div>
           <button type="button" class="right" data-dir="right" aria-label="Move right">&rarr;</button>
           <button type="button" class="down" data-dir="down" aria-label="Move down">&darr;</button>
         </div>
@@ -181,7 +190,7 @@
           <ol>
             <li><strong style="color:var(--ink)">On your phone:</strong> tap the big arrows above, or swipe on the board in the direction you want.</li>
             <li><strong style="color:var(--ink)">On desktop:</strong> use the arrow keys or W A S D.</li>
-            <li>Every gold dot is +10 points and one block longer. Hit a wall or your own body and it&rsquo;s game over.</li>
+            <li>Every red apple is +10 points and one block longer. Hit a wall or your own body and it&rsquo;s game over.</li>
             <li>Changed your mind? &ldquo;Back to auto-play&rdquo; hands control back to the snake &mdash; it goes back to playing itself.</li>
           </ol>
         </div>
@@ -287,7 +296,7 @@
           overEl.classList.remove("show");
           hintEl.innerHTML = gMode === "auto"
             ? "<strong>AUTO-PLAYING&hellip;</strong> tap an arrow below, swipe the board, or use arrow keys / WASD to take control."
-            : "<strong>YOU'RE IN CONTROL.</strong> Eat the gold dots \u2014 don't hit the walls or yourself.";
+            : "<strong>YOU'RE IN CONTROL.</strong> Eat the red apples \u2014 don't hit the walls or yourself.";
           gUpdateHud();
           gDraw(0);
         }
@@ -385,29 +394,29 @@
           if (!gtx) return;
           var W = gc.width, H = gc.height, cw = W / COLS, ch = H / ROWS;
           gtx.clearRect(0, 0, W, H);
-          gtx.fillStyle = "#0a0a24";
+          gtx.fillStyle = "#03130a";
           gtx.fillRect(0, 0, W, H);
-          gtx.fillStyle = "rgba(163,230,53,0.07)";
+          gtx.fillStyle = "rgba(57,255,20,0.07)";
           for (var gx = 0; gx < COLS; gx++) for (var gy = 0; gy < ROWS; gy++)
             gtx.fillRect(gx * cw + cw / 2 - 1.5, gy * ch + ch / 2 - 1.5, 3, 3);
           if (gFood) {
             var pulse = 1 + 0.2 * Math.sin(now / 200);
             var fs = cw * 0.42 * pulse, cx = gFood.x * cw + cw / 2, cy = gFood.y * ch + ch / 2;
-            gtx.fillStyle = "#f7c948";
+            gtx.fillStyle = "#ff3b30";
             gtx.fillRect(cx - fs / 2, cy - fs / 2, fs, fs);
             gtx.fillRect(cx - 3, cy - fs / 2 - 5, 6, 5);
           }
           var blink = !gAlive && Math.floor(now / 180) % 2 === 0;
           for (var i = gSnake.length - 1; i >= 0; i--) {
             var seg = gSnake[i], x = seg.x * cw, y = seg.y * ch;
-            if (i === 0) gtx.fillStyle = blink ? "#3f6212" : "#d9f99d";
+            if (i === 0) gtx.fillStyle = blink ? "#14532d" : "#baffa0";
             else {
               var t = i / Math.max(1, gSnake.length);
-              gtx.fillStyle = blink ? "#365314" : "rgb(" + Math.round(163 - 60 * t) + "," + Math.round(230 - 70 * t) + "," + Math.round(53 - 20 * t) + ")";
+              gtx.fillStyle = blink ? "#052e16" : "rgb(" + Math.round(57 - 17 * t) + "," + Math.round(255 - 105 * t) + "," + Math.round(20 - 10 * t) + ")";
             }
             gtx.fillRect(x + 2, y + 2, cw - 4, ch - 4);
             if (i === 0) {
-              gtx.fillStyle = "#0a0f04";
+              gtx.fillStyle = "#021003";
               var ex = x + cw / 2, ey = y + ch / 2;
               var ox = gDir.x * 5, oy = gDir.y * 5;
               var px = gDir.y !== 0 ? 6 : 0, py = gDir.x !== 0 ? 6 : 0;
@@ -436,7 +445,7 @@
           } else {
             if (gSnake.length > 1 && nx === -gDir.x && ny === -gDir.y) return;
             gMode = "manual";
-            hintEl.innerHTML = "<strong>YOU'RE IN CONTROL.</strong> Eat the gold dots \u2014 don't hit the walls or yourself.";
+            hintEl.innerHTML = "<strong>YOU'RE IN CONTROL.</strong> Eat the red apples \u2014 don't hit the walls or yourself.";
           }
           gNext = { x: nx, y: ny };
           gUpdateHud();

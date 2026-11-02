@@ -22,6 +22,7 @@
         --overlay: 0.58;
         --bg: #020a03;
         --red: #ff3b30;
+        --gold: #f5c542;
         --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
         --display: "Press Start 2P", monospace;
         --sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -90,6 +91,8 @@
       .stat .k { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
       .stat .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; word-break: break-all; }
       .stat .v small { font-size: 13px; color: var(--muted); font-weight: 400; }
+      /* Collection scope picker */
+      .scope-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
       /* Tabs */
       .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
       .tab-btn { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 1.8px; color: var(--muted); background: rgba(2, 14, 4, .7); border: 1px solid var(--line); padding: 12px 16px; cursor: pointer; }
@@ -124,6 +127,15 @@
       .badge.minted { background: #3b82f6; color: #fff; }
       .badge.cancelled { background: #52525b; color: #fff; }
       .badge.updated { background: var(--neon-dim); color: #021003; }
+      .badge.coll-snake { background: var(--neon); color: #021003; }
+      .badge.coll-panda { background: var(--gold); color: #1a1200; }
+      .badge.tier-common { background: #5b6b5f; color: #eaffea; }
+      .badge.tier-uncommon { background: #1db954; color: #021003; }
+      .badge.tier-rare { background: #3b82f6; color: #fff; }
+      .badge.tier-epic { background: #a855f7; color: #fff; }
+      .badge.tier-legendary { background: var(--gold); color: #1a1200; }
+      .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+      .badge-row .badge { margin-bottom: 0; }
       .empty { text-align: center; padding: 44px 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; margin-top: 16px; }
       .empty h3 { font-family: var(--display); font-size: 15px; line-height: 1.5; color: var(--ink); margin: 0 0 10px; }
       .empty p { color: var(--muted); font-size: 15px; line-height: 1.65; max-width: 480px; margin: 0 auto 18px; }
@@ -146,7 +158,7 @@
       .bar > div { height: 100%; width: 0%; background: var(--neon); transition: width 0.4s ease; }
       /* Sales table */
       .table-wrap { overflow-x: auto; margin-top: 16px; }
-      table.sales { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+      table.sales { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 720px; }
       table.sales th, table.sales td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px; }
       table.sales th { color: var(--neon); letter-spacing: 1.5px; font-size: 11px; }
       table.sales td { color: var(--ink); word-break: break-all; }
@@ -187,13 +199,19 @@
       <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header>
       <nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html">LAUNCHPAD</a><a href="/market.html" aria-current="page">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
       <main>
-        <div class="status-line">MARKET FEE 5% &middot; SELLER RECEIVES 95% &middot; MIN LISTING 0.001 BNB</div>
+        <div class="status-line">MARKET FEE 5% &middot; SELLER RECEIVES 95% &middot; SNAKEID + AGENT PANDA</div>
         <h1>Market <em>live</em></h1>
-        <p class="lede">Every listing, sale and price below is read live from the SnakeID Market contract on BNB Chain. Nothing here is a guess — if a number cannot be read on-chain, it shows as &ldquo;&mdash;&rdquo;.</p>
+        <p class="lede">Every listing, sale and price below is read live from the SnakeID and Agent Panda Market contracts on BNB Chain. Nothing here is a guess &mdash; if a number cannot be read on-chain, it shows as &ldquo;&mdash;&rdquo;.</p>
 
         <div class="card" id="lockBanner" style="display:none; margin-top: 0">
           <h3>MARKET NOT OPEN YET</h3>
           <p id="lockText">The market opens automatically when all 10,000 SnakeID are minted.</p>
+        </div>
+
+        <div class="scope-row" role="group" aria-label="Collection">
+          <button class="chip scope-chip" type="button" data-scope="all" aria-pressed="true">ALL COLLECTIONS</button>
+          <button class="chip scope-chip" type="button" data-scope="snake" aria-pressed="false">SNAKEID</button>
+          <button class="chip scope-chip" type="button" data-scope="panda" aria-pressed="false">AGENT PANDA</button>
         </div>
 
         <div class="stat-grid" id="statsBar" aria-live="polite">
@@ -235,11 +253,21 @@
             <span class="search-box"><input type="search" id="searchInput" placeholder="Search Token ID, e.g. 1234" inputmode="numeric" aria-label="Search by Token ID" /></span>
             <button class="btn small" type="button" id="searchBtn">SEARCH</button>
           </div>
+          <div class="filters" role="group" aria-label="Rarity filter" style="margin-top:10px">
+            <span class="mono">RARITY:</span>
+            <button class="chip rarity-chip" type="button" data-rarity="all" aria-pressed="true">ALL</button>
+            <button class="chip rarity-chip" type="button" data-rarity="Common" aria-pressed="false">COMMON</button>
+            <button class="chip rarity-chip" type="button" data-rarity="Uncommon" aria-pressed="false">UNCOMMON</button>
+            <button class="chip rarity-chip" type="button" data-rarity="Rare" aria-pressed="false">RARE</button>
+            <button class="chip rarity-chip" type="button" data-rarity="Epic" aria-pressed="false">EPIC</button>
+            <button class="chip rarity-chip" type="button" data-rarity="Legendary" aria-pressed="false">LEGENDARY</button>
+            <span class="mono" id="rarityNote">Agent Panda has no tiers — shown only on ALL.</span>
+          </div>
           <div id="exploreGridWrap">
             <div class="listing-grid" id="exploreGrid"></div>
             <div class="empty" id="exploreEmpty" style="display:none">
-              <h3>No snakes listed yet</h3>
-              <p>Be the first to list yours. Market fee 5%, seller receives 95%, minimum listing 0.001 BNB.</p>
+              <h3>No listings yet</h3>
+              <p>Be the first to list yours. Market fee 5%, seller receives 95%. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
               <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
             </div>
             <div class="empty" id="searchEmpty" style="display:none">
@@ -255,8 +283,8 @@
           <p class="mono" style="margin-top:18px">Active listings only — cheapest first. Cancelled listings are not shown here, and sold tokens never appear as listed.</p>
           <div class="listing-grid" id="listedGrid"></div>
           <div class="empty" id="listedEmpty" style="display:none">
-            <h3>No snakes listed yet</h3>
-            <p>Be the first to list yours. Market fee 5%, seller receives 95%, minimum listing 0.001 BNB.</p>
+            <h3>No listings yet</h3>
+            <p>Be the first to list yours. Market fee 5%, seller receives 95%. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
           </div>
           <div class="pagination" id="listedPagination"></div>
@@ -278,13 +306,13 @@
           <p class="mono" style="margin-top:18px">Completed sales only. A cancelled listing is never shown as a sale.</p>
           <div class="table-wrap">
             <table class="sales">
-              <thead><tr><th>TOKEN</th><th>PRICE</th><th>SELLER</th><th>BUYER</th><th>DATE</th><th>TX</th></tr></thead>
+              <thead><tr><th>TOKEN</th><th>COLLECTION</th><th>PRICE</th><th>SELLER</th><th>BUYER</th><th>DATE</th><th>TX</th></tr></thead>
               <tbody id="salesBody"></tbody>
             </table>
           </div>
           <div class="empty" id="salesEmpty" style="display:none">
             <h3>No sales yet</h3>
-            <p>No SnakeID has sold on the market yet. Sales will appear here the moment the first one happens.</p>
+            <p>No SnakeID or Agent Panda has sold on the market yet. Sales will appear here the moment the first one happens.</p>
           </div>
         </section>
 
@@ -310,7 +338,11 @@
         <div class="card" id="tradePanel">
           <h3>TRADE VIA AGENT &mdash; BUY &amp; SELL</h3>
           <p>This site never connects a wallet and never asks for a seed phrase or private key. Copy a prompt, paste it to your agent (e.g. Binance AI Pro), your agent verifies everything on-chain first, shows a transaction preview, and waits for your confirmation before anything is signed.</p>
-          <p style="margin-top:10px">Market fee 5% &middot; Seller receives 95% &middot; Minimum listing 0.001 BNB.</p>
+          <p style="margin-top:10px">Market fee 5% &middot; Seller receives 95% &middot; Minimum listing: SnakeID 0.001 BNB &middot; Agent Panda 0.0001 BNB.</p>
+          <div class="row" style="margin-top:16px">
+            <button class="chip trade-chip" type="button" data-trade-coll="snake" aria-pressed="true">SNAKEID</button>
+            <button class="chip trade-chip" type="button" data-trade-coll="panda" aria-pressed="false">AGENT PANDA</button>
+          </div>
           <div class="row" style="margin-top:16px">
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
             <button class="btn" type="button" data-copy="buy">COPY BUY PROMPT</button>
@@ -322,7 +354,7 @@
         <!-- MY NFTS -->
         <div class="card" id="myNfts">
           <h3>MY NFTS &mdash; LOOK UP BY WALLET ADDRESS</h3>
-          <p>Paste any wallet address. The page finds that wallet&rsquo;s SnakeID tokens by reading NFT Transfer events on BNB Chain (the contract has no per-owner enumeration), then shows each token&rsquo;s status: LISTED at its price, or NOT LISTED. Results are cached on this device.</p>
+          <p>Paste any wallet address. The page finds that wallet&rsquo;s SnakeID and Agent Panda tokens by reading ownerOf on both NFT contracts, then shows each token&rsquo;s status: LISTED at its price, or NOT LISTED. Results are cached on this device.</p>
           <div class="lookup-row">
             <input type="text" id="walletInput" placeholder="0x..." autocomplete="off" spellcheck="false" aria-label="Wallet address" />
             <button class="btn btn-primary" type="button" id="lookupBtn">LOOK UP</button>
@@ -330,8 +362,8 @@
           <p class="mono" id="lookupLine" style="margin-top:12px"></p>
           <div class="my-grid" id="myGrid"></div>
           <div class="empty" id="myEmpty" style="display:none">
-            <h3>No SnakeID found</h3>
-            <p id="myEmptyText">That wallet holds no SnakeID tokens (or none were found in the Transfer events).</p>
+            <h3>No SnakeID or Agent Panda found</h3>
+            <p id="myEmptyText">That wallet holds no SnakeID or Agent Panda tokens (or none were found).</p>
           </div>
         </div>
 
@@ -345,33 +377,61 @@
           </ol>
         </div>
         <div class="card">
-          <h3>MARKET CONTRACT</h3>
-          <p>Market contract<br /><span class="addr">0x0a5e8d61230241312a623e17d61540d0dff2feb7</span></p>
-          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">View Market contract on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
-          <p style="margin-top: 10px">NFT contract<br /><span class="addr">0xafc6bca0e191e396306343213b04ff9a8d717263</span></p>
-          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">View NFT contract on BscScan &nearr;</a></p>
+          <h3>MARKET CONTRACTS</h3>
+          <p>SnakeID Market<br /><span class="addr">0x0a5e8d61230241312a623e17d61540d0dff2feb7</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">View SnakeID Market on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x0a5e8d61230241312a623e17d61540d0dff2feb7" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
+          <p style="margin-top: 10px">SnakeID NFT<br /><span class="addr">0xafc6bca0e191e396306343213b04ff9a8d717263</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">View SnakeID NFT on BscScan &nearr;</a></p>
+          <p style="margin-top: 10px">Agent Panda Market<br /><span class="addr">0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898" target="_blank" rel="noopener">View Agent Panda Market on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
+          <p style="margin-top: 10px">Agent Panda NFT<br /><span class="addr">0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e" target="_blank" rel="noopener">View Agent Panda NFT on BscScan &nearr;</a></p>
         </div>
       </main>
 
       <footer>
         <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a></div>
-        <div class="contracts">&copy; 2026 SNAKEID &middot; NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7</div>
+        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898</div>
       </footer>
     </div>
 
     <script>
     (function () {
       "use strict";
-      /* ============ Constants ============ */
-      var NFT = "0xafc6bca0e191e396306343213b04ff9a8d717263";
-      var MARKET = "0x0a5e8d61230241312a623e17d61540d0dff2feb7";
+      /* ============ Collection configs ============ */
+      /* Two collections, one marketplace. Each collection has its own NFT
+       * and Market contracts, its own minimum listing price, its own event
+       * history start block, and its own shipped snapshots. Nothing here is
+       * shared between them except the chain and the page chrome. */
+      var COLLS = {
+        snake: {
+          key: "snake", name: "SnakeID", short: "SNAKEID",
+          nft: "0xafc6bca0e191e396306343213b04ff9a8d717263",
+          market: "0x0a5e8d61230241312a623e17d61540d0dff2feb7",
+          minPriceWei: "1000000000000000", minPriceBnb: "0.001",
+          maxSupply: 10000, eventsStart: 131070000,
+          snapListings: "listings.json", snapEvents: "market-events.json",
+          cacheEvents: "snakeid-market-events-v2",
+          img: function (id) { return "https://snakeid.xyz/snake-" + id + ".webp"; },
+          label: function (id) { return "SnakeID #" + id; }
+        },
+        panda: {
+          key: "panda", name: "Agent Panda", short: "AGENT PANDA",
+          nft: "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+          market: "0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898",
+          minPriceWei: "100000000000000", minPriceBnb: "0.0001",
+          maxSupply: 10000, eventsStart: 131130000,
+          snapListings: "listings-panda.json", snapEvents: "market-events-panda.json",
+          cacheEvents: "snakeid-panda-market-events-v1",
+          img: function (id) { return "panda-card.webp"; },
+          label: function (id) { return "Agent Panda #" + id; }
+        }
+      };
+      var COLL_KEYS = ["snake", "panda"];
       var MULTICALL = "0xcA11bde05977b3631167028862bE2a173976CA11";
-      var MAX_SUPPLY = 10000;
-      var EVENTS_START_BLOCK = 131070000;
       var PAGE_SIZE = 24;
       var CHUNK = 50; // 1RPC caps eth_getLogs at 50-block ranges; dRPC also handles 50
-      var RECENT_WINDOW = 900; // live fetches stay inside the recent window so page loads stay fast — full history comes from the shipped market-events.json snapshot, not from live log calls
-      var SNAPSHOT_URL = "listings.json";
+      var RECENT_WINDOW = 900; // live fetches stay inside the recent window so page loads stay fast — full history comes from the shipped market-events snapshots, not from live log calls
       var TICK_MS = 1000;
       var REFRESH_MS = 60000;
       // Event-log endpoints (free): 1RPC serves eth_getLogs on historical
@@ -390,34 +450,41 @@
       var TOPIC_SOLD = "0x16dd16959a056953a63cf14bf427881e762e54f03d86b864efea8238dd3b822f";
       var TOPIC_TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
       var ZERO = "0x0000000000000000000000000000000000000000";
-      var CACHE_EVENTS = "snakeid-market-events-v2";
       var CACHE_TIMES = "snakeid-block-times-v1";
       var CACHE_WALLET = "snakeid-my-nfts-v1";
 
       /* ============ State ============ */
+      function newCollState() {
+        return {
+          totalMinted: null,
+          marketEvents: [],   // parsed market events, sorted by block/logIndex
+          mintEvents: [],     // compact [block, tx, logIndex, to, tokenId]
+          activeListings: {}, // tokenId -> {seller, priceWei(BigInt), block, tx, logIndex}
+          soldMap: {},        // tokenId -> latest sale {seller, buyer, priceWei, block, tx, logIndex}
+          sales: [],          // all Sold events, newest first
+          activity: [],       // unified feed for this collection, newest first
+          listingsChecked: false,
+          dataReady: false,
+          eventsUnavailable: false, // true when every eth_getLogs chunk failed (public RPC rate limit) and no cached events exist — sales stats must show "—", never 0
+          eventsPartial: false,     // true when the loaded events start after this collection's events start (recent window only) — lifetime totals would be incomplete, so they show "—" too
+          eventsCoverageStart: 0,   // first block the loaded events cover
+          soldComplete: false,    // true when the loaded snapshot authoritatively covers ALL Sold events from market open — Total Sold + volumes are real even if Listed/Cancelled history is not
+          listedComplete: false,  // true only when the loaded snapshot covers the FULL Listed+Sold+Cancelled history — Total Market Txs needs this
+          snapshotAt: 0,      // ms epoch of the loaded listings snapshot
+          snapshotBlock: 0,   // latest block the listings snapshot covers
+          refreshing: false   // a silent background listings refresh is running for this collection
+        };
+      }
+      var S = { snake: newCollState(), panda: newCollState() };
       var latestBlock = 0;
-      var totalMinted = null;
-      var marketEvents = [];   // parsed market events, sorted by block/logIndex
-      var mintEvents = [];     // compact [block, tx, logIndex, to, tokenId]
-      var activeListings = {}; // tokenId -> {seller, priceWei(BigInt), block, tx, logIndex}
-      var soldMap = {};        // tokenId -> latest sale {seller, buyer, priceWei, block, tx, logIndex}
-      var sales = [];          // all Sold events, newest first
-      var activity = [];       // unified feed, newest first
-      var listingsChecked = false;
-      var dataReady = false;
-      var eventsUnavailable = false; // true when every eth_getLogs chunk failed (public RPC rate limit) and no cached events exist — sales stats must show "—", never 0
-      var eventsPartial = false;     // true when the loaded events start after EVENTS_START_BLOCK (recent window only) — lifetime totals would be incomplete, so they show "—" too
-      var eventsCoverageStart = EVENTS_START_BLOCK; // first block the loaded events cover
-      var soldComplete = false;    // true when the loaded snapshot authoritatively covers ALL Sold events from market open — Total Sold + volumes are real even if Listed/Cancelled history is not
-      var listedComplete = false;  // true only when the loaded snapshot covers the FULL Listed+Sold+Cancelled history — Total Market Txs needs this
       var blockTimes = {};     // blockNumber -> unix seconds
       var activityShown = 50;
-      var snapshotAt = 0;      // ms epoch of the loaded listings snapshot
-      var snapshotBlock = 0;   // latest block the listings snapshot covers
-      var refreshing = false;  // a silent background listings refresh is running
-      var tickBusy = false;    // a 1-second block poll is in flight
       var dirty = false;       // in-memory listings changed — re-render grids on next tick
+      var tickBusy = false;    // a 1-second block poll is in flight
       var liveStarted = false; // 1s tick + 60s refresh intervals started once
+      var collectionFilter = "all"; // "all" | "snake" | "panda"
+      var tradeColl = "snake";      // collection the trade-panel prompts are for
+      var chartRange = "24h";
 
       /* ============ Small helpers ============ */
       function $(id) { return document.getElementById(id); }
@@ -453,6 +520,8 @@
       }
       function loadCache(key) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
       function saveCache(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
+      function collsInScope() { return collectionFilter === "all" ? COLL_KEYS : [collectionFilter]; }
+      function scopeLabel() { return collectionFilter === "all" ? "" : COLLS[collectionFilter].name; }
 
       /* ============ RPC layer (fetch POST, 8s timeout, fallback across RPCs) ============ */
       function rpcOnce(url, method, params) {
@@ -501,16 +570,19 @@
       }
 
       /* ============ Copy prompts (agent pattern — no wallet connect anywhere) ============ */
-      function promptList(tokenId) {
-        var t = tokenId ? " SnakeID #" + tokenId : " my SnakeID NFT";
-        return "List" + t + " on the SnakeID Market on BNB Chain. NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7, market fee 5%, seller receives 95%, minimum listing 0.001 BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum 0.001] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
+      function promptList(tokenId, coll) {
+        var C = COLLS[coll || tradeColl];
+        var t = tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT";
+        return "List" + t + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ", market fee 5%, seller receives 95%, minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
       }
-      function promptBuy(tokenId, seller, priceWei) {
-        var detail = tokenId ? " SnakeID #" + tokenId + (seller ? " from seller " + seller : "") + (priceWei !== undefined && priceWei !== null ? " at " + fmtBNB(priceWei) + " BNB" : "") + "." : " a SnakeID NFT.";
-        return "Buy" + detail + " NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7, market fee 5%, seller receives 95%. Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
+      function promptBuy(tokenId, seller, priceWei, coll) {
+        var C = COLLS[coll || tradeColl];
+        var detail = tokenId ? " " + C.name + " #" + tokenId + (seller ? " from seller " + seller : "") + (priceWei !== undefined && priceWei !== null ? " at " + fmtBNB(priceWei) + " BNB" : "") + "." : " a " + C.name + " NFT.";
+        return "Buy" + detail + " NFT " + C.nft + ", Market " + C.market + ", market fee 5%, seller receives 95%. Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
       }
-      function promptCancel(tokenId) {
-        return "Cancel my listing for" + (tokenId ? " SnakeID #" + tokenId : " my SnakeID NFT") + " on the SnakeID Market on BNB Chain. NFT 0xafc6bca0e191e396306343213b04ff9a8d717263, Market 0x0a5e8d61230241312a623e17d61540d0dff2feb7. Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
+      function promptCancel(tokenId, coll) {
+        var C = COLLS[coll || tradeColl];
+        return "Cancel my listing for" + (tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT") + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ". Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
       }
       function copyText(text, noteEl) {
         function done(ok) { if (noteEl) noteEl.textContent = ok ? "COPIED \u2713" : "Copy failed \u2014 long-press the prompt to copy it manually."; }
@@ -529,9 +601,10 @@
         var btn = ev.target.closest ? ev.target.closest("[data-copy]") : null;
         if (!btn) return;
         var kind = btn.getAttribute("data-copy");
-        var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null)
-          : kind === "buy" ? promptBuy(btn.getAttribute("data-token") || null, btn.getAttribute("data-seller") || null, btn.getAttribute("data-price") || null)
-          : promptCancel(btn.getAttribute("data-token") || null);
+        var coll = btn.getAttribute("data-coll") || tradeColl;
+        var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null, coll)
+          : kind === "buy" ? promptBuy(btn.getAttribute("data-token") || null, btn.getAttribute("data-seller") || null, btn.getAttribute("data-price") || null, coll)
+          : promptCancel(btn.getAttribute("data-token") || null, coll);
         var note = $("tradeCopied");
         copyText(text, note);
         if (note) setTimeout(function () { note.textContent = ""; }, 4000);
@@ -559,10 +632,12 @@
       }
       function sortEvents(a, b) { return (a.block - b.block) || (a.logIndex - b.logIndex); }
 
-      /* Replay market events in block order to derive listings / sales / price updates. */
-      function replayEvents() {
-        soldMap = {}; sales = []; activity = [];
-        var sorted = marketEvents.slice().sort(sortEvents);
+      /* Replay one collection's market events in block order to derive its
+       * listings / sales / price updates. */
+      function replayEvents(coll) {
+        var st = S[coll];
+        st.soldMap = {}; st.sales = []; st.activity = [];
+        var sorted = st.marketEvents.slice().sort(sortEvents);
         // Tracks which tokens are listed according to the events replayed so
         // far (independent of the snapshot) — a second Listed for the same
         // token is a "Price change", a Listed after a Cancelled is a fresh
@@ -576,59 +651,70 @@
           if (e.type === "Listed") {
             var isUpdate = !!seenListed[e.tokenId];
             seenListed[e.tokenId] = true;
-            if (e.block > snapshotBlock) {
-              activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
+            if (e.block > st.snapshotBlock) {
+              st.activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
             }
-            activity.push({ kind: isUpdate ? "Price change" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            st.activity.push({ coll: coll, kind: isUpdate ? "Price change" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
           } else if (e.type === "Cancelled") {
-            if (e.block > snapshotBlock) delete activeListings[e.tokenId];
+            if (e.block > st.snapshotBlock) delete st.activeListings[e.tokenId];
             delete seenListed[e.tokenId];
-            activity.push({ kind: "Cancelled", tokenId: e.tokenId, seller: e.seller, price: null, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            st.activity.push({ coll: coll, kind: "Cancelled", tokenId: e.tokenId, seller: e.seller, price: null, block: e.block, tx: e.tx, logIndex: e.logIndex });
           } else if (e.type === "Sold") {
-            if (e.block > snapshotBlock) delete activeListings[e.tokenId];
+            if (e.block > st.snapshotBlock) delete st.activeListings[e.tokenId];
             delete seenListed[e.tokenId];
-            var sale = { seller: e.seller, buyer: e.buyer, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
-            soldMap[e.tokenId] = sale;
-            sales.push({ tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, priceWei: sale.priceWei, block: e.block, tx: e.tx, logIndex: e.logIndex });
-            activity.push({ kind: "Sold", tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            var sale = { coll: coll, seller: e.seller, buyer: e.buyer, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
+            st.soldMap[e.tokenId] = sale;
+            st.sales.push({ coll: coll, tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, priceWei: sale.priceWei, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            st.activity.push({ coll: coll, kind: "Sold", tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
           }
         });
-        mintEvents.forEach(function (m) {
-          activity.push({ kind: "Minted", tokenId: m[4], seller: null, buyer: m[3], price: null, block: m[0], tx: m[1], logIndex: m[2] });
+        st.mintEvents.forEach(function (m) {
+          st.activity.push({ coll: coll, kind: "Minted", tokenId: m[4], seller: null, buyer: m[3], price: null, block: m[0], tx: m[1], logIndex: m[2] });
         });
-        activity.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
-        sales.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
+        st.activity.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
+        st.sales.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
       }
 
-      /* ============ Stats ============ */
+      /* ============ Stats (scope-aware) ============ */
       function setStat(id, text) { var el = $(id); if (el) el.textContent = text; }
+      /* Event-derived stats are real only when every collection in scope has
+       * a trustworthy event history for that metric: Sold + volumes need
+       * (soldComplete OR no incompleteness) per collection; Total Market Txs
+       * needs (no incompleteness AND listedComplete) per collection. When
+       * any in-scope collection fails that, the combined number shows "—"
+       * instead of a partial sum — never a made-up total. */
       function updateStats() {
-        setStat("stTotalMinted", totalMinted === null ? "—" : fmtInt(totalMinted));
-        var activeCount = Object.keys(activeListings).length;
-        setStat("stListed", dataReady ? fmtInt(activeCount) : "…");
-        setStat("stActive", dataReady ? fmtInt(activeCount) : "…");
-        // Event-derived stats: when the event load could not complete at all,
-        // or when the loaded events only cover a recent window (the free
-        // plan cannot serve full history), show "—" — never 0, because 0
-        // would falsely claim no sales ever happened.
-        // Exception: the Sold history can be authoritatively complete even
-        // when Listed/Cancelled history is not (soldComplete) — then Total
-        // Sold and the volumes are real, while Total Market Txs stays "—"
-        // because the Listed/Cancelled counts are still unknown.
-        var eventsIncomplete = eventsUnavailable || eventsPartial;
-        var soldReady = soldComplete || !eventsIncomplete;
-        setStat("stSold", soldReady ? (dataReady ? fmtInt(sales.length) : "…") : "—");
-        setStat("stTxs", (eventsIncomplete || !listedComplete) ? "—" : (dataReady ? fmtInt(marketEvents.length) : "…"));
-        if (dataReady && soldReady) {
-          var vol = sales.reduce(function (acc, s) { return acc + s.priceWei; }, 0n);
+        var scope = collsInScope();
+        var tm = 0, tmKnown = true;
+        scope.forEach(function (k) { if (S[k].totalMinted === null) tmKnown = false; else tm += S[k].totalMinted; });
+        setStat("stTotalMinted", tmKnown ? fmtInt(tm) : "—");
+        var activeCount = 0, allReady = true;
+        scope.forEach(function (k) { activeCount += Object.keys(S[k].activeListings).length; if (!S[k].dataReady) allReady = false; });
+        setStat("stListed", allReady ? fmtInt(activeCount) : "…");
+        setStat("stActive", allReady ? fmtInt(activeCount) : "…");
+        var soldReady = true, txsReady = true;
+        scope.forEach(function (k) {
+          var st = S[k];
+          var incomplete = st.eventsUnavailable || st.eventsPartial;
+          if (!st.soldComplete && incomplete) soldReady = false;
+          if (incomplete || !st.listedComplete) txsReady = false;
+        });
+        var soldCount = 0, txCount = 0;
+        scope.forEach(function (k) { soldCount += S[k].sales.length; txCount += S[k].marketEvents.length; });
+        setStat("stSold", soldReady ? (allReady ? fmtInt(soldCount) : "…") : "—");
+        setStat("stTxs", txsReady ? (allReady ? fmtInt(txCount) : "…") : "—");
+        if (allReady && soldReady) {
+          var vol = 0n;
+          scope.forEach(function (k) { vol += S[k].sales.reduce(function (acc, s) { return acc + s.priceWei; }, 0n); });
           setStat("stVolume", fmtBNB(vol) + " BNB");
           setStat("anVolume", fmtBNB(vol) + " BNB");
-          setStat("anSold", fmtInt(sales.length));
+          setStat("anSold", fmtInt(soldCount));
           var cutoff = latestBlock - 28800;
-          var vol24 = sales.filter(function (s) { return s.block >= cutoff; }).reduce(function (acc, s) { return acc + s.priceWei; }, 0n);
+          var vol24 = 0n;
+          scope.forEach(function (k) { vol24 += S[k].sales.filter(function (s) { return s.block >= cutoff; }).reduce(function (acc, s) { return acc + s.priceWei; }, 0n); });
           setStat("stVolume24h", fmtBNB(vol24) + " BNB");
           setStat("anVolume24h", fmtBNB(vol24) + " BNB");
-        } else if (dataReady && !soldReady) {
+        } else if (allReady && !soldReady) {
           setStat("stVolume", "—");
           setStat("anVolume", "—");
           setStat("anSold", "—");
@@ -637,53 +723,56 @@
         }
         // Floor price comes from the listings() check, not
         // from events — so it is shown even when the event load is unavailable.
-        if (dataReady) {
+        if (allReady) {
           var floor = null;
-          Object.keys(activeListings).forEach(function (id) {
-            var p = activeListings[id].priceWei;
-            if (floor === null || p < floor) floor = p;
+          scope.forEach(function (k) {
+            Object.keys(S[k].activeListings).forEach(function (id) {
+              var p = S[k].activeListings[id].priceWei;
+              if (floor === null || p < floor) floor = p;
+            });
           });
           setStat("stFloor", floor === null ? "—" : fmtBNB(floor) + " BNB");
           setStat("anFloor", floor === null ? "—" : fmtBNB(floor) + " BNB");
         }
       }
 
-      /* ============ Events (silent background load) ============ */
+      /* ============ Events (silent background load, per collection) ============ */
       // Event history loads in the background with no progress text anywhere.
-      // First it seeds from the per-device cache, then from market-events.json
-      // (a snapshot of past events shipped with the site — its soldComplete /
-      // listedComplete flags say which histories it authoritatively covers:
-      // Sold may be complete from market open while Listed/Cancelled are
-      // not yet), then it fetches only the new blocks since that point via
+      // First it seeds from the per-device cache, then from the shipped
+      // market-events snapshot for that collection (its soldComplete /
+      // listedComplete flags say which histories it authoritatively covers),
+      // then it fetches only the new blocks since that point via
       // eth_getLogs. If every log call fails and there are no events at all,
       // the history sections render as "unavailable" — never as 0 sales.
       // Live fetches are clamped to the recent window so page loads stay
       // fast; events older than that come from the snapshot.
-      async function loadEvents() {
-        var cached = loadCache(CACHE_EVENTS);
-        var fromBlock = EVENTS_START_BLOCK;
-        var coverageStart = EVENTS_START_BLOCK;
+      async function loadEvents(coll) {
+        var C = COLLS[coll];
+        var st = S[coll];
+        var cached = loadCache(C.cacheEvents);
+        var fromBlock = C.eventsStart;
+        var coverageStart = C.eventsStart;
         var haveSource = false;
-        if (cached && cached.toBlock && cached.toBlock >= EVENTS_START_BLOCK && Array.isArray(cached.market)) {
-          marketEvents = cached.market;
-          mintEvents = Array.isArray(cached.mints) ? cached.mints : [];
+        if (cached && cached.toBlock && cached.toBlock >= C.eventsStart && Array.isArray(cached.market)) {
+          st.marketEvents = cached.market;
+          st.mintEvents = Array.isArray(cached.mints) ? cached.mints : [];
           fromBlock = cached.toBlock + 1;
-          coverageStart = (typeof cached.fromBlock === "number") ? cached.fromBlock : EVENTS_START_BLOCK;
-          soldComplete = cached.soldComplete === true;
-          listedComplete = cached.listedComplete === true;
+          coverageStart = (typeof cached.fromBlock === "number") ? cached.fromBlock : C.eventsStart;
+          st.soldComplete = cached.soldComplete === true;
+          st.listedComplete = cached.listedComplete === true;
           haveSource = true;
         } else {
           try {
-            var res = await fetch("market-events.json", { cache: "no-store" });
+            var res = await fetch(C.snapEvents, { cache: "no-store" });
             if (res.ok) {
               var snap = await res.json();
-              if (snap && Array.isArray(snap.market) && typeof snap.toBlock === "number" && snap.toBlock >= EVENTS_START_BLOCK) {
-                marketEvents = snap.market;
-                mintEvents = Array.isArray(snap.mints) ? snap.mints : [];
+              if (snap && Array.isArray(snap.market) && typeof snap.toBlock === "number" && snap.toBlock >= C.eventsStart) {
+                st.marketEvents = snap.market;
+                st.mintEvents = Array.isArray(snap.mints) ? snap.mints : [];
                 fromBlock = snap.toBlock + 1;
-                coverageStart = (typeof snap.fromBlock === "number") ? snap.fromBlock : EVENTS_START_BLOCK;
-                soldComplete = snap.soldComplete === true;
-                listedComplete = snap.listedComplete === true;
+                coverageStart = (typeof snap.fromBlock === "number") ? snap.fromBlock : C.eventsStart;
+                st.soldComplete = snap.soldComplete === true;
+                st.listedComplete = snap.listedComplete === true;
                 haveSource = true;
               }
             }
@@ -693,39 +782,46 @@
         // Already-loaded events are unaffected; only the new fetch is limited.
         if (fromBlock < latestBlock - RECENT_WINDOW) fromBlock = latestBlock - RECENT_WINDOW;
         if (!haveSource) coverageStart = fromBlock;
-        eventsCoverageStart = coverageStart;
-        eventsPartial = eventsCoverageStart > EVENTS_START_BLOCK;
-        if (fromBlock > latestBlock) { replayEvents(); renderExplore(); renderListed(); return; }
+        st.eventsCoverageStart = coverageStart;
+        st.eventsPartial = st.eventsCoverageStart > C.eventsStart;
+        if (fromBlock > latestBlock) { replayEvents(coll); await fillTimestamps(allEventBlocks(coll)); renderAll(); return; }
         var marketChunks = 0, marketChunkFails = 0;
-        var hadCachedEvents = marketEvents.length > 0;
+        var hadCachedEvents = st.marketEvents.length > 0;
         for (var from = fromBlock; from <= latestBlock; from += CHUNK) {
           var to = Math.min(from + CHUNK - 1, latestBlock);
           marketChunks++;
           try {
-            var logs = await getLogs(MARKET, null, from, to);
-            logs.forEach(function (l) { var e = parseMarketLog(l); if (e) marketEvents.push(e); });
+            var logs = await getLogs(C.market, null, from, to);
+            logs.forEach(function (l) { var e = parseMarketLog(l); if (e) st.marketEvents.push(e); });
           } catch (e) { marketChunkFails++; /* one chunk failing must not kill the whole load; it is retried on the next visit */ }
           try {
-            var mlogs = await getLogs(NFT, [TOPIC_TRANSFER, padAddr(ZERO), null], from, to);
+            var mlogs = await getLogs(C.nft, [TOPIC_TRANSFER, padAddr(ZERO), null], from, to);
             mlogs.forEach(function (l) {
-              mintEvents.push([l.blockNumber, l.transactionHash, l.logIndex, topicAddr(l.topics[2]), parseInt(l.topics[3], 16)]);
+              st.mintEvents.push([l.blockNumber, l.transactionHash, l.logIndex, topicAddr(l.topics[2]), parseInt(l.topics[3], 16)]);
             });
           } catch (e) {}
-          replayEvents();
+          replayEvents(coll);
           updateStats();
         }
         // If every market-log chunk failed and we have no events at all (not
         // even cached or snapshot ones), the sales/activity data is UNAVAILABLE
         // — it must render as "—", never as 0 sales / 0 volume.
-        if (marketChunks > 0 && marketChunkFails >= marketChunks && marketEvents.length === 0 && !hadCachedEvents) {
-          eventsUnavailable = true;
+        if (marketChunks > 0 && marketChunkFails >= marketChunks && st.marketEvents.length === 0 && !hadCachedEvents) {
+          st.eventsUnavailable = true;
         }
-        marketEvents.sort(sortEvents);
-        saveCache(CACHE_EVENTS, { v: 1, fromBlock: eventsCoverageStart, toBlock: latestBlock, market: marketEvents, mints: mintEvents, soldComplete: soldComplete, listedComplete: listedComplete });
-        replayEvents();
+        st.marketEvents.sort(sortEvents);
+        saveCache(C.cacheEvents, { v: 1, fromBlock: st.eventsCoverageStart, toBlock: latestBlock, market: st.marketEvents, mints: st.mintEvents, soldComplete: st.soldComplete, listedComplete: st.listedComplete });
+        replayEvents(coll);
         dirty = true;
-        renderExplore();
-        renderListed();
+        await fillTimestamps(allEventBlocks(coll));
+        renderAll();
+      }
+      function allEventBlocks(coll) {
+        var st = S[coll];
+        var blocks = {};
+        st.marketEvents.forEach(function (e) { blocks[e.block] = true; });
+        st.mintEvents.forEach(function (m) { blocks[m[0]] = true; });
+        return Object.keys(blocks).map(Number);
       }
 
       function parseListingHex(hexData) {
@@ -787,24 +883,26 @@
         } catch (e) {}
         return out;
       }
-      // Silent background refresh of the active listings, straight from the
-      // market contract (Multicall listings(), free public RPCs). No text, no
-      // spinner, no visible state anywhere — when it finishes, the grid and
-      // the stats simply update. Runs on page load only as a fallback and
-      // then every 60 seconds.
-      async function refreshListings() {
-        if (refreshing) return;
-        refreshing = true;
+      // Silent background refresh of one collection's active listings, straight
+      // from its market contract (Multicall listings(), free public RPCs). No
+      // text, no spinner, no visible state anywhere — when it finishes, the
+      // grid and the stats simply update. Runs on page load only as a fallback
+      // and then every 60 seconds, for each collection.
+      async function refreshListings(coll) {
+        var C = COLLS[coll];
+        var st = S[coll];
+        if (st.refreshing) return;
+        st.refreshing = true;
         var found = 0;
         var failures = 0;
         var foundIds = {};
         var BATCH = 400;
-        for (var start = 1; start <= MAX_SUPPLY; start += BATCH) {
+        for (var start = 1; start <= C.maxSupply; start += BATCH) {
           var ids = [];
-          for (var i = start; i < start + BATCH && i <= MAX_SUPPLY; i++) ids.push(i);
+          for (var i = start; i < start + BATCH && i <= C.maxSupply; i++) ids.push(i);
           var results = null;
           try {
-            var calls = ids.map(function (id) { return { target: MARKET, allowFailure: true, callData: SEL_LISTINGS + encodeUint256(id) }; });
+            var calls = ids.map(function (id) { return { target: C.market, allowFailure: true, callData: SEL_LISTINGS + encodeUint256(id) }; });
             var mcHex = await ethCall(MULTICALL, encodeAggregate3(calls));
             var decoded = decodeAggregate3(mcHex);
             if (decoded.length === ids.length) {
@@ -816,7 +914,7 @@
             results = [];
             for (var g = 0; g < ids.length; g += 20) {
               var part = await Promise.all(ids.slice(g, g + 20).map(function (id) {
-                return ethCall(MARKET, SEL_LISTINGS + encodeUint256(id)).then(parseListingHex).catch(function () { failures++; return null; });
+                return ethCall(C.market, SEL_LISTINGS + encodeUint256(id)).then(parseListingHex).catch(function () { failures++; return null; });
               }));
               results = results.concat(part);
             }
@@ -826,11 +924,11 @@
               found++;
               var id = ids[k];
               foundIds[id] = true;
-              if (!activeListings[id]) {
-                activeListings[id] = { seller: l.seller, priceWei: l.priceWei, block: null, tx: null, logIndex: 0 };
+              if (!st.activeListings[id]) {
+                st.activeListings[id] = { seller: l.seller, priceWei: l.priceWei, block: null, tx: null, logIndex: 0 };
               } else {
-                activeListings[id].seller = l.seller;
-                activeListings[id].priceWei = l.priceWei;
+                st.activeListings[id].seller = l.seller;
+                st.activeListings[id].priceWei = l.priceWei;
               }
             }
           });
@@ -839,246 +937,313 @@
         // but only if every single listings() call succeeded (a failed call must
         // never be mistaken for "not listed").
         if (failures === 0) {
-          Object.keys(activeListings).forEach(function (id) {
-            if (!foundIds[id]) delete activeListings[id];
+          Object.keys(st.activeListings).forEach(function (id) {
+            if (!foundIds[id]) delete st.activeListings[id];
           });
         }
-        listingsChecked = true;
+        st.listingsChecked = true;
         dirty = true;
-        refreshing = false;
+        st.refreshing = false;
         updateStats();
         renderExplore();
         renderListed();
       }
 
-      /* ============ Rendering: grids ============ */
-      var exploreState = { sort: "price-asc", filter: "all", page: 1, search: null };
-      var listedState = { page: 1 };
-
-      function listingCard(l, status) {
-        var price = fmtBNB(l.priceWei);
-        var isSold = status === "SOLD";
-        var badge = isSold ? '<span class="badge sold">SOLD</span>' : '<span class="badge listed">LISTED</span>';
-        var sellerLine = l.seller ? '<p class="seller">Seller ' + esc(shortAddr(l.seller)) + '</p>' : "";
-        var buyerLine = isSold && l.buyer ? '<p class="seller">Buyer ' + esc(shortAddr(l.buyer)) + '</p>' : "";
-        var timeLine = l.block && blockTimes[l.block] ? '<p class="listed-at" data-block="' + l.block + '">' + esc(fmtRel(blockTimes[l.block])) + ' \u00b7 ' + esc(fmtTime(blockTimes[l.block])) + '</p>' : "";
-        var action = isSold
-          ? '<button class="btn small" type="button" disabled>SOLD</button>'
-          : '<button class="btn small btn-primary" type="button" data-copy="buy" data-token="' + l.id + '" data-seller="' + esc(l.seller || "") + '" data-price="' + l.priceWei.toString() + '">BUY NOW</button>';
-        return '<div class="listing' + (isSold ? ' sold' : '') + '">' +
-          '<img class="thumb" src="https://snakeid.xyz/snake-' + l.id + '.webp" alt="SnakeID #' + l.id + '" loading="lazy" onerror="this.outerHTML=\'<div class=\\\'thumb-fallback\\\'>#' + l.id + '</div>\'">' +
-          badge +
-          '<p class="tid">SnakeID #' + l.id + '</p>' +
-          '<p class="price">' + price + ' BNB</p>' +
-          sellerLine + buyerLine + timeLine + action +
-          '</div>';
+      /* ============ Rarity (SnakeID only) ============ */
+      // SnakeID tiers come from the per-token metadata ("Rarity" attribute).
+      // They are baked into ONE snapshot file (rarity.json, built once at
+      // build time) — the page never fetches metadata per token at open.
+      // Agent Panda has NO tiers (one image for all 10,000 tokens), so Panda
+      // cards never get a rarity badge, and a specific tier filter hides
+      // Panda listings (they have no tier to match) — Panda is only shown
+      // when the rarity filter is "All".
+      var rarity = {}; // tokenId -> "Common"|"Uncommon"|"Rare"|"Epic"|"Legendary"
+      var rarityFilter = "all";
+      var RARITY_ORDER = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      function tierBadge(coll, id) {
+        if (coll !== "snake") return "";
+        var t = rarity[id];
+        if (!t) return "";
+        return '<span class="badge tier-' + t.toLowerCase() + '">' + esc(t.toUpperCase()) + '</span>';
       }
-      function applySortFilter(list, sort, filter) {
-        var out = list.slice();
-        if (filter === "available") out = out.filter(function (x) { return x.status === "LISTED"; });
-        if (filter === "sold") out = out.filter(function (x) { return x.status === "SOLD"; });
-        if (sort === "price-asc") out.sort(function (a, b) { return a.priceWei < b.priceWei ? -1 : a.priceWei > b.priceWei ? 1 : a.id - b.id; });
-        else if (sort === "price-desc") out.sort(function (a, b) { return a.priceWei > b.priceWei ? -1 : a.priceWei < b.priceWei ? 1 : b.id - a.id; });
-        else if (sort === "recent") out.sort(function (a, b) { return (b.block || 0) - (a.block || 0) || b.id - a.id; });
-        else if (sort === "id-asc") out.sort(function (a, b) { return a.id - b.id; });
-        else if (sort === "id-desc") out.sort(function (a, b) { return b.id - a.id; });
+      function rarityMatches(coll, id) {
+        if (rarityFilter === "all") return true;
+        if (coll !== "snake") return false; // Panda has no tier — hidden by a specific tier filter
+        return rarity[id] === rarityFilter;
+      }
+      async function loadRarity() {
+        try {
+          var res = await fetch("rarity.json", { cache: "no-store" });
+          if (res.ok) {
+            var j = await res.json();
+            if (j && typeof j === "object") { rarity = j; dirty = true; renderAll(); }
+          }
+        } catch (e) { /* no rarity snapshot — cards render without badges, never with fake tiers */ }
+      }
+
+      /* ============ Rendering ============ */
+      var currentTab = "explore";
+      var explorePage = 1, listedPage = 1;
+      var searchId = null;
+      var searchInvalid = false;
+      var filterMode = "all"; // all | available | sold
+
+      function scopeRows(rows) { return rows.filter(function (r) { return collectionFilter === "all" || r.coll === collectionFilter; }); }
+      function applyFilters(rows) {
+        var out = scopeRows(rows);
+        if (filterMode === "available") out = out.filter(function (r) { return r.status === "LISTED"; });
+        if (filterMode === "sold") out = out.filter(function (r) { return r.status === "SOLD"; });
+        out = out.filter(function (r) { return rarityMatches(r.coll, r.tokenId); });
+        if (searchId !== null) out = out.filter(function (r) { return r.tokenId === searchId; });
         return out;
+      }
+      function getExploreRows() {
+        var rows = [];
+        COLL_KEYS.forEach(function (coll) {
+          var st = S[coll];
+          Object.keys(st.activeListings).forEach(function (id) {
+            var l = st.activeListings[id];
+            rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx });
+          });
+          Object.keys(st.soldMap).forEach(function (id) {
+            var s = st.soldMap[id];
+            if (!st.activeListings[id]) rows.push({ coll: coll, tokenId: Number(id), status: "SOLD", seller: s.seller, buyer: s.buyer, priceWei: s.priceWei, block: s.block, tx: s.tx });
+          });
+        });
+        return rows;
+      }
+      function getListedRows() {
+        var rows = [];
+        COLL_KEYS.forEach(function (coll) {
+          var st = S[coll];
+          Object.keys(st.activeListings).forEach(function (id) {
+            var l = st.activeListings[id];
+            rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx });
+          });
+        });
+        return rows;
+      }
+      function sortRows(rows) {
+        var mode = $("sortSelect").value;
+        var sorted = rows.slice();
+        if (mode === "price-asc") sorted.sort(function (a, b) { return a.priceWei < b.priceWei ? -1 : a.priceWei > b.priceWei ? 1 : a.tokenId - b.tokenId; });
+        else if (mode === "price-desc") sorted.sort(function (a, b) { return a.priceWei > b.priceWei ? -1 : a.priceWei < b.priceWei ? 1 : a.tokenId - b.tokenId; });
+        else if (mode === "recent") sorted.sort(function (a, b) { return (b.block || 0) - (a.block || 0) || b.tokenId - a.tokenId; });
+        else if (mode === "id-asc") sorted.sort(function (a, b) { return a.tokenId - b.tokenId; });
+        else if (mode === "id-desc") sorted.sort(function (a, b) { return b.tokenId - a.tokenId; });
+        return sorted;
+      }
+      function cardHTML(r) {
+        var C = COLLS[r.coll];
+        var collBadge = r.coll === "snake"
+          ? '<span class="badge coll-snake">SNAKEID</span>'
+          : '<span class="badge coll-panda">AGENT PANDA</span>';
+        var statusBadge = r.status === "LISTED"
+          ? '<span class="badge listed">LISTED</span>'
+          : '<span class="badge sold">SOLD</span>';
+        var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>&#128012;</div>\'" />';
+        var priceLine = r.status === "LISTED"
+          ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>'
+          : '<p class="price">Sold ' + fmtBNB(r.priceWei) + ' BNB</p>';
+        var sellerLine = '<p class="seller">Seller ' + shortAddr(r.seller) + '</p>';
+        var listedLine = r.block && blockTimes[r.block] ? '<p class="listed-at">' + fmtTime(blockTimes[r.block]) + ' &middot; ' + fmtRel(blockTimes[r.block]) + ' ago</p>' : "";
+        var action = r.status === "LISTED"
+          ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'
+          : '<button class="btn" type="button" data-copy="list" data-coll="' + r.coll + '" data-token="' + r.tokenId + '">LIST IT</button>';
+        return '<article class="listing' + (r.status === "SOLD" ? " sold" : "") + '">' + img
+          + '<div class="badge-row">' + collBadge + statusBadge + tierBadge(r.coll, r.tokenId) + '</div>'
+          + '<div class="tid">' + esc(C.label(r.tokenId)) + '</div>'
+          + priceLine + sellerLine + listedLine + action + '</article>';
       }
       function renderPagination(el, page, totalPages, onPage) {
         if (totalPages <= 1) { el.innerHTML = ""; return; }
-        var html = '<button class="page-btn" type="button" data-pg="prev"' + (page <= 1 ? ' disabled' : '') + '>&larr; PREV</button>';
-        var start = Math.max(1, Math.min(page - 2, totalPages - 4));
-        var end = Math.min(totalPages, start + 4);
-        for (var p = start; p <= end; p++) {
-          html += '<button class="page-btn" type="button" data-pg="' + p + '"' + (p === page ? ' aria-current="page"' : '') + '>' + p + '</button>';
-        }
-        html += '<button class="page-btn" type="button" data-pg="next"' + (page >= totalPages ? ' disabled' : '') + '>NEXT &rarr;</button>';
+        var html = "";
+        html += '<button class="page-btn" type="button" data-page="prev"' + (page <= 1 ? " disabled" : "") + '>&larr; PREV</button>';
+        var start = Math.max(1, page - 2), end = Math.min(totalPages, page + 2);
+        if (start > 1) html += '<button class="page-btn" type="button" data-page="1">1</button>' + (start > 2 ? '<span class="mono">\u2026</span>' : "");
+        for (var p = start; p <= end; p++) html += '<button class="page-btn" type="button" data-page="' + p + '"' + (p === page ? ' aria-current="page"' : "") + '>' + p + '</button>';
+        if (end < totalPages) html += (end < totalPages - 1 ? '<span class="mono">\u2026</span>' : "") + '<button class="page-btn" type="button" data-page="' + totalPages + '">' + totalPages + '</button>';
+        html += '<button class="page-btn" type="button" data-page="next"' + (page >= totalPages ? " disabled" : "") + '>NEXT &rarr;</button>';
         el.innerHTML = html;
-        el.querySelectorAll("[data-pg]").forEach(function (b) {
-          b.addEventListener("click", function () {
-            var v = b.getAttribute("data-pg");
-            var np = v === "prev" ? page - 1 : v === "next" ? page + 1 : parseInt(v, 10);
-            onPage(np);
-          });
-        });
-      }
-      function allItems() {
-        var items = [];
-        Object.keys(activeListings).forEach(function (id) {
-          var l = activeListings[id];
-          items.push({ id: parseInt(id, 10), seller: l.seller, priceWei: l.priceWei, block: l.block, status: "LISTED" });
-        });
-        Object.keys(soldMap).forEach(function (id) {
-          var s = soldMap[id];
-          items.push({ id: parseInt(id, 10), seller: s.seller, buyer: s.buyer, priceWei: s.priceWei, block: s.block, status: "SOLD" });
-        });
-        return items;
+        el.onclick = function (ev) {
+          var b = ev.target.closest ? ev.target.closest("[data-page]") : null;
+          if (!b || b.disabled) return;
+          var v = b.getAttribute("data-page");
+          var next = v === "prev" ? page - 1 : v === "next" ? page + 1 : Number(v);
+          onPage(next);
+        };
       }
       function renderExplore() {
-        var grid = $("exploreGrid"), empty = $("exploreEmpty"), searchEmpty = $("searchEmpty");
-        var items = allItems();
-        if (exploreState.search !== null) {
-          var q = exploreState.search;
-          var hit = items.filter(function (x) { return x.id === q; });
-          if (hit.length) {
-            grid.innerHTML = hit.map(function (x) { return listingCard(x, x.status); }).join("");
-            empty.style.display = "none"; searchEmpty.style.display = "none";
+        var rows = sortRows(applyFilters(getExploreRows()));
+        if (searchInvalid) rows = [];
+        var totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+        if (explorePage > totalPages) explorePage = totalPages;
+        var pageRows = rows.slice((explorePage - 1) * PAGE_SIZE, explorePage * PAGE_SIZE);
+        var grid = $("exploreGrid");
+        grid.innerHTML = pageRows.map(cardHTML).join("");
+        var searching = searchId !== null;
+        var anyUnavailable = collsInScope().some(function (k) { return S[k].eventsUnavailable; });
+        var exploreEmptyEl = $("exploreEmpty"), searchEmptyEl = $("searchEmpty");
+        exploreEmptyEl.style.display = "none";
+        searchEmptyEl.style.display = "none";
+        if (rows.length === 0) {
+          if (searchInvalid) {
+            searchEmptyEl.style.display = "block";
+            $("searchEmptyText").textContent = "Enter a Token ID between 1 and 10,000.";
+          } else if (searching) {
+            searchEmptyEl.style.display = "block";
+            var anySold = false;
+            COLL_KEYS.forEach(function (coll) { if (S[coll].soldMap[searchId]) anySold = true; });
+            $("searchEmptyText").textContent = anySold
+              ? "Token #" + searchId + " was already sold and is not listed right now."
+              : "Token #" + searchId + " is not listed on the market and has no recorded sale.";
+          } else if (filterMode === "sold") {
+            searchEmptyEl.style.display = "block";
+            $("searchEmptyText").textContent = anyUnavailable
+              ? "Sales history unavailable right now — the public data sources are rate-limited at the moment. Listings above are still live. Try again later."
+              : "No sold tokens in this view yet.";
           } else {
-            grid.innerHTML = "";
-            empty.style.display = "none";
-            $("searchEmptyText").textContent = "SnakeID #" + q + " is not listed on the market and has no recorded sale.";
-            searchEmpty.style.display = "block";
+            exploreEmptyEl.style.display = "block";
           }
-          $("explorePagination").innerHTML = "";
-          return;
         }
-        var filtered = applySortFilter(items, exploreState.sort, exploreState.filter);
-        var totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-        if (exploreState.page > totalPages) exploreState.page = totalPages;
-        var pageItems = filtered.slice((exploreState.page - 1) * PAGE_SIZE, exploreState.page * PAGE_SIZE);
-        grid.innerHTML = pageItems.map(function (x) { return listingCard(x, x.status); }).join("");
-        var showEmpty = dataReady && filtered.length === 0 && exploreState.filter !== "sold";
-        empty.style.display = showEmpty ? "block" : "none";
-        if (dataReady && filtered.length === 0 && exploreState.filter === "sold") {
-          grid.innerHTML = "";
-          $("searchEmptyText").textContent = eventsUnavailable ? "Sales history is unavailable right now (public RPCs are rate-limiting event queries), so sold tokens cannot be listed." : eventsPartial ? "No sales found in the recent blocks loaded so far — earlier sales are not included in this view." : "No SnakeID has sold yet — nothing to show under SOLD.";
-          searchEmpty.style.display = "block";
-        } else if (!showEmpty) {
-          searchEmpty.style.display = "none";
-        }
-        renderPagination($("explorePagination"), exploreState.page, totalPages, function (p) { exploreState.page = p; renderExplore(); });
+        renderPagination($("explorePagination"), explorePage, totalPages, function (p) { explorePage = p; renderExplore(); });
       }
       function renderListed() {
-        var items = allItems().filter(function (x) { return x.status === "LISTED"; });
-        items.sort(function (a, b) { return a.priceWei < b.priceWei ? -1 : a.priceWei > b.priceWei ? 1 : a.id - b.id; });
-        var totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-        if (listedState.page > totalPages) listedState.page = totalPages;
-        var pageItems = items.slice((listedState.page - 1) * PAGE_SIZE, listedState.page * PAGE_SIZE);
-        $("listedGrid").innerHTML = pageItems.map(function (x) { return listingCard(x, "LISTED"); }).join("");
-        $("listedEmpty").style.display = dataReady && items.length === 0 ? "block" : "none";
-        renderPagination($("listedPagination"), listedState.page, totalPages, function (p) { listedState.page = p; renderListed(); });
+        var rows = applyFilters(getListedRows());
+        rows.sort(function (a, b) { return a.priceWei < b.priceWei ? -1 : a.priceWei > b.priceWei ? 1 : a.tokenId - b.tokenId; });
+        var totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+        if (listedPage > totalPages) listedPage = totalPages;
+        var pageRows = rows.slice((listedPage - 1) * PAGE_SIZE, listedPage * PAGE_SIZE);
+        $("listedGrid").innerHTML = pageRows.map(cardHTML).join("");
+        $("listedEmpty").style.display = rows.length === 0 ? "block" : "none";
+        renderPagination($("listedPagination"), listedPage, totalPages, function (p) { listedPage = p; renderListed(); });
       }
-
-      /* ============ Rendering: activity & sales ============ */
-      function activityRow(a) {
-        var badgeCls = a.kind === "Listed" ? "listed" : a.kind === "Sold" ? "sold" : a.kind === "Minted" ? "minted" : a.kind === "Cancelled" ? "cancelled" : "updated";
-        var badgeTxt = a.kind.toUpperCase();
-        var price = a.price ? fmtBNB(BigInt(a.price)) + " BNB" : "";
-        var who = a.kind === "Sold" ? "Seller " + shortAddr(a.seller) + " \u2192 Buyer " + shortAddr(a.buyer)
-          : a.kind === "Minted" ? "To " + shortAddr(a.buyer)
-          : a.seller ? "By " + shortAddr(a.seller) : "";
-        var ts = blockTimes[a.block];
-        var time = ts ? fmtRel(ts) + " \u00b7 " + fmtTime(ts) : "#" + fmtInt(a.block);
-        return '<div class="feed-row">' +
-          '<img src="https://snakeid.xyz/snake-' + a.tokenId + '.webp" alt="SnakeID #' + a.tokenId + '" loading="lazy" onerror="this.outerHTML=\'<div class=\\\'thumb-fallback-sm\\\'>#' + a.tokenId + '</div>\'">' +
-          '<div class="body"><span class="badge ' + badgeCls + '">' + badgeTxt + '</span>' +
-          '<p class="line1">SnakeID #' + a.tokenId + (price ? ' \u00b7 ' + price : '') + '</p>' +
-          '<p class="line2">' + esc(who) + ' \u00b7 ' + esc(time) + ' \u00b7 <a href="https://bscscan.com/tx/' + a.tx + '" target="_blank" rel="noopener">' + esc(shortTx(a.tx)) + ' \u2197</a></p>' +
-          '</div></div>';
-      }
-      async function renderActivity() {
+      function renderActivity() {
         var feed = $("activityFeed");
-        var shown = activity.slice(0, activityShown);
-        var blocks = [];
-        shown.forEach(function (a) { if (!blockTimes[a.block]) blocks.push(a.block); });
-        if (blocks.length) await fillTimestamps(blocks);
-        feed.innerHTML = shown.map(activityRow).join("");
-        var empty = $("activityEmpty");
-        if (eventsUnavailable) {
-          empty.innerHTML = "<h3>Activity history unavailable</h3><p>Public BSC RPCs are currently rate-limiting event queries, so past activity could not be loaded. Active listings are still shown from the market contract.</p>";
-          empty.style.display = "block";
-        } else if (eventsPartial && activity.length === 0) {
-          empty.innerHTML = "<h3>No recent activity</h3><p>Only the most recent blocks could be loaded, so older activity is not shown here. New activity will appear as it happens.</p>";
-          empty.style.display = "block";
-        } else {
-          empty.style.display = dataReady && activity.length === 0 ? "block" : "none";
-        }
-        $("loadMoreActivityBtn").style.display = activity.length > activityShown ? "inline-block" : "none";
-      }
-      async function renderSales() {
-        var body = $("salesBody");
-        var blocks = [];
-        sales.forEach(function (s) { if (!blockTimes[s.block]) blocks.push(s.block); });
-        if (blocks.length) await fillTimestamps(blocks);
-        body.innerHTML = sales.map(function (s) {
-          return "<tr><td>#" + s.tokenId + "</td><td>" + fmtBNB(s.priceWei) + " BNB</td><td>" + esc(shortAddr(s.seller)) + "</td><td>" + esc(shortAddr(s.buyer)) + "</td><td>" + esc(fmtTime(blockTimes[s.block])) + "</td><td><a href=\"https://bscscan.com/tx/" + s.tx + "\" target=\"_blank\" rel=\"noopener\">" + esc(shortTx(s.tx)) + " ↗</a></td></tr>";
+        var all = [];
+        collsInScope().forEach(function (coll) { all = all.concat(S[coll].activity); });
+        all.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
+        var shown = all.slice(0, activityShown);
+        feed.innerHTML = shown.map(function (e) {
+          var C = COLLS[e.coll];
+          var badge = e.kind === "Listed" ? '<span class="badge listed">LISTED</span>'
+            : e.kind === "Sold" ? '<span class="badge sold">SOLD</span>'
+            : e.kind === "Cancelled" ? '<span class="badge cancelled">CANCELLED</span>'
+            : e.kind === "Minted" ? '<span class="badge minted">MINTED</span>'
+            : '<span class="badge updated">PRICE CHANGE</span>';
+          var collBadge = e.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : '<span class="badge coll-panda">AGENT PANDA</span>';
+          var img = '<img src="' + esc(C.img(e.tokenId)) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback-sm&quot;>&#128012;</div>\'" />';
+          var priceTxt = e.price ? " &middot; " + fmtBNB(BigInt(e.price)) + " BNB" : "";
+          var who = e.kind === "Sold"
+            ? "Seller " + shortAddr(e.seller) + " &rarr; Buyer " + shortAddr(e.buyer)
+            : e.kind === "Minted"
+              ? "Minted to " + shortAddr(e.buyer)
+              : "Seller " + shortAddr(e.seller);
+          var when = blockTimes[e.block] ? fmtTime(blockTimes[e.block]) + " &middot; " + fmtRel(blockTimes[e.block]) + " ago" : "Block " + e.block;
+          return '<div class="feed-row">' + img + '<div class="body">'
+            + '<div class="badge-row">' + collBadge + badge + tierBadge(e.coll, e.tokenId) + '</div>'
+            + '<p class="line1">' + e.kind + ' &mdash; ' + esc(C.label(e.tokenId)) + priceTxt + '</p>'
+            + '<p class="line2">' + who + ' &middot; ' + when + ' &middot; <a href="https://bscscan.com/tx/' + esc(e.tx) + '" target="_blank" rel="noopener">' + shortTx(e.tx) + ' &nearr;</a></p>'
+            + '</div></div>';
         }).join("");
-        var empty = $("salesEmpty");
-        if (eventsUnavailable) {
-          empty.innerHTML = "<h3>Sales history unavailable</h3><p>Public BSC RPCs are currently rate-limiting event queries, so past sales could not be loaded. This does not mean there were no sales — the history is simply unreachable right now.</p>";
-          empty.style.display = "block";
-        } else if (eventsPartial && sales.length === 0) {
-          empty.innerHTML = "<h3>No recent sales</h3><p>Only the most recent blocks could be loaded, so earlier sales are not shown here. New sales will appear as they happen.</p>";
-          empty.style.display = "block";
+        var anyUnavailable = collsInScope().some(function (k) { return S[k].eventsUnavailable; });
+        var anyPartial = collsInScope().some(function (k) { return S[k].eventsPartial; });
+        var noEventsAtAll = all.length === 0 && collsInScope().every(function (k) { return S[k].marketEvents.length === 0 && S[k].mintEvents.length === 0; });
+        var emptyEl = $("activityEmpty");
+        if (anyUnavailable && noEventsAtAll) {
+          emptyEl.querySelector("h3").textContent = "Activity unavailable right now";
+          emptyEl.querySelector("p").textContent = "The market activity could not be loaded — the public data sources are rate-limited at the moment. Listings and prices above are still live. Try again later.";
+          emptyEl.style.display = "block";
+        } else if (anyPartial && noEventsAtAll) {
+          emptyEl.querySelector("h3").textContent = "No recent activity";
+          emptyEl.querySelector("p").textContent = "No activity in the recent window. Older history is still loading.";
+          emptyEl.style.display = "block";
         } else {
-          empty.style.display = dataReady && sales.length === 0 ? "block" : "none";
+          emptyEl.querySelector("h3").textContent = "No market activity yet";
+          emptyEl.querySelector("p").textContent = "No Listed, Sold, Cancelled or Mint events have been found on-chain yet.";
+          emptyEl.style.display = all.length === 0 ? "block" : "none";
         }
       }
-
-      /* ============ Analytics chart (plain inline SVG) ============ */
-      var chartRange = "24h";
+      function renderSales() {
+        var all = [];
+        collsInScope().forEach(function (coll) { all = all.concat(S[coll].sales); });
+        all.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
+        var body = $("salesBody");
+        body.innerHTML = all.map(function (s) {
+          var C = COLLS[s.coll];
+          var collTxt = s.coll === "snake" ? "SNAKEID" : "AGENT PANDA";
+          var tierTxt = s.coll === "snake" && rarity[s.tokenId] ? " &middot; " + esc(rarity[s.tokenId]) : "";
+          return "<tr><td>" + esc(C.label(s.tokenId)) + tierTxt + "</td><td>" + collTxt + "</td><td>" + fmtBNB(s.priceWei) + " BNB</td><td>" + shortAddr(s.seller) + "</td><td>" + shortAddr(s.buyer) + "</td><td>" + (blockTimes[s.block] ? fmtTime(blockTimes[s.block]) : "Block " + s.block) + "</td><td><a href=\"https://bscscan.com/tx/" + esc(s.tx) + "\" target=\"_blank\" rel=\"noopener\">" + shortTx(s.tx) + " &nearr;</a></td></tr>";
+        }).join("");
+        var anyUnavailable = collsInScope().some(function (k) { return S[k].eventsUnavailable; });
+        var anyPartial = collsInScope().some(function (k) { return S[k].eventsPartial; });
+        var noSales = all.length === 0;
+        if (anyUnavailable && noSales) {
+          body.innerHTML = "";
+          $("salesEmpty").style.display = "block";
+          $("salesEmpty").querySelector("h3").textContent = "Sales history unavailable right now";
+          $("salesEmpty").querySelector("p").textContent = "Sales history could not be loaded — the public data sources are rate-limited at the moment. Listings and prices above are still live. Try again later.";
+        } else if (anyPartial && noSales) {
+          body.innerHTML = "";
+          $("salesEmpty").style.display = "block";
+          $("salesEmpty").querySelector("h3").textContent = "No recent sales";
+          $("salesEmpty").querySelector("p").textContent = "No sales in the recent window. Older history is still loading.";
+        } else {
+          $("salesEmpty").querySelector("h3").textContent = "No sales yet";
+          $("salesEmpty").querySelector("p").textContent = "No SnakeID or Agent Panda has sold on the market yet. Sales will appear here the moment the first one happens.";
+          $("salesEmpty").style.display = noSales ? "block" : "none";
+        }
+      }
       function renderChart() {
         var wrap = $("chartWrap");
-        if (!dataReady) { wrap.innerHTML = '<p class="mono">Loading sales data\u2026</p>'; return; }
+        var sales = [];
+        collsInScope().forEach(function (coll) { sales = sales.concat(S[coll].sales); });
+        var anyUnavailable = collsInScope().some(function (k) { return S[k].eventsUnavailable; });
+        var anyPartial = collsInScope().some(function (k) { return S[k].eventsPartial; });
+        if ((anyUnavailable || anyPartial) && sales.length === 0) {
+          wrap.innerHTML = '<div class="empty"><h3>' + (anyUnavailable ? "Volume chart unavailable" : "No recent sales") + '</h3><p>' + (anyUnavailable ? "Sales history could not be loaded — the public data sources are rate-limited at the moment." : "No sales in the recent window. Older history is still loading.") + '</p></div>';
+          $("chartNote").textContent = anyUnavailable
+            ? "Volume chart unavailable — the sales history could not be loaded because the public data sources are rate-limited at the moment."
+            : "No recent sales. Older history is still loading.";
+          return;
+        }
         var now = Math.floor(Date.now() / 1000);
-        var bucketSec, bucketCount, label;
-        if (chartRange === "24h") { bucketSec = 3600; bucketCount = 24; label = "hourly"; }
-        else if (chartRange === "7d") { bucketSec = 86400; bucketCount = 7; label = "daily"; }
-        else if (chartRange === "30d") { bucketSec = 86400; bucketCount = 30; label = "daily"; }
-        else { bucketSec = 7 * 86400; bucketCount = 12; label = "weekly"; }
-        var start = now - bucketSec * bucketCount;
-        var vols = new Array(bucketCount).fill(0);
-        var counts = new Array(bucketCount).fill(0);
-        var inWindow = 0;
+        var rangeSecs = chartRange === "24h" ? 86400 : chartRange === "7d" ? 604800 : chartRange === "30d" ? 2592000 : Infinity;
+        var bucketSecs = chartRange === "24h" ? 3600 : chartRange === "7d" ? 86400 : chartRange === "30d" ? 86400 : 86400;
+        var buckets = chartRange === "24h" ? 24 : chartRange === "7d" ? 7 : chartRange === "30d" ? 30 : 30;
+        var start = now - rangeSecs;
+        var vols = new Array(buckets).fill(0), counts = new Array(buckets).fill(0);
         sales.forEach(function (s) {
           var ts = blockTimes[s.block];
           if (!ts) return;
           if (ts < start) return;
-          var idx = Math.min(bucketCount - 1, Math.floor((ts - start) / bucketSec));
+          var idx = Math.min(buckets - 1, Math.floor((ts - start) / bucketSecs));
           vols[idx] += Number(s.priceWei) / 1e18;
           counts[idx] += 1;
-          inWindow++;
         });
-        if (eventsUnavailable) {
-          wrap.innerHTML = '<div class="empty"><h3>Volume chart unavailable</h3><p>Sales history could not be loaded — public BSC RPCs are rate-limiting event queries. The chart shows nothing rather than a made-up curve.</p></div>';
-          $("chartNote").textContent = "Sales data unavailable \u00b7 data comes only from on-chain Sold events.";
-          return;
-        }
-        if (inWindow === 0) {
-          if (eventsPartial) {
-            wrap.innerHTML = '<div class="empty"><h3>No recent sales</h3><p>Only the most recent blocks could be loaded, so this chart covers recent sales only — earlier sales are not included.</p></div>';
-            $("chartNote").textContent = "Recent blocks only \u00b7 data from on-chain Sold events.";
-          } else {
-            wrap.innerHTML = '<div class="empty"><h3>No sales in this period</h3><p>No SnakeID sold in the selected ' + (chartRange === "all" ? "all-time" : chartRange.toUpperCase()) + ' window. The chart stays empty rather than showing a made-up curve.</p></div>';
-            $("chartNote").textContent = "0 sales in this window \u00b7 buckets are " + label + " \u00b7 data from on-chain Sold events only.";
-          }
-          return;
-        }
-        var W = 640, H = 240, PAD = 34;
-        var maxV = Math.max.apply(null, vols.concat([0.0001]));
+        var maxV = Math.max.apply(null, vols.concat([0.001]));
         var maxC = Math.max.apply(null, counts.concat([1]));
-        var bw = (W - PAD * 2) / bucketCount;
-        var bars = "", points = [];
-        for (var i = 0; i < bucketCount; i++) {
-          var bh = (vols[i] / maxV) * (H - PAD * 2);
-          var x = PAD + i * bw + 2;
-          var y = H - PAD - bh;
-          bars += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + Math.max(1, bw - 4).toFixed(1) + '" height="' + Math.max(0, bh).toFixed(1) + '" fill="#39ff14" opacity="0.85"><title>' + vols[i].toFixed(5) + ' BNB \u00b7 ' + counts[i] + ' sale(s)</title></rect>';
-          points.push((PAD + i * bw + bw / 2).toFixed(1) + "," + (H - PAD - (counts[i] / maxC) * (H - PAD * 2)).toFixed(1));
-        }
-        var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Trading volume chart">' +
-          '<line x1="' + PAD + '" y1="' + (H - PAD) + '" x2="' + (W - PAD) + '" y2="' + (H - PAD) + '" stroke="rgba(57,255,20,.38)" />' +
-          '<text x="6" y="18" fill="#9fc49b" font-size="11" font-family="IBM Plex Mono, monospace">' + maxV.toFixed(4) + ' BNB</text>' +
-          '<text x="6" y="' + (H - PAD + 4) + '" fill="#9fc49b" font-size="11" font-family="IBM Plex Mono, monospace">0</text>' +
-          bars +
-          '<polyline points="' + points.join(" ") + '" fill="none" stroke="#39ff14" stroke-width="2" />' +
-          '<text x="' + PAD + '" y="' + (H - 8) + '" fill="#9fc49b" font-size="11" font-family="IBM Plex Mono, monospace">' + label + ' buckets \u00b7 bars = volume (BNB), green line = number of sales</text>' +
-          '</svg>';
-        wrap.innerHTML = svg;
-        var totalVol = vols.reduce(function (a, b) { return a + b; }, 0);
-        $("chartNote").textContent = inWindow + " sale(s) in this window \u00b7 " + totalVol.toFixed(5) + " BNB total \u00b7 buckets are " + label + " \u00b7 data from on-chain Sold events only" + (eventsPartial ? " \u00b7 recent blocks only." : ".");
+        var W = 800, H = 260, PAD = 36, BW = (W - PAD * 2) / buckets;
+        var y = function (v) { return H - PAD - (v / maxV) * (H - PAD * 2); };
+        var bars = vols.map(function (v, i) {
+          var x = PAD + i * BW + 2;
+          var h = Math.max(v > 0 ? 2 : 0, (v / maxV) * (H - PAD * 2));
+          return '<rect x="' + x.toFixed(1) + '" y="' + (H - PAD - h).toFixed(1) + '" width="' + Math.max(1, BW - 4).toFixed(1) + '" height="' + h.toFixed(1) + '" fill="#39ff14" opacity="0.85"><title>' + v.toFixed(5) + ' BNB &middot; ' + counts[i] + ' sales</title></rect>';
+        }).join("");
+        var linePts = counts.map(function (c, i) { return (PAD + i * BW + BW / 2).toFixed(1) + "," + (H - PAD - (c / maxC) * (H - PAD * 2)).toFixed(1); }).join(" ");
+        var dots = counts.map(function (c, i) { return '<circle cx="' + (PAD + i * BW + BW / 2).toFixed(1) + '" cy="' + (H - PAD - (c / maxC) * (H - PAD * 2)).toFixed(1) + '" r="3" fill="#fff" />'; }).join("");
+        wrap.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Sales volume chart">'
+          + '<line x1="' + PAD + '" y1="' + (H - PAD) + '" x2="' + (W - PAD) + '" y2="' + (H - PAD) + '" stroke="rgba(57,255,20,.38)" />'
+          + '<text x="' + PAD + '" y="18" fill="#9fc49b" font-family="IBM Plex Mono, monospace" font-size="12">VOLUME (BNB)</text>'
+          + '<text x="' + (W - PAD) + '" y="18" fill="#9fc49b" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="end">SALES ' + (chartRange === "all" ? "ALL TIME" : chartRange.toUpperCase()) + '</text>'
+          + bars
+          + '<polyline points="' + linePts + '" fill="none" stroke="#fff" stroke-width="2" />'
+          + dots
+          + '</svg>';
+        var rangeVol = vols.reduce(function (a, b) { return a + b; }, 0);
+        var rangeCount = counts.reduce(function (a, b) { return a + b; }, 0);
+        $("chartNote").textContent = rangeCount + " sale(s) · " + rangeVol.toFixed(5) + " BNB in range. Volume in BNB per bucket (bars) and number of sales (line). Data comes only from on-chain Sold events.";
       }
-
       function renderAll() {
         updateStats();
         renderExplore();
@@ -1088,42 +1253,130 @@
         renderChart();
       }
 
-      /* ============ Tabs ============ */
+      /* ============ MY NFTS (read-only lookup across BOTH NFT contracts) ============ */
+      var SEL_OWNER_OF = "0x6352211e";
+      var SEL_BALANCE_OF = "0x70a08231";
+      var SEL_TOKEN_OF_OWNER_BY_INDEX = "0x2f745c59";
+      async function lookupWallet(addr) {
+        var line = $("lookupLine"), grid = $("myGrid"), empty = $("myEmpty");
+        line.textContent = "";
+        grid.innerHTML = "";
+        empty.style.display = "none";
+        if (!/^0x[0-9a-fA-F]{40}$/.test(addr)) {
+          line.textContent = "Enter a valid wallet address (0x + 40 hex characters).";
+          return;
+        }
+        var cached = loadCache(CACHE_WALLET);
+        // Cached results are stored per collection: { snake: {tokens:[...]}, panda: {tokens:[...]} }.
+        // The old single-collection cache shape {tokens:[...]} is NOT trusted
+        // here — its tokens are SnakeID-only, so it is ignored, not misread.
+        var rows = [];
+        var usedCache = false;
+        if (cached && cached[addr.toLowerCase()] && Array.isArray(cached[addr.toLowerCase()].snake) && Array.isArray(cached[addr.toLowerCase()].panda)) {
+          rows = cached[addr.toLowerCase()].snake.concat(cached[addr.toLowerCase()].panda);
+          usedCache = true;
+        } else {
+          try {
+            var found = [];
+            for (var ci = 0; ci < COLL_KEYS.length; ci++) {
+              var coll = COLL_KEYS[ci];
+              var C = COLLS[coll];
+              var balHex = await ethCall(C.nft, SEL_BALANCE_OF + padAddr(addr).slice(2));
+              var bal = parseInt(balHex, 16);
+              for (var i = 0; i < Math.min(bal, 1000); i++) {
+                try {
+                  var tokHex = await ethCall(C.nft, SEL_TOKEN_OF_OWNER_BY_INDEX + padAddr(addr).slice(2) + encodeUint256(i));
+                  found.push({ coll: coll, tokenId: parseInt(tokHex, 16) });
+                } catch (e) {}
+              }
+            }
+            rows = found;
+            var toSave = loadCache(CACHE_WALLET) || {};
+            toSave[addr.toLowerCase()] = {
+              snake: found.filter(function (r) { return r.coll === "snake"; }).map(function (r) { return r.tokenId; }),
+              panda: found.filter(function (r) { return r.coll === "panda"; }).map(function (r) { return r.tokenId; })
+            };
+            saveCache(CACHE_WALLET, toSave);
+          } catch (e) {
+            line.textContent = "Lookup failed — the public data sources are rate-limited at the moment. Try again later.";
+            return;
+          }
+        }
+        // Attach live status per token (listed at price, or not listed).
+        var enriched = rows.map(function (r) {
+          var l = S[r.coll].activeListings[r.tokenId];
+          return { coll: r.coll, tokenId: r.tokenId, status: l ? "LISTED" : "NOT LISTED", seller: l ? l.seller : addr, priceWei: l ? l.priceWei : null, block: l ? l.block : null, tx: l ? l.tx : null };
+        });
+        enriched.sort(function (a, b) { return (a.coll === b.coll) ? a.tokenId - b.tokenId : (a.coll === "snake" ? -1 : 1); });
+        grid.innerHTML = enriched.map(function (r) {
+          var C = COLLS[r.coll];
+          var collBadge = r.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : '<span class="badge coll-panda">AGENT PANDA</span>';
+          var statusBadge = r.status === "LISTED" ? '<span class="badge listed">LISTED</span>' : '<span class="badge updated">NOT LISTED</span>';
+          var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>&#128012;</div>\'" />';
+          var priceLine = r.status === "LISTED" ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>' : '<p class="price">Not listed</p>';
+          var action = r.status === "LISTED"
+            ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'
+            : '<button class="btn" type="button" data-copy="list" data-coll="' + r.coll + '" data-token="' + r.tokenId + '">LIST IT</button>';
+          return '<article class="listing">' + img
+            + '<div class="badge-row">' + collBadge + statusBadge + tierBadge(r.coll, r.tokenId) + '</div>'
+            + '<div class="tid">' + esc(C.label(r.tokenId)) + '</div>'
+            + priceLine + action + '</article>';
+        }).join("");
+        line.textContent = enriched.length === 0
+          ? ""
+          : enriched.length + " token" + (enriched.length === 1 ? "" : "s") + " found" + (usedCache ? " (cached on this device)" : "") + ".";
+        empty.style.display = enriched.length === 0 ? "block" : "none";
+        if (enriched.length === 0) $("myEmptyText").textContent = "That wallet holds no SnakeID or Agent Panda tokens (or none were found).";
+      }
+
+      /* ============ Tabs, filters, scope, trade collection ============ */
       document.querySelectorAll(".tab-btn").forEach(function (btn) {
         btn.addEventListener("click", function () {
           document.querySelectorAll(".tab-btn").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
           btn.setAttribute("aria-selected", "true");
+          currentTab = btn.getAttribute("data-tab");
           document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
-          $("panel-" + btn.getAttribute("data-tab")).classList.add("active");
-          if (btn.getAttribute("data-tab") === "activity") renderActivity();
-          if (btn.getAttribute("data-tab") === "sales") renderSales();
-          if (btn.getAttribute("data-tab") === "analytics") renderChart();
+          $("panel-" + currentTab).classList.add("active");
+          if (currentTab === "activity") renderActivity();
+          if (currentTab === "sales") renderSales();
+          if (currentTab === "analytics") renderChart();
         });
       });
-      $("sortSelect").addEventListener("change", function () { exploreState.sort = this.value; exploreState.page = 1; renderExplore(); });
-      document.querySelectorAll(".chip[data-filter]").forEach(function (chip) {
-        chip.addEventListener("click", function () {
-          document.querySelectorAll(".chip[data-filter]").forEach(function (c) { c.setAttribute("aria-pressed", "false"); });
-          chip.setAttribute("aria-pressed", "true");
-          exploreState.filter = chip.getAttribute("data-filter");
-          exploreState.page = 1; exploreState.search = null; $("searchInput").value = "";
+      document.querySelectorAll(".scope-chip").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".scope-chip").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+          btn.setAttribute("aria-pressed", "true");
+          collectionFilter = btn.getAttribute("data-scope");
+          explorePage = 1; listedPage = 1;
+          renderAll();
+        });
+      });
+      document.querySelectorAll(".rarity-chip").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".rarity-chip").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+          btn.setAttribute("aria-pressed", "true");
+          rarityFilter = btn.getAttribute("data-rarity");
+          explorePage = 1; listedPage = 1;
+          renderExplore();
+          renderListed();
+        });
+      });
+      document.querySelectorAll(".trade-chip").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".trade-chip").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+          btn.setAttribute("aria-pressed", "true");
+          tradeColl = btn.getAttribute("data-trade-coll");
+        });
+      });
+      document.querySelectorAll("[data-filter]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll("[data-filter]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+          btn.setAttribute("aria-pressed", "true");
+          filterMode = btn.getAttribute("data-filter");
+          explorePage = 1;
           renderExplore();
         });
       });
-      function doSearch() {
-        var v = $("searchInput").value.trim();
-        if (!v) { exploreState.search = null; exploreState.page = 1; renderExplore(); return; }
-        var n = parseInt(v.replace("#", ""), 10);
-        if (isNaN(n) || n < 1 || n > MAX_SUPPLY) {
-          $("searchEmptyText").textContent = "Enter a Token ID between 1 and 10,000.";
-          $("exploreGrid").innerHTML = ""; $("exploreEmpty").style.display = "none"; $("searchEmpty").style.display = "block";
-          $("explorePagination").innerHTML = "";
-          return;
-        }
-        exploreState.search = n; renderExplore();
-      }
-      $("searchBtn").addEventListener("click", doSearch);
-      $("searchInput").addEventListener("keydown", function (e) { if (e.key === "Enter") doSearch(); });
       document.querySelectorAll(".range-btn").forEach(function (btn) {
         btn.addEventListener("click", function () {
           document.querySelectorAll(".range-btn").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
@@ -1132,203 +1385,128 @@
           renderChart();
         });
       });
-      $("loadMoreActivityBtn").addEventListener("click", function () { activityShown += 50; renderActivity(); });
-      $("tradeAgentBtn").addEventListener("click", function () {
-        var el = $("agentFlow");
-        if (el) el.scrollIntoView({ behavior: "smooth" });
+      $("sortSelect").addEventListener("change", function () { explorePage = 1; renderExplore(); });
+      $("searchBtn").addEventListener("click", function () {
+        var v = $("searchInput").value.trim();
+        var n = parseInt(v, 10);
+        if (v === "") { searchId = null; searchInvalid = false; }
+        else if (!isNaN(n) && n >= 1 && n <= 10000) { searchId = n; searchInvalid = false; }
+        else { searchId = null; searchInvalid = true; }
+        explorePage = 1;
+        renderExplore();
       });
-
-      /* ============ MY NFTS ============ */
-      function parseWallet(addr) {
-        var a = (addr || "").trim();
-        if (!/^0x[0-9a-fA-F]{40}$/.test(a)) return null;
-        return a.toLowerCase();
-      }
-      var SEL_OWNEROF = "0x6352211e";
-      async function lookupWallet() {
-        var wallet = parseWallet($("walletInput").value);
-        var line = $("lookupLine"), grid = $("myGrid"), empty = $("myEmpty");
-        grid.innerHTML = ""; empty.style.display = "none";
-        if (!wallet) { line.textContent = "Enter a valid wallet address (0x followed by 40 hex characters)."; return; }
-        line.textContent = "Looking up tokens for " + shortAddr(wallet) + "\u2026";
-        var cache = loadCache(CACHE_WALLET) || {};
-        var owned = null;
-        if (cache[wallet] && cache[wallet].toBlock >= latestBlock - 600) {
-          owned = cache[wallet].tokens;
-          line.textContent = "Loaded from this device's cache (checked to block " + fmtInt(cache[wallet].toBlock) + ").";
-        } else {
-          try {
-            // Ownership is read straight from the NFT contract (ownerOf for all
-            // 10,000 tokens via Multicall) — fast and exact. The old Transfer
-            // event walk would need ~2,000 log calls at the log endpoint's
-            // 100-block range limit, so it is no longer used.
-            owned = [];
-            var BATCH = 400;
-            for (var start = 1; start <= MAX_SUPPLY; start += BATCH) {
-              var ids = [];
-              for (var i = start; i < start + BATCH && i <= MAX_SUPPLY; i++) ids.push(i);
-              var calls = ids.map(function (id) { return { target: NFT, allowFailure: true, callData: SEL_OWNEROF + encodeUint256(id) }; });
-              var mcHex = await ethCall(MULTICALL, encodeAggregate3(calls));
-              var decoded = decodeAggregate3(mcHex);
-              if (decoded.length !== ids.length) throw new Error("unexpected Multicall result");
-              decoded.forEach(function (d, k) {
-                if (!d.success || !d.returnData || d.returnData.length < 66) return;
-                var owner = ("0x" + d.returnData.slice(26, 66)).toLowerCase();
-                if (owner === wallet) owned.push(ids[k]);
-              });
-            }
-            cache[wallet] = { toBlock: latestBlock, tokens: owned };
-            saveCache(CACHE_WALLET, cache);
-            line.textContent = "Checked to block " + fmtInt(latestBlock) + ". Found " + owned.length + " SnakeID token(s).";
-          } catch (e) {
-            line.textContent = "Lookup failed: " + (e && e.message ? e.message : e) + " — check the address and try again.";
-            return;
-          }
-        }
-        if (!owned.length) { empty.style.display = "block"; return; }
-        // Confirm listing status live for each owned token (uses the checked listings when available)
-        var cards = [];
-        for (var i = 0; i < owned.length; i++) {
-          var id = owned[i];
-          var l = activeListings[id];
-          if (!l && listingsChecked) {
-            cards.push({ id: id, status: "NOT LISTED" });
-          } else if (!l) {
-            try {
-              var hx = await ethCall(MARKET, SEL_LISTINGS + encodeUint256(id));
-              var parsed = parseListingHex(hx);
-              if (parsed && parsed.active) cards.push({ id: id, status: "LISTED", seller: parsed.seller, priceWei: parsed.priceWei });
-              else cards.push({ id: id, status: "NOT LISTED" });
-            } catch (e) { cards.push({ id: id, status: "NOT LISTED" }); }
-          } else {
-            cards.push({ id: id, status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block });
-          }
-        }
-        grid.innerHTML = cards.map(function (c) {
-          var inner;
-          if (c.status === "LISTED") {
-            inner = '<span class="badge listed">LISTED</span><p class="tid">SnakeID #' + c.id + '</p><p class="price">' + fmtBNB(c.priceWei) + ' BNB</p>' +
-              '<p class="seller">Seller ' + esc(shortAddr(c.seller)) + '</p>' +
-              '<button class="btn small" type="button" data-copy="cancel" data-token="' + c.id + '">CANCEL LISTING</button>';
-          } else {
-            inner = '<span class="badge cancelled">NOT LISTED</span><p class="tid">SnakeID #' + c.id + '</p><p class="price">Not on the market</p>' +
-              '<button class="btn small btn-primary" type="button" data-copy="list" data-token="' + c.id + '">COPY LIST PROMPT</button>';
-          }
-          return '<div class="listing"><img class="thumb" src="https://snakeid.xyz/snake-' + c.id + '.webp" alt="SnakeID #' + c.id + '" loading="lazy" onerror="this.outerHTML=\'<div class=\\\'thumb-fallback\\\'>#' + c.id + '</div>\'">' + inner + '</div>';
-        }).join("");
-      }
-      $("lookupBtn").addEventListener("click", lookupWallet);
-      $("walletInput").addEventListener("keydown", function (e) { if (e.key === "Enter") lookupWallet(); });
-
-      /* ============ Instant snapshot load + live refresh ============ */
-      // The grid renders instantly from listings.json (a snapshot of the live
-      // listings, shipped with the site) — the page never waits for a chain
-      // read before showing content. Afterwards the data stays live: a
-      // 1-second tick refreshes the relative times on the cards and polls
-      // the latest block, while a silent 60-second background refresh
-      // re-checks the listings on-chain and pulls in any new market events.
-      // A full listings re-check every second would hammer the public RPCs
-      // into rate-limiting, so the 1-second tick is UI + block polling only;
-      // the heavy re-check runs every 60 seconds, silently. There is no
-      // visible update/status line anywhere on the page.
-      async function loadSnapshot() {
-        try {
-          var res = await fetch(SNAPSHOT_URL, { cache: "no-store" });
-          if (!res.ok) return false;
-          var snap = await res.json();
-          if (!snap || !Array.isArray(snap.listings)) return false;
-          activeListings = {};
-          snap.listings.forEach(function (l) {
-            if (!l || typeof l.tokenId !== "number" || !l.priceWei) return;
-            activeListings[l.tokenId] = { seller: (l.seller || "").toLowerCase(), priceWei: BigInt(l.priceWei), block: null, tx: null, logIndex: 0 };
-          });
-          if (typeof snap.totalMinted === "number") totalMinted = snap.totalMinted;
-          if (typeof snap.latestBlock === "number" && !latestBlock) latestBlock = snap.latestBlock;
-          snapshotAt = snap.generatedAt ? Date.parse(snap.generatedAt) : Date.now();
-          snapshotBlock = typeof snap.latestBlock === "number" ? snap.latestBlock : 0;
-          listingsChecked = true;
-          dataReady = true;
-          updateStats();
-          renderExplore();
-          renderListed();
-          return true;
-        } catch (e) { return false; }
-      }
-      async function tick() {
-        // Refresh the relative times on the cards in place — the grid itself
-        // is only rebuilt when the underlying data changes (see `dirty`), so
-        // a tap on a BUY NOW button is never lost to a rebuild mid-tap.
-        document.querySelectorAll(".listed-at[data-block]").forEach(function (el) {
-          var b = parseInt(el.getAttribute("data-block"), 10);
-          var ts = blockTimes[b];
-          if (ts) el.textContent = fmtRel(ts) + " \u00b7 " + fmtTime(ts);
-        });
-        if (dirty) {
-          dirty = false;
-          renderExplore();
-          renderListed();
-        }
-        if (document.hidden || tickBusy) return;
-        tickBusy = true;
-        try {
-          var bn = await rpc("eth_blockNumber", []);
-          var n = parseInt(bn, 16);
-          if (n && n !== latestBlock) { latestBlock = n; }
-        } catch (e) { /* silent — the next tick retries */ }
-        tickBusy = false;
-      }
-      function startLiveRefresh() {
-        if (liveStarted) return;
-        liveStarted = true;
-        setInterval(tick, TICK_MS);
-        setInterval(function () {
-          if (document.hidden || refreshing) return;
-          refreshListings();
-          loadEvents().then(function () { updateStats(); renderActivity(); renderSales(); renderChart(); }).catch(function () {});
-        }, REFRESH_MS);
-      }
+      $("searchInput").addEventListener("keydown", function (ev) { if (ev.key === "Enter") $("searchBtn").click(); });
+      $("searchInput").addEventListener("input", function () {
+        if ($("searchInput").value.trim() === "" && (searchId !== null || searchInvalid)) { searchId = null; searchInvalid = false; explorePage = 1; renderExplore(); }
+      });
+      $("loadMoreActivityBtn").addEventListener("click", function () { activityShown += 50; renderActivity(); });
+      $("lookupBtn").addEventListener("click", function () { lookupWallet($("walletInput").value.trim()); });
+      $("walletInput").addEventListener("keydown", function (ev) { if (ev.key === "Enter") $("lookupBtn").click(); });
+      $("retryBtn").addEventListener("click", function () { $("loadError").style.display = "none"; init(); });
+      $("tradeAgentBtn").addEventListener("click", function () {
+        $("tradePanel").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
 
       /* ============ Init ============ */
+      async function loadSnapshot(coll) {
+        var C = COLLS[coll];
+        var st = S[coll];
+        try {
+          var res = await fetch(C.snapListings, { cache: "no-store" });
+          if (!res.ok) throw new Error("snapshot " + res.status);
+          var snap = await res.json();
+          if (snap && typeof snap === "object") {
+            st.snapshotAt = snap.generatedAt || 0;
+            st.snapshotBlock = snap.latestBlock || 0;
+            if (typeof snap.totalMinted === "number") st.totalMinted = snap.totalMinted;
+            // Real snapshot format: a price-sorted `listings` array
+            // [{tokenId, seller, priceWei, priceBnb}]. A map-shaped
+            // `activeListings` is also accepted, defensively.
+            if (Array.isArray(snap.listings)) {
+              snap.listings.forEach(function (l) {
+                if (l && typeof l.tokenId === "number" && l.seller && l.priceWei) {
+                  st.activeListings[l.tokenId] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0 };
+                }
+              });
+            } else if (snap.activeListings && typeof snap.activeListings === "object") {
+              Object.keys(snap.activeListings).forEach(function (id) {
+                var l = snap.activeListings[id];
+                if (l && l.seller && l.priceWei) {
+                  st.activeListings[id] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0 };
+                }
+              });
+            }
+            st.dataReady = true;
+            dirty = true;
+          }
+        } catch (e) {
+          st.dataReady = false;
+        }
+      }
       async function init() {
         blockTimes = loadCache(CACHE_TIMES) || {};
+        // SnakeID lock banner: SnakeID is sold out (10,000/10,000), so the
+        // banner never shows for SnakeID. It stays hidden for Panda too —
+        // Panda's market is live while its mint is still open.
+        $("lockBanner").style.display = "none";
+        var errors = [];
         try {
-          var bn = await rpc("eth_blockNumber", []);
-          latestBlock = parseInt(bn, 16);
-        } catch (e) { /* RPC unreachable for now — the snapshot carries its own block number */ }
-        var snapshotOk = await loadSnapshot();
-        if (!snapshotOk) {
-          // Snapshot unreachable: fall back to a silent on-chain check so the
-          // page still works instead of showing an empty grid.
-          try { await refreshListings(); } catch (e) {}
-        }
-        if (!dataReady) {
+          var blk = await rpc("eth_blockNumber", []);
+          latestBlock = parseInt(blk, 16);
+        } catch (e) { errors.push("block number"); }
+        await Promise.all(COLL_KEYS.map(async function (coll) {
+          try {
+            var tm = await ethCall(COLLS[coll].nft, SEL_TOTAL_MINTED);
+            S[coll].totalMinted = parseInt(tm, 16);
+          } catch (e) { /* totalMinted stays null — stats show "—" */ }
+          await loadSnapshot(coll);
+          // The listings snapshot renders first — no Multicall on load.
+          // The silent background refresh runs every 60 seconds and
+          // verifies the snapshot against the contracts (no text, no
+          // spinner — the grid just updates when it finishes).
+          loadRarity();
+          loadEvents(coll);
+        }));
+        if (COLL_KEYS.every(function (k) { return !S[k].dataReady; })) {
           $("loadError").style.display = "block";
-          $("loadErrorText").textContent = "Could not load listings. Check your connection and reload the page.";
+          $("loadErrorText").textContent = "Could not load the market data (" + (errors.join(", ") || "all data sources failed") + "). Check your connection and retry.";
           return;
         }
-        try {
-          var totalHex = await ethCall(NFT, SEL_TOTAL_MINTED);
-          if (totalHex) totalMinted = parseInt(totalHex, 16);
-        } catch (e) { /* the snapshot's totalMinted stands */ }
-        if (totalMinted !== null && totalMinted < MAX_SUPPLY) {
-          $("lockBanner").style.display = "block";
-          $("lockText").textContent = "Minted so far: " + fmtInt(totalMinted) + " / 10,000 — the market opens automatically at 10,000 minted.";
-        }
-        updateStats();
         renderAll();
-        // Market events load silently in the background (snapshot seed first,
-        // then only the new blocks). No progress text anywhere.
-        loadEvents().then(function () { updateStats(); renderActivity(); renderSales(); renderChart(); }).catch(function () {});
-        startLiveRefresh();
+        if (!liveStarted) {
+          liveStarted = true;
+          // 1-second tick: polls the latest block; when it moves, the
+          // relative times ("3m ago") update and a background re-check of new
+          // events is kicked off. 60-second refresh: silently re-checks both
+          // markets' listings (no text, no spinner — the grid just updates).
+          setInterval(async function () {
+            if (tickBusy) return;
+            tickBusy = true;
+            try {
+              var blk = await rpc("eth_blockNumber", []);
+              var b = parseInt(blk, 16);
+              if (b !== latestBlock) {
+                latestBlock = b;
+                COLL_KEYS.forEach(function (coll) { loadEvents(coll); });
+                if (dirty) { renderAll(); dirty = false; }
+              }
+            } catch (e) {}
+            tickBusy = false;
+          }, TICK_MS);
+          setInterval(function () {
+            COLL_KEYS.forEach(function (coll) { refreshListings(coll); });
+          }, REFRESH_MS);
+        }
       }
-      $("retryBtn").addEventListener("click", function () {
-        $("loadError").style.display = "none";
-        dataReady = false;
-        init();
-      });
-      // Test/debug hook (no wallet, no secrets): lets automated checks trigger
-      // the silent background refresh on demand.
-      window.__snakeidMarket = { refreshListings: refreshListings, loadEvents: loadEvents, loadSnapshot: loadSnapshot };
+      // Debug/test handle: refreshes both collections' listings from the
+      // contracts and exposes the trade-prompt builders (no wallet, no
+      // signing — prompts are just text the user copies to their agent).
+      window.__snakeidMarket = {
+        refreshListings: function () { return Promise.all(COLL_KEYS.map(function (c) { return refreshListings(c); })); },
+        promptList: promptList,
+        promptBuy: promptBuy,
+        promptCancel: promptCancel
+      };
       init();
     })();
     </script>

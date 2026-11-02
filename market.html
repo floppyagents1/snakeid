@@ -208,11 +208,7 @@
           <p id="lockText">The market opens automatically when all 10,000 SnakeID are minted.</p>
         </div>
 
-        <div class="scope-row" role="group" aria-label="Collection">
-          <button class="chip scope-chip" type="button" data-scope="all" aria-pressed="true">ALL COLLECTIONS</button>
-          <button class="chip scope-chip" type="button" data-scope="snake" aria-pressed="false">SNAKEID</button>
-          <button class="chip scope-chip" type="button" data-scope="panda" aria-pressed="false">AGENT PANDA</button>
-        </div>
+        <div class="scope-row" id="scopeRow" role="group" aria-label="Collection"><!-- Collection chips are built from COLLECTIONS at load — one collection, one chip. --></div>
 
         <div class="stat-grid" id="statsBar" aria-live="polite">
           <div class="stat"><div class="k">TOTAL MINTED</div><div class="v" id="stTotalMinted">&hellip;</div></div>
@@ -253,7 +249,7 @@
             <span class="search-box"><input type="search" id="searchInput" placeholder="Search Token ID, e.g. 1234" inputmode="numeric" aria-label="Search by Token ID" /></span>
             <button class="btn small" type="button" id="searchBtn">SEARCH</button>
           </div>
-          <div class="filters" role="group" aria-label="Rarity filter" style="margin-top:10px">
+          <div class="filters" id="rarityRow" role="group" aria-label="Rarity filter" style="margin-top:10px">
             <span class="mono">RARITY:</span>
             <button class="chip rarity-chip" type="button" data-rarity="all" aria-pressed="true">ALL</button>
             <button class="chip rarity-chip" type="button" data-rarity="Common" aria-pressed="false">COMMON</button>
@@ -261,8 +257,8 @@
             <button class="chip rarity-chip" type="button" data-rarity="Rare" aria-pressed="false">RARE</button>
             <button class="chip rarity-chip" type="button" data-rarity="Epic" aria-pressed="false">EPIC</button>
             <button class="chip rarity-chip" type="button" data-rarity="Legendary" aria-pressed="false">LEGENDARY</button>
-            <span class="mono" id="rarityNote">Agent Panda has no tiers — shown only on ALL.</span>
           </div>
+          <div class="mono" id="noTiersNote" style="display:none;margin-top:10px">Agent Panda has no tiers.</div>
           <div id="exploreGridWrap">
             <div class="listing-grid" id="exploreGrid"></div>
             <div class="empty" id="exploreEmpty" style="display:none">
@@ -312,7 +308,7 @@
           </div>
           <div class="empty" id="salesEmpty" style="display:none">
             <h3>No sales yet</h3>
-            <p>No SnakeID or Agent Panda has sold on the market yet. Sales will appear here the moment the first one happens.</p>
+            <p>No tokens have sold on the market yet. Sales will appear here the moment the first one happens.</p>
           </div>
         </section>
 
@@ -339,10 +335,7 @@
           <h3>TRADE VIA AGENT &mdash; BUY &amp; SELL</h3>
           <p>This site never connects a wallet and never asks for a seed phrase or private key. Copy a prompt, paste it to your agent (e.g. Binance AI Pro), your agent verifies everything on-chain first, shows a transaction preview, and waits for your confirmation before anything is signed.</p>
           <p style="margin-top:10px">Market fee 5% &middot; Seller receives 95% &middot; Minimum listing: SnakeID 0.001 BNB &middot; Agent Panda 0.0001 BNB.</p>
-          <div class="row" style="margin-top:16px">
-            <button class="chip trade-chip" type="button" data-trade-coll="snake" aria-pressed="true">SNAKEID</button>
-            <button class="chip trade-chip" type="button" data-trade-coll="panda" aria-pressed="false">AGENT PANDA</button>
-          </div>
+          <div class="row" id="tradeChipsRow" style="margin-top:16px"><!-- Trade chips are built from COLLECTIONS at load — one collection, one chip. --></div>
           <div class="row" style="margin-top:16px">
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
             <button class="btn" type="button" data-copy="buy">COPY BUY PROMPT</button>
@@ -399,11 +392,29 @@
     (function () {
       "use strict";
       /* ============ Collection configs ============ */
-      /* Two collections, one marketplace. Each collection has its own NFT
-       * and Market contracts, its own minimum listing price, its own event
-       * history start block, and its own shipped snapshots. Nothing here is
-       * shared between them except the chain and the page chrome. */
-      var COLLS = {
+      /* ONE config, ONE marketplace, NO combined view. Every collection is
+       * shown on its own: stats, grid, activity, sales and chart all follow
+       * the selected collection only (see collsInScope). Each entry has its
+       * own NFT and Market contracts, its own minimum listing price, its own
+       * event-history start block, its own shipped snapshots, and its own
+       * rarity setting. Nothing here is shared between collections except
+       * the chain and the page chrome.
+       *
+       * ONBOARDING A NEW COLLECTION (the standard for every project that
+       * joins Snake from now on):
+       *   1. Add ONE entry here (nft, market, minPriceWei/Bnb, maxSupply,
+       *      eventsStart = the market contract's deploy block, snapListings
+       *      + snapEvents filenames, a cacheEvents key, img + label, and
+       *      hasRarity + snapRarity when the collection has tiers).
+       *   2. Ship its snapshots next to market.html: a listings snapshot
+       *      (Multicall read of listings() for every token) and an events
+       *      snapshot (full Listed/Sold/Cancelled history from eventsStart;
+       *      soldComplete/listedComplete say which histories it covers).
+       *   3. The collection then gets, with no other change: its own chip
+       *      in the selector and the trade panel, per-collection stats,
+       *      grid, activity feed (live: 1s tick + silent 60s refresh),
+       *      sales history, chart, trade prompts, and MY NFTS lookup. */
+      var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID",
           nft: "0xafc6bca0e191e396306343213b04ff9a8d717263",
@@ -412,6 +423,7 @@
           maxSupply: 10000, eventsStart: 131070000,
           snapListings: "listings.json", snapEvents: "market-events.json",
           cacheEvents: "snakeid-market-events-v2",
+          hasRarity: true, snapRarity: "rarity.json",
           img: function (id) { return "https://snakeid.xyz/snake-" + id + ".webp"; },
           label: function (id) { return "SnakeID #" + id; }
         },
@@ -423,22 +435,62 @@
           maxSupply: 10000, eventsStart: 131130000,
           snapListings: "listings-panda.json", snapEvents: "market-events-panda.json",
           cacheEvents: "snakeid-panda-market-events-v1",
+          hasRarity: false, snapRarity: null,
+          // zeroSalesKnown: verified 2026-11-02 — no Sold event for Agent
+          // Panda in ANY verifiable window (recent-window checks + the
+          // partial seed), so the honest display is 0 sold / 0 volume, not
+          // "—". Applies ONLY while the loaded sales list is empty AND the
+          // event sources are not down: the moment a sale exists, the total
+          // is genuinely unknown until the full history is backfilled, so
+          // the stat goes back to "—". A future sale self-corrects the
+          // number through the live refresh. Total Market Txs is NOT covered
+          // by this flag (Listed events exist historically, so 0 would be
+          // false). The flag is a stopgap until the full Panda event
+          // history is backfilled — see market-events-panda.json.
+          zeroSalesKnown: true,
           img: function (id) { return "panda-card.webp"; },
           label: function (id) { return "Agent Panda #" + id; }
         }
       };
-      var COLL_KEYS = ["snake", "panda"];
+      var COLL_KEYS = Object.keys(COLLECTIONS);
+      // The collection selector and the trade-panel selector are built from
+      // this config at load, so a new collection appears in both the moment
+      // its entry is added — no HTML to edit. The first entry is the home
+      // collection and the default scope.
+      function buildCollectionChips() {
+        var scopeRow = document.getElementById("scopeRow");
+        var tradeRow = document.getElementById("tradeChipsRow");
+        COLL_KEYS.forEach(function (key, idx) {
+          var C = COLLECTIONS[key];
+          var scopeBtn = document.createElement("button");
+          scopeBtn.className = "chip scope-chip";
+          scopeBtn.type = "button";
+          scopeBtn.setAttribute("data-scope", key);
+          scopeBtn.setAttribute("aria-pressed", idx === 0 ? "true" : "false");
+          scopeBtn.textContent = C.short;
+          if (scopeRow) scopeRow.appendChild(scopeBtn);
+          var tradeBtn = document.createElement("button");
+          tradeBtn.className = "chip trade-chip";
+          tradeBtn.type = "button";
+          tradeBtn.setAttribute("data-trade-coll", key);
+          tradeBtn.setAttribute("aria-pressed", idx === 0 ? "true" : "false");
+          tradeBtn.textContent = C.short;
+          if (tradeRow) tradeRow.appendChild(tradeBtn);
+        });
+      }
+      buildCollectionChips();
       var MULTICALL = "0xcA11bde05977b3631167028862bE2a173976CA11";
       var PAGE_SIZE = 24;
       var CHUNK = 50; // 1RPC caps eth_getLogs at 50-block ranges; dRPC also handles 50
       var RECENT_WINDOW = 900; // live fetches stay inside the recent window so page loads stay fast — full history comes from the shipped market-events snapshots, not from live log calls
       var TICK_MS = 1000;
       var REFRESH_MS = 60000;
-      // Event-log endpoints (free): 1RPC serves eth_getLogs on historical
-      // blocks (capped at 50-block ranges, and rate-limited, so live fetches
-      // stay inside RECENT_WINDOW). dRPC is the fallback for the same calls.
-      // eth_call traffic keeps using the free public RPCs above and never
-      // touches these endpoints.
+      // Event-log endpoints (free): dRPC is tried first — it serves
+      // eth_getLogs for the recent window (100-block ranges; older blocks
+      // are rate-limited on the free plan, so live fetches stay inside
+      // RECENT_WINDOW and full history comes from the shipped snapshots).
+      // 1RPC is the fallback for the same calls. eth_call traffic keeps
+      // using the free public RPCs above and never touches these endpoints.
       var LOGS_RPC_1RPC = "https://1rpc.io/bnb";
       var LOGS_RPC = "https://lb.drpc.org/bsc/ApggRhCQgkomqjM_X4y0glQUxNgY1moR8aGQ3h3f2IgU";
       var RPCS = ["https://bsc-dataseed.bnbchain.org", "https://bsc-dataseed1.bnbchain.org", "https://bsc-dataseed2.bnbchain.org", "https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-dataseed2.binance.org", "https://binance.llamarpc.com", "https://bsc.publicnode.com", "https://rpc.ankr.com/bsc"];
@@ -468,6 +520,7 @@
           eventsUnavailable: false, // true when every eth_getLogs chunk failed (public RPC rate limit) and no cached events exist — sales stats must show "—", never 0
           eventsPartial: false,     // true when the loaded events start after this collection's events start (recent window only) — lifetime totals would be incomplete, so they show "—" too
           eventsCoverageStart: 0,   // first block the loaded events cover
+          eventsSettled: false,     // true once loadEvents has finished its first pass (seed + live fetch) — the zero-sales flag may only apply after this, never while the load is still in flight
           soldComplete: false,    // true when the loaded snapshot authoritatively covers ALL Sold events from market open — Total Sold + volumes are real even if Listed/Cancelled history is not
           listedComplete: false,  // true only when the loaded snapshot covers the FULL Listed+Sold+Cancelled history — Total Market Txs needs this
           snapshotAt: 0,      // ms epoch of the loaded listings snapshot
@@ -482,8 +535,8 @@
       var dirty = false;       // in-memory listings changed — re-render grids on next tick
       var tickBusy = false;    // a 1-second block poll is in flight
       var liveStarted = false; // 1s tick + 60s refresh intervals started once
-      var collectionFilter = "all"; // "all" | "snake" | "panda"
-      var tradeColl = "snake";      // collection the trade-panel prompts are for
+      var collectionFilter = COLL_KEYS[0]; // default scope — the first entry in COLLECTIONS (the home collection). There is no combined view: one collection at a time.
+      var tradeColl = COLL_KEYS[0];      // collection the trade-panel prompts are for
       var chartRange = "24h";
 
       /* ============ Small helpers ============ */
@@ -520,8 +573,7 @@
       }
       function loadCache(key) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
       function saveCache(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {} }
-      function collsInScope() { return collectionFilter === "all" ? COLL_KEYS : [collectionFilter]; }
-      function scopeLabel() { return collectionFilter === "all" ? "" : COLLS[collectionFilter].name; }
+      function collsInScope() { return [collectionFilter]; }
 
       /* ============ RPC layer (fetch POST, 8s timeout, fallback across RPCs) ============ */
       function rpcOnce(url, method, params) {
@@ -546,8 +598,8 @@
       }
       function getLogs(address, topics, fromBlock, toBlock) {
         var params = [{ address: address, topics: topics, fromBlock: hex(fromBlock), toBlock: hex(toBlock) }];
-        return rpcOnce(LOGS_RPC_1RPC, "eth_getLogs", params).catch(function () {
-          return rpcOnce(LOGS_RPC, "eth_getLogs", params);
+        return rpcOnce(LOGS_RPC, "eth_getLogs", params).catch(function () {
+          return rpcOnce(LOGS_RPC_1RPC, "eth_getLogs", params);
         }).catch(function () {
           return rpc("eth_getLogs", params);
         });
@@ -571,17 +623,17 @@
 
       /* ============ Copy prompts (agent pattern — no wallet connect anywhere) ============ */
       function promptList(tokenId, coll) {
-        var C = COLLS[coll || tradeColl];
+        var C = COLLECTIONS[coll || tradeColl];
         var t = tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT";
         return "List" + t + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ", market fee 5%, seller receives 95%, minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
       }
       function promptBuy(tokenId, seller, priceWei, coll) {
-        var C = COLLS[coll || tradeColl];
+        var C = COLLECTIONS[coll || tradeColl];
         var detail = tokenId ? " " + C.name + " #" + tokenId + (seller ? " from seller " + seller : "") + (priceWei !== undefined && priceWei !== null ? " at " + fmtBNB(priceWei) + " BNB" : "") + "." : " a " + C.name + " NFT.";
         return "Buy" + detail + " NFT " + C.nft + ", Market " + C.market + ", market fee 5%, seller receives 95%. Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
       }
       function promptCancel(tokenId, coll) {
-        var C = COLLS[coll || tradeColl];
+        var C = COLLECTIONS[coll || tradeColl];
         return "Cancel my listing for" + (tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT") + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ". Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
       }
       function copyText(text, noteEl) {
@@ -677,12 +729,15 @@
 
       /* ============ Stats (scope-aware) ============ */
       function setStat(id, text) { var el = $(id); if (el) el.textContent = text; }
-      /* Event-derived stats are real only when every collection in scope has
+      /* Event-derived stats are real only when the selected collection has
        * a trustworthy event history for that metric: Sold + volumes need
-       * (soldComplete OR no incompleteness) per collection; Total Market Txs
-       * needs (no incompleteness AND listedComplete) per collection. When
-       * any in-scope collection fails that, the combined number shows "—"
-       * instead of a partial sum — never a made-up total. */
+       * (soldComplete OR no incompleteness) for the collection; Total Market
+       * Txs needs (no incompleteness AND listedComplete). When the selected
+       * collection fails that, the number shows "—" instead of a partial
+       * sum — never a made-up total. Exception: a collection with
+       * zeroSalesKnown (verified zero sales) shows 0 sold / 0 volume while
+       * its loaded sales list is empty and the sources are up — see the
+       * config comment. */
       function updateStats() {
         var scope = collsInScope();
         var tm = 0, tmKnown = true;
@@ -696,7 +751,8 @@
         scope.forEach(function (k) {
           var st = S[k];
           var incomplete = st.eventsUnavailable || st.eventsPartial;
-          if (!st.soldComplete && incomplete) soldReady = false;
+          var zeroKnown = COLLECTIONS[k].zeroSalesKnown && st.sales.length === 0 && !st.eventsUnavailable && st.eventsSettled;
+          if (!st.soldComplete && incomplete && !zeroKnown) soldReady = false;
           if (incomplete || !st.listedComplete) txsReady = false;
         });
         var soldCount = 0, txCount = 0;
@@ -747,7 +803,7 @@
       // Live fetches are clamped to the recent window so page loads stay
       // fast; events older than that come from the snapshot.
       async function loadEvents(coll) {
-        var C = COLLS[coll];
+        var C = COLLECTIONS[coll];
         var st = S[coll];
         var cached = loadCache(C.cacheEvents);
         var fromBlock = C.eventsStart;
@@ -784,7 +840,7 @@
         if (!haveSource) coverageStart = fromBlock;
         st.eventsCoverageStart = coverageStart;
         st.eventsPartial = st.eventsCoverageStart > C.eventsStart;
-        if (fromBlock > latestBlock) { replayEvents(coll); await fillTimestamps(allEventBlocks(coll)); renderAll(); return; }
+        if (fromBlock > latestBlock) { st.eventsSettled = true; replayEvents(coll); await fillTimestamps(allEventBlocks(coll)); renderAll(); return; }
         var marketChunks = 0, marketChunkFails = 0;
         var hadCachedEvents = st.marketEvents.length > 0;
         for (var from = fromBlock; from <= latestBlock; from += CHUNK) {
@@ -811,6 +867,7 @@
         }
         st.marketEvents.sort(sortEvents);
         saveCache(C.cacheEvents, { v: 1, fromBlock: st.eventsCoverageStart, toBlock: latestBlock, market: st.marketEvents, mints: st.mintEvents, soldComplete: st.soldComplete, listedComplete: st.listedComplete });
+        st.eventsSettled = true;
         replayEvents(coll);
         dirty = true;
         await fillTimestamps(allEventBlocks(coll));
@@ -889,7 +946,7 @@
       // grid and the stats simply update. Runs on page load only as a fallback
       // and then every 60 seconds, for each collection.
       async function refreshListings(coll) {
-        var C = COLLS[coll];
+        var C = COLLECTIONS[coll];
         var st = S[coll];
         if (st.refreshing) return;
         st.refreshing = true;
@@ -949,36 +1006,39 @@
         renderListed();
       }
 
-      /* ============ Rarity (SnakeID only) ============ */
-      // SnakeID tiers come from the per-token metadata ("Rarity" attribute).
-      // They are baked into ONE snapshot file (rarity.json, built once at
-      // build time) — the page never fetches metadata per token at open.
-      // Agent Panda has NO tiers (one image for all 10,000 tokens), so Panda
-      // cards never get a rarity badge, and a specific tier filter hides
-      // Panda listings (they have no tier to match) — Panda is only shown
-      // when the rarity filter is "All".
-      var rarity = {}; // tokenId -> "Common"|"Uncommon"|"Rare"|"Epic"|"Legendary"
+      /* ============ Rarity (per collection) ============ */
+      // A collection's tiers come from its per-token metadata ("Rarity"
+      // attribute), baked into ONE snapshot file per collection
+      // (COLLECTIONS[coll].snapRarity, built once at build time) — the page
+      // never fetches metadata per token at open. A collection with
+      // hasRarity false (Agent Panda: one image for all 10,000 tokens) has
+      // no rarity file, its cards never get a badge, and its rarity filter
+      // row is hidden while it is the selected scope (see updateScopeUI).
+      var rarity = {}; // coll -> {tokenId -> "Common"|"Uncommon"|"Rare"|"Epic"|"Legendary"}
       var rarityFilter = "all";
       var RARITY_ORDER = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
       function tierBadge(coll, id) {
-        if (coll !== "snake") return "";
-        var t = rarity[id];
+        if (!COLLECTIONS[coll].hasRarity) return "";
+        var t = (rarity[coll] || {})[id];
         if (!t) return "";
         return '<span class="badge tier-' + t.toLowerCase() + '">' + esc(t.toUpperCase()) + '</span>';
       }
       function rarityMatches(coll, id) {
         if (rarityFilter === "all") return true;
-        if (coll !== "snake") return false; // Panda has no tier — hidden by a specific tier filter
-        return rarity[id] === rarityFilter;
+        if (!COLLECTIONS[coll].hasRarity) return false; // no tiers — hidden by a specific tier filter
+        return (rarity[coll] || {})[id] === rarityFilter;
       }
       async function loadRarity() {
-        try {
-          var res = await fetch("rarity.json", { cache: "no-store" });
-          if (res.ok) {
-            var j = await res.json();
-            if (j && typeof j === "object") { rarity = j; dirty = true; renderAll(); }
-          }
-        } catch (e) { /* no rarity snapshot — cards render without badges, never with fake tiers */ }
+        // One file per collection that has tiers; collections without tiers
+        // have no file and are skipped. Called once at init.
+        var jobs = COLL_KEYS.filter(function (k) { return COLLECTIONS[k].hasRarity && COLLECTIONS[k].snapRarity; }).map(function (k) {
+          return fetch(COLLECTIONS[k].snapRarity, { cache: "no-store" }).then(function (res) {
+            if (!res.ok) return;
+            return res.json().then(function (j) { if (j && typeof j === "object") { rarity[k] = j; dirty = true; } });
+          }).catch(function () { /* no rarity snapshot — cards render without badges, never with fake tiers */ });
+        });
+        await Promise.all(jobs);
+        renderAll();
       }
 
       /* ============ Rendering ============ */
@@ -988,7 +1048,7 @@
       var searchInvalid = false;
       var filterMode = "all"; // all | available | sold
 
-      function scopeRows(rows) { return rows.filter(function (r) { return collectionFilter === "all" || r.coll === collectionFilter; }); }
+      function scopeRows(rows) { return rows.filter(function (r) { return r.coll === collectionFilter; }); }
       function applyFilters(rows) {
         var out = scopeRows(rows);
         if (filterMode === "available") out = out.filter(function (r) { return r.status === "LISTED"; });
@@ -1034,7 +1094,7 @@
         return sorted;
       }
       function cardHTML(r) {
-        var C = COLLS[r.coll];
+        var C = COLLECTIONS[r.coll];
         var collBadge = r.coll === "snake"
           ? '<span class="badge coll-snake">SNAKEID</span>'
           : '<span class="badge coll-panda">AGENT PANDA</span>';
@@ -1125,7 +1185,7 @@
         all.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
         var shown = all.slice(0, activityShown);
         feed.innerHTML = shown.map(function (e) {
-          var C = COLLS[e.coll];
+          var C = COLLECTIONS[e.coll];
           var badge = e.kind === "Listed" ? '<span class="badge listed">LISTED</span>'
             : e.kind === "Sold" ? '<span class="badge sold">SOLD</span>'
             : e.kind === "Cancelled" ? '<span class="badge cancelled">CANCELLED</span>'
@@ -1170,9 +1230,9 @@
         all.sort(function (a, b) { return (b.block - a.block) || (b.logIndex - a.logIndex); });
         var body = $("salesBody");
         body.innerHTML = all.map(function (s) {
-          var C = COLLS[s.coll];
+          var C = COLLECTIONS[s.coll];
           var collTxt = s.coll === "snake" ? "SNAKEID" : "AGENT PANDA";
-          var tierTxt = s.coll === "snake" && rarity[s.tokenId] ? " &middot; " + esc(rarity[s.tokenId]) : "";
+          var tierTxt = COLLECTIONS[s.coll].hasRarity && (rarity[s.coll] || {})[s.tokenId] ? " &middot; " + esc((rarity[s.coll] || {})[s.tokenId]) : "";
           return "<tr><td>" + esc(C.label(s.tokenId)) + tierTxt + "</td><td>" + collTxt + "</td><td>" + fmtBNB(s.priceWei) + " BNB</td><td>" + shortAddr(s.seller) + "</td><td>" + shortAddr(s.buyer) + "</td><td>" + (blockTimes[s.block] ? fmtTime(blockTimes[s.block]) : "Block " + s.block) + "</td><td><a href=\"https://bscscan.com/tx/" + esc(s.tx) + "\" target=\"_blank\" rel=\"noopener\">" + shortTx(s.tx) + " &nearr;</a></td></tr>";
         }).join("");
         var anyUnavailable = collsInScope().some(function (k) { return S[k].eventsUnavailable; });
@@ -1190,7 +1250,7 @@
           $("salesEmpty").querySelector("p").textContent = "No sales in the recent window. Older history is still loading.";
         } else {
           $("salesEmpty").querySelector("h3").textContent = "No sales yet";
-          $("salesEmpty").querySelector("p").textContent = "No SnakeID or Agent Panda has sold on the market yet. Sales will appear here the moment the first one happens.";
+          $("salesEmpty").querySelector("p").textContent = "No " + COLLECTIONS[collectionFilter].name + " has sold on the market yet. Sales will appear here the moment the first one happens.";
           $("salesEmpty").style.display = noSales ? "block" : "none";
         }
       }
@@ -1244,7 +1304,22 @@
         var rangeCount = counts.reduce(function (a, b) { return a + b; }, 0);
         $("chartNote").textContent = rangeCount + " sale(s) · " + rangeVol.toFixed(5) + " BNB in range. Volume in BNB per bucket (bars) and number of sales (line). Data comes only from on-chain Sold events.";
       }
+      // Scope UI: the rarity filter row only exists for collections with
+      // tiers; a collection without tiers shows a short note instead, and
+      // any active tier filter is reset when switching to it.
+      function updateScopeUI() {
+        var hasRarity = COLLECTIONS[collectionFilter].hasRarity;
+        var row = $("rarityRow");
+        if (row) row.style.display = hasRarity ? "" : "none";
+        var note = $("noTiersNote");
+        if (note) note.style.display = hasRarity ? "none" : "block";
+        if (!hasRarity && rarityFilter !== "all") {
+          rarityFilter = "all";
+          document.querySelectorAll(".rarity-chip").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-rarity") === "all" ? "true" : "false"); });
+        }
+      }
       function renderAll() {
+        updateScopeUI();
         updateStats();
         renderExplore();
         renderListed();
@@ -1280,7 +1355,7 @@
             var found = [];
             for (var ci = 0; ci < COLL_KEYS.length; ci++) {
               var coll = COLL_KEYS[ci];
-              var C = COLLS[coll];
+              var C = COLLECTIONS[coll];
               var balHex = await ethCall(C.nft, SEL_BALANCE_OF + padAddr(addr).slice(2));
               var bal = parseInt(balHex, 16);
               for (var i = 0; i < Math.min(bal, 1000); i++) {
@@ -1309,7 +1384,7 @@
         });
         enriched.sort(function (a, b) { return (a.coll === b.coll) ? a.tokenId - b.tokenId : (a.coll === "snake" ? -1 : 1); });
         grid.innerHTML = enriched.map(function (r) {
-          var C = COLLS[r.coll];
+          var C = COLLECTIONS[r.coll];
           var collBadge = r.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : '<span class="badge coll-panda">AGENT PANDA</span>';
           var statusBadge = r.status === "LISTED" ? '<span class="badge listed">LISTED</span>' : '<span class="badge updated">NOT LISTED</span>';
           var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>&#128012;</div>\'" />';
@@ -1409,7 +1484,7 @@
 
       /* ============ Init ============ */
       async function loadSnapshot(coll) {
-        var C = COLLS[coll];
+        var C = COLLECTIONS[coll];
         var st = S[coll];
         try {
           var res = await fetch(C.snapListings, { cache: "no-store" });
@@ -1456,7 +1531,7 @@
         } catch (e) { errors.push("block number"); }
         await Promise.all(COLL_KEYS.map(async function (coll) {
           try {
-            var tm = await ethCall(COLLS[coll].nft, SEL_TOTAL_MINTED);
+            var tm = await ethCall(COLLECTIONS[coll].nft, SEL_TOTAL_MINTED);
             S[coll].totalMinted = parseInt(tm, 16);
           } catch (e) { /* totalMinted stays null — stats show "—" */ }
           await loadSnapshot(coll);
@@ -1464,9 +1539,10 @@
           // The silent background refresh runs every 60 seconds and
           // verifies the snapshot against the contracts (no text, no
           // spinner — the grid just updates when it finishes).
-          loadRarity();
           loadEvents(coll);
         }));
+        // Rarity loads once for every collection that has tiers.
+        loadRarity();
         if (COLL_KEYS.every(function (k) { return !S[k].dataReady; })) {
           $("loadError").style.display = "block";
           $("loadErrorText").textContent = "Could not load the market data (" + (errors.join(", ") || "all data sources failed") + "). Check your connection and retry.";
@@ -1501,11 +1577,13 @@
       // Debug/test handle: refreshes both collections' listings from the
       // contracts and exposes the trade-prompt builders (no wallet, no
       // signing — prompts are just text the user copies to their agent).
+      // getState exposes the in-memory per-collection state for tests.
       window.__snakeidMarket = {
         refreshListings: function () { return Promise.all(COLL_KEYS.map(function (c) { return refreshListings(c); })); },
         promptList: promptList,
         promptBuy: promptBuy,
-        promptCancel: promptCancel
+        promptCancel: promptCancel,
+        getState: function () { return S; }
       };
       init();
     })();

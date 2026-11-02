@@ -73,6 +73,8 @@
       .btn { display: inline-block; font-family: var(--sans); font-size: 15px; font-weight: 700; letter-spacing: 0; text-decoration: none; cursor: pointer; border: 1px solid var(--line); border-radius: 10px; background: rgba(2, 14, 4, .7); color: var(--ink); padding: 13px 20px; }
       .btn-primary { background: var(--neon); border-color: var(--neon); color: #021003; box-shadow: 0 0 24px rgba(57, 255, 20, .35); }
       .btn:hover { filter: brightness(1.1); }
+      .qty-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; background: rgba(2, 14, 4, .7); padding: 7px 13px; cursor: pointer; }
+      .qty-btn[aria-pressed="true"] { background: var(--neon); border-color: var(--neon); color: #021003; }
       .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-top: 30px; }
       .card h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2.5px; color: var(--neon); margin: 0 0 12px; font-weight: 600; }
       .card p, .card li { color: #c9e8c4; font-size: 15px; line-height: 1.65; }
@@ -124,15 +126,15 @@
       <header><a class="wordmark" href="/">Snake<span>ID</span></a><button class="trade-btn" id="tradeAgentBtn" type="button">TRADE VIA AGENT</button></header><nav aria-label="Pages"><a href="/">HOME</a><a href="/mint.html" aria-current="page">LAUNCHPAD</a><a href="/market.html">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
       <main>
 
-        <div class="status-line">SNAKEID &times; AGENT PANDA</div>
-        <h1>Snake x Panda <em>Launchpad</em></h1>
-        <p class="lede">Curated NFT launches from the SnakeID and Agent Panda teams. New collections apply, the team picks the best, and collectors mint through their AI agent &mdash; no wallet connect, no seed phrase, ever.</p>
+        <div class="status-line">SNAKE LAUNCHPAD</div>
+        <h1>Snake <em>Launchpad</em></h1>
+        <p class="lede">A launchpad service from Snake for NFT collections. New collections apply, the team picks the best, and collectors mint through their AI agent &mdash; no wallet connect, no seed phrase, ever.</p>
 
         <div class="card">
           <h3>HOW IT WORKS</h3>
           <ol>
             <li><strong>Apply</strong> &mdash; A project applies to launch, sharing its website, X account and contract.</li>
-            <li><strong>Curated</strong> &mdash; The SnakeID + Agent Panda team reviews every application and picks the launches.</li>
+            <li><strong>Curated</strong> &mdash; The Snake team reviews every application and picks the launches.</li>
             <li><strong>Launch</strong> &mdash; Approved collections get a launch slot on this page, with their mint rules.</li>
             <li><strong>Mint via agent</strong> &mdash; Collectors copy the mint prompt, paste it to their AI agent, check the transaction preview, and confirm.</li>
           </ol>
@@ -152,10 +154,28 @@
             </div>
             <p style="margin-top: 16px"><a href="/market.html">View live market &rarr;</a> &middot; <a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">BscScan &nearr;</a></p>
           </div>
-          <div class="launch-card soon">
-            <h3>SLOT 02 &middot; COMING SOON</h3>
-            <div class="launch-name">Coming soon</div>
-            <p>The next launch will be announced here.</p>
+          <div class="launch-card" id="pandaCard">
+            <h3>SLOT 02 &middot; LIVE</h3>
+            <div class="launch-name">Agent Panda</div>
+            <p>One golden panda card for all 10,000 tokens. Agent ID holders mint 2 free + 2 paid at 0.001 BNB; everyone else 0.001 BNB each, max 4 per wallet. No tiers, no rarity &mdash; every panda is the same card. Free mints need a proof-of-work puzzle first &mdash; your agent solves it.</p>
+            <div class="launch-stats">
+              <div class="pr"><span>Supply</span><span>10,000</span></div>
+              <div class="pr"><span>Minted</span><span id="pandaMinted">549 / 10,000</span></div>
+              <div class="pr"><span>Free mints</span><span>2 / Agent ID</span></div>
+              <div class="pr"><span>Paid mint</span><span>0.001 BNB</span></div>
+            </div>
+            <p style="margin-top: 16px"><a href="https://agentpandabnb.xyz/" target="_blank" rel="noopener">agentpandabnb.xyz &nearr;</a> &middot; <a href="https://bscscan.com/address/0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e" target="_blank" rel="noopener">BscScan &nearr;</a></p>
+            <div class="row" style="margin-top: 16px">
+              <span class="mono">QTY</span>
+              <button class="qty-btn" type="button" data-qty="1" aria-pressed="true">1</button>
+              <button class="qty-btn" type="button" data-qty="2" aria-pressed="false">2</button>
+              <button class="qty-btn" type="button" data-qty="3" aria-pressed="false">3</button>
+              <button class="qty-btn" type="button" data-qty="4" aria-pressed="false">4</button>
+            </div>
+            <div class="row" style="margin-top: 12px">
+              <button class="btn btn-primary" type="button" id="copyPandaMintPrompt">MINT VIA AGENT</button>
+              <span id="pandaMintCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
+            </div>
           </div>
           <div class="launch-card soon">
             <h3>SLOT 03 &middot; COMING SOON</h3>
@@ -237,8 +257,35 @@
       refreshSnakeMinted();
       setInterval(refreshSnakeMinted, 30000);
       document.getElementById("copyApplyPrompt").addEventListener("click", function () {
-        var p = "I want to apply to launch my NFT collection on the Snake x Panda Launchpad. Here are my project details: Project name: ___ / Website: ___ / X account: ___ / Contract address (if deployed): ___ / Supply: ___ / Mint price (BNB): ___ / Per-wallet limit: ___ / One-line description: ___. Please check the project first (official website, X account, verified contract), then prepare my launch application for the SnakeID + Agent Panda team.";
+        var p = "I want to apply to launch my NFT collection on the Snake Launchpad. Here are my project details: Project name: ___ / Website: ___ / X account: ___ / Contract address (if deployed): ___ / Supply: ___ / Mint price (BNB): ___ / Per-wallet limit: ___ / One-line description: ___. Please check the project first (official website, X account, verified contract), then prepare my launch application for the Snake team.";
         copyText(p, document.getElementById("applyPromptCopied"));
+      });
+      var PANDA_NFT = "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e";
+      var PANDA_REGISTRY = "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F";
+      var pandaQty = 1;
+      function pandaMintPrompt(qty) {
+        return "Mint " + qty + " Agent Panda NFT for me. Contract " + PANDA_NFT + " on BNB Chain. First check if I hold an Agent ID (registry " + PANDA_REGISTRY + ") and how many free mints I have left. If I am an Agent ID holder with free mints left, solve the proof-of-work puzzle first (find a nonce such that keccak256(abi.encodePacked(my wallet, my freeMintsUsed, nonce)) is below 2^231 — use the solver: node solve_pow.mjs <my wallet> <my freeMintsUsed>), then call mintFree(nonce) with 0 BNB for the free ones, and mint() with 0.001 BNB each for any remaining ones. If I am not an Agent ID holder, or my free mints are used up, call mint(" + qty + ") with 0.001 BNB per NFT. Max 4 mints per wallet in total. Verify on-chain first (Agent ID balance, free mints remaining, mint open), show me a transaction preview, and wait for my confirmation before executing.";
+      }
+      async function refreshPandaMinted() {
+        try {
+          var totalHex = await rpcCall(PANDA_NFT, SEL_TOTAL_MINTED);
+          if (totalHex === null) return;
+          var total = parseInt(totalHex, 16);
+          document.getElementById("pandaMinted").textContent = total.toLocaleString("en-US") + " / 10,000";
+        } catch (e) {}
+      }
+      refreshPandaMinted();
+      setInterval(refreshPandaMinted, 30000);
+      Array.prototype.forEach.call(document.querySelectorAll(".qty-btn"), function (b) {
+        b.addEventListener("click", function () {
+          pandaQty = parseInt(b.getAttribute("data-qty"), 10);
+          Array.prototype.forEach.call(document.querySelectorAll(".qty-btn"), function (x) {
+            x.setAttribute("aria-pressed", x === b ? "true" : "false");
+          });
+        });
+      });
+      document.getElementById("copyPandaMintPrompt").addEventListener("click", function () {
+        copyText(pandaMintPrompt(pandaQty), document.getElementById("pandaMintCopied"));
       });
     </script>
 

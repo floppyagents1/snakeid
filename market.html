@@ -424,12 +424,11 @@
       // then the Jolly tab shows "market not deployed yet" and trading is
       // disabled. The SnakeID and Agent Panda markets are unaffected.
       var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
-      // Jolly images are live on IPFS (CID bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie),
-      // served via the ipfs.io SUBDOMAIN gateway, which returns raw image
-      // bytes for <img> tags. (The ipfs.io path gateway redirects to a
-      // JS service-worker gateway, and inbrowser.link serves a JS loader
-      // page — neither works as an <img> src.) Images load as
-      // <base>/<tokenId>.jpg.
+      // Jolly images are static files on snakeid.xyz (jolly/<colorway>.jpg,
+      // 16 total — see the Jolly img() function and colorway-jolly.json).
+      // The IPFS CID below is kept only as a fallback for the card image
+      // loader (JOLLY_IMG_GWS) in case a static file is ever missing.
+      // Images CID: bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.
       var JOLLY_IMG_BASE = "https://bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.ipfs.ipfs.io";
       // If the primary gateway fails for a Jolly image, the card tries the
       // next gateway in this list before giving up (see jollyImgFallback).
@@ -520,7 +519,11 @@
           snapListings: "listings-jolly.json", snapEvents: "market-events-jolly.json",
           cacheEvents: "snakeid-jolly-market-events-v1",
           hasRarity: true, snapRarity: "rarity-jolly.json",
-          img: function (id) { return JOLLY_IMG_BASE + "/" + id + ".jpg"; },
+          // Jolly images are static files on snakeid.xyz (one per colorway,
+          // 16 total — tokens sharing a colorway have identical images).
+          // colorway-jolly.json maps tokenId -> colorway slug.
+          snapColorway: "colorway-jolly.json",
+          img: function (id) { return "https://snakeid.xyz/jolly/" + (colorway[id] || "aurora") + ".jpg"; },
           label: function (id) { return "Jolly #" + id; }
         }
       };
@@ -1138,6 +1141,20 @@
         });
         await Promise.all(jobs);
         renderAll();
+      }
+
+      /* ============ Jolly colorway map ============ */
+      // Maps tokenId -> colorway slug (e.g. 55 -> "aurora"), from the
+      // colorway-jolly.json snapshot. Used by the Jolly img() function so
+      // each card shows its token's colorway image from snakeid.xyz.
+      var colorway = {}; // tokenId -> "aurora"|"berry"|...
+      async function loadColorway() {
+        try {
+          var res = await fetch("colorway-jolly.json", { cache: "no-store" });
+          if (!res.ok) return;
+          var j = await res.json();
+          if (j && typeof j === "object") { colorway = j; dirty = true; renderAll(); }
+        } catch (e) { /* no colorway snapshot — cards fall back to the aurora image */ }
       }
 
       /* Thumbnail fallback emoji per collection (shown when an image fails
@@ -1759,6 +1776,8 @@
         }));
         // Rarity loads once for every collection that has tiers.
         loadRarity();
+        // Jolly colorway map loads once (tokenId -> colorway slug).
+        loadColorway();
         if (COLL_KEYS.every(function (k) { return !S[k].dataReady; })) {
           $("loadError").style.display = "block";
           $("loadErrorText").textContent = "Could not load the market data (" + (errors.join(", ") || "all data sources failed") + "). Check your connection and retry.";

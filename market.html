@@ -425,11 +425,12 @@
       // disabled. The SnakeID and Agent Panda markets are unaffected.
       var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
       // Jolly images are live on IPFS (CID bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie),
-      // served via the ipfs.io gateway, which returns raw image bytes for
-      // <img> tags. (The inbrowser.link gateway only works on direct
-      // navigation — it serves a JS loader page, so <img> tags showed
-      // broken icons.) Images load as <base>/<tokenId>.jpg.
-      var JOLLY_IMG_BASE = "https://ipfs.io/ipfs/bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie";
+      // served via the ipfs.io SUBDOMAIN gateway, which returns raw image
+      // bytes for <img> tags. (The ipfs.io path gateway redirects to a
+      // JS service-worker gateway, and inbrowser.link serves a JS loader
+      // page — neither works as an <img> src.) Images load as
+      // <base>/<tokenId>.jpg.
+      var JOLLY_IMG_BASE = "https://bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.ipfs.ipfs.io";
       var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID",

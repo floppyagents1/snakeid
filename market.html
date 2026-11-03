@@ -431,6 +431,24 @@
       // page — neither works as an <img> src.) Images load as
       // <base>/<tokenId>.jpg.
       var JOLLY_IMG_BASE = "https://bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.ipfs.ipfs.io";
+      // If the primary gateway fails for a Jolly image, the card tries the
+      // next gateway in this list before giving up (see jollyImgFallback).
+      var JOLLY_IMG_CID = "bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie";
+      var JOLLY_IMG_GWS = [
+        JOLLY_IMG_BASE,
+        "https://gateway.pinata.cloud/ipfs/" + JOLLY_IMG_CID,
+        "https://dweb.link/ipfs/" + JOLLY_IMG_CID,
+        "https://ipfs.io/ipfs/" + JOLLY_IMG_CID
+      ];
+      function jollyImgFallback(el) {
+        var idx = parseInt(el.getAttribute("data-gw") || "0", 10) + 1;
+        if (idx >= JOLLY_IMG_GWS.length) {
+          el.outerHTML = '<div class="thumb-fallback">' + fallbackEmoji("jolly") + '</div>';
+          return;
+        }
+        el.setAttribute("data-gw", String(idx));
+        el.src = JOLLY_IMG_GWS[idx] + "/" + el.getAttribute("data-token") + ".jpg";
+      }
       var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID",
@@ -1213,7 +1231,9 @@
           : r.status === "MINTED"
             ? '<span class="badge unlisted">NOT LISTED</span>'
             : '<span class="badge sold">SOLD</span>';
-        var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
+        var img = r.coll === "jolly"
+          ? '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" data-token="' + r.tokenId + '" data-gw="0" onerror="jollyImgFallback(this)" />'
+          : '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
         var priceLine = r.status === "LISTED"
           ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>'
           : r.status === "MINTED"
@@ -1572,7 +1592,9 @@
           var C = COLLECTIONS[r.coll];
           var collBadge = r.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : r.coll === "panda" ? '<span class="badge coll-panda">AGENT PANDA</span>' : '<span class="badge coll-jolly">JOLLY</span>';
           var statusBadge = r.status === "LISTED" ? '<span class="badge listed">LISTED</span>' : '<span class="badge updated">NOT LISTED</span>';
-          var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
+          var img = r.coll === "jolly"
+          ? '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" data-token="' + r.tokenId + '" data-gw="0" onerror="jollyImgFallback(this)" />'
+          : '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
           var priceLine = r.status === "LISTED" ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>' : '<p class="price">Not listed</p>';
           var action = r.status === "LISTED"
             ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'

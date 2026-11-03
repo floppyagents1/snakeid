@@ -118,12 +118,14 @@
       .listing .thumb-fallback { width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #03130a; color: var(--neon); font-family: var(--display); font-weight: 400; font-size: 15px; }
       .listing .tid { font-family: var(--mono); font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
       .listing .price { color: var(--neon); font-family: var(--mono); font-size: 13px; margin: 0 0 4px; }
+      .listing .not-listed { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 0 0 4px; }
       .listing .seller { font-family: var(--mono); font-size: 11px; color: var(--muted); word-break: break-all; margin: 0 0 4px; }
       .listing .listed-at { font-family: var(--mono); font-size: 11px; color: var(--muted); margin: 0 0 10px; }
       .listing .btn { margin-top: auto; text-align: center; }
       .badge { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 1.5px; padding: 3px 8px; margin-bottom: 8px; }
       .badge.listed { background: var(--neon); color: #021003; }
       .badge.sold { background: #ff3b30; color: #fff; }
+      .badge.unlisted { background: #52525b; color: #fff; }
       .badge.minted { background: #3b82f6; color: #fff; }
       .badge.cancelled { background: #52525b; color: #fff; }
       .badge.updated { background: var(--neon-dim); color: #021003; }
@@ -472,6 +474,12 @@
           // "JOLLY · COMING SOON", the lock banner shows COMING SOON, and
           // trading is blocked. Remove the flag only when the owner says
           // to open trading.
+          // showMinted: Explore shows EVERY minted token of this collection
+          // (IDs 1..totalMinted, read live from the contract), not just the
+          // ones listed for sale. Unlisted tokens get a "NOT LISTED" card
+          // with a LIST IT button. SnakeID and Agent Panda keep the old
+          // listings-only view.
+          showMinted: true,
           comingSoon: true,
           nft: "0xdc11764a5664e333c8d303eb465e89a1caadb85b",
           // Market contract NOT deployed yet — paste the deployed Jolly
@@ -1066,6 +1074,16 @@
         renderListed();
       }
 
+      // Minted-tokens view (Jolly): re-read totalMinted from the contract
+      // on the 60s refresh so the Explore grid grows as new tokens mint.
+      // A failed read keeps the last known value — never blanks the grid.
+      async function refreshTotalMinted(coll) {
+        try {
+          var tm = await ethCall(COLLECTIONS[coll].nft, SEL_TOTAL_MINTED);
+          var n = parseInt(tm, 16);
+          if (n !== S[coll].totalMinted) { S[coll].totalMinted = n; dirty = true; updateStats(); renderExplore(); }
+        } catch (e) { /* totalMinted stays as-is */ }
+      }
       /* ============ Rarity (per collection) ============ */
       // A collection's tiers come from its per-token metadata ("Rarity"
       // attribute), baked into ONE snapshot file per collection
@@ -1134,6 +1152,17 @@
             var s = st.soldMap[id];
             if (!st.activeListings[id]) rows.push({ coll: coll, tokenId: Number(id), status: "SOLD", seller: s.seller, buyer: s.buyer, priceWei: s.priceWei, block: s.block, tx: s.tx });
           });
+          // Minted-tokens view (collections with showMinted, currently
+          // Jolly only): every minted token appears in Explore, not just
+          // listed ones. Token IDs are sequential from 1, so the minted
+          // set is 1..totalMinted (read live from the contract). Tokens
+          // already listed or sold are skipped here — their rows above
+          // carry the price/status.
+          if (COLLECTIONS[coll].showMinted && typeof st.totalMinted === "number" && st.totalMinted > 0) {
+            for (var id = 1; id <= st.totalMinted; id++) {
+              if (!st.activeListings[id] && !st.soldMap[id]) rows.push({ coll: coll, tokenId: id, status: "MINTED", seller: null, priceWei: null, block: null, tx: null });
+            }
+          }
         });
         return rows;
       }
@@ -1148,11 +1177,22 @@
         });
         return rows;
       }
+      // Price compare for the sort dropdown. Unlisted (minted, no price)
+      // tokens sort last in both price modes; priced rows keep the exact
+      // original ordering (price, then Token ID ascending on ties).
+      function cmpPrice(a, b, dir) {
+        var an = a.priceWei == null, bn = b.priceWei == null;
+        if (an && bn) return a.tokenId - b.tokenId;
+        if (an) return 1;
+        if (bn) return -1;
+        if (dir > 0) return a.priceWei < b.priceWei ? -1 : a.priceWei > b.priceWei ? 1 : a.tokenId - b.tokenId;
+        return a.priceWei > b.priceWei ? -1 : a.priceWei < b.priceWei ? 1 : a.tokenId - b.tokenId;
+      }
       function sortRows(rows) {
         var mode = $("sortSelect").value;
         var sorted = rows.slice();
-        if (mode === "price-asc") sorted.sort(function (a, b) { return a.priceWei < b.priceWei ? -1 : a.priceWei > b.priceWei ? 1 : a.tokenId - b.tokenId; });
-        else if (mode === "price-desc") sorted.sort(function (a, b) { return a.priceWei > b.priceWei ? -1 : a.priceWei < b.priceWei ? 1 : a.tokenId - b.tokenId; });
+        if (mode === "price-asc") sorted.sort(function (a, b) { return cmpPrice(a, b, 1); });
+        else if (mode === "price-desc") sorted.sort(function (a, b) { return cmpPrice(a, b, -1); });
         else if (mode === "recent") sorted.sort(function (a, b) { return (b.block || 0) - (a.block || 0) || b.tokenId - a.tokenId; });
         else if (mode === "id-asc") sorted.sort(function (a, b) { return a.tokenId - b.tokenId; });
         else if (mode === "id-desc") sorted.sort(function (a, b) { return b.tokenId - a.tokenId; });
@@ -1167,12 +1207,16 @@
             : '<span class="badge coll-jolly">JOLLY</span>';
         var statusBadge = r.status === "LISTED"
           ? '<span class="badge listed">LISTED</span>'
-          : '<span class="badge sold">SOLD</span>';
+          : r.status === "MINTED"
+            ? '<span class="badge unlisted">NOT LISTED</span>'
+            : '<span class="badge sold">SOLD</span>';
         var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
         var priceLine = r.status === "LISTED"
           ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>'
-          : '<p class="price">Sold ' + fmtBNB(r.priceWei) + ' BNB</p>';
-        var sellerLine = '<p class="seller">Seller ' + shortAddr(r.seller) + '</p>';
+          : r.status === "MINTED"
+            ? '<p class="not-listed">Not listed on the market yet.</p>'
+            : '<p class="price">Sold ' + fmtBNB(r.priceWei) + ' BNB</p>';
+        var sellerLine = r.status === "MINTED" ? "" : '<p class="seller">Seller ' + shortAddr(r.seller) + '</p>';
         var listedLine = r.block && blockTimes[r.block] ? '<p class="listed-at">' + fmtTime(blockTimes[r.block]) + ' &middot; ' + fmtRel(blockTimes[r.block]) + ' ago</p>' : "";
         var action = r.status === "LISTED"
           ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'
@@ -1717,7 +1761,10 @@
             tickBusy = false;
           }, TICK_MS);
           setInterval(function () {
-            COLL_KEYS.forEach(function (coll) { refreshListings(coll); });
+            COLL_KEYS.forEach(function (coll) {
+              refreshListings(coll);
+              if (COLLECTIONS[coll].showMinted) refreshTotalMinted(coll);
+            });
           }, REFRESH_MS);
         }
       }

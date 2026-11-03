@@ -187,7 +187,10 @@
               <div class="pr"><span>Free mints</span><span id="jollyFreeLeft">5,000 left</span></div>
               <div class="pr"><span>Paid mint</span><span>0.0005 BNB</span></div>
             </div>
-            <p style="margin-top: 16px"><a href="https://muse.ai/s/web-mint-farcaster-xaw6xcxl0mu6xam/U_NuPubnaPh_N1CwvG32yFJ5VSzuL_1Uk35L7wgjLDc" target="_blank" rel="noopener">Mint Jolly &nearr;</a> &middot; <span class="mono">Contract deploys soon</span></p>
+            <div class="row" style="margin-top: 16px">
+              <button class="btn btn-primary" type="button" id="copyJollyMintPrompt">MINT VIA AGENT</button>
+              <span id="jollyMintCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
+            </div>
           </div>
         </div>
 
@@ -313,6 +316,17 @@
       }
       refreshJollyMinted();
       setInterval(refreshJollyMinted, 30000);
+      var JOLLY_REGISTRY = "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F";
+      function jollyMintPrompt() {
+        return "Mint 1 Jolly NFT for me. Contract " + JOLLY_NFT + " on BNB Chain. First check if I hold an Agent ID (registry " + JOLLY_REGISTRY + ") and whether the free or paid pool applies. If I am an Agent ID holder and free mints are left (5,000 free pool), call mint() with 0 BNB. Otherwise, call mint() with 0.0005 BNB. Max 1 mint per wallet. Verify on-chain first (Agent ID balance, free mints remaining, total minted), show me a transaction preview, and wait for my confirmation before executing.";
+      }
+      document.getElementById("copyJollyMintPrompt").addEventListener("click", function () {
+        if (!JOLLY_NFT) {
+          document.getElementById("jollyMintCopied").textContent = "Contract deploys soon \u2014 check back after launch.";
+          return;
+        }
+        copyText(jollyMintPrompt(), document.getElementById("jollyMintCopied"));
+      });
     </script>
 
   </body>

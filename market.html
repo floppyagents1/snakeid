@@ -204,7 +204,7 @@
         <p class="lede">Every listing, sale and price below is read live from the SnakeID, Agent Panda and Jolly Market contracts on BNB Chain. Nothing here is a guess &mdash; if a number cannot be read on-chain, it shows as &ldquo;&mdash;&rdquo;.</p>
 
         <div class="card" id="lockBanner" style="display:none; margin-top: 0">
-          <h3>MARKET NOT DEPLOYED YET</h3>
+          <h3 id="lockTitle">MARKET NOT DEPLOYED YET</h3>
           <p id="lockText">The Jolly Market contract has not been deployed yet. Trading opens when the market contract is live.</p>
         </div>
 
@@ -466,6 +466,13 @@
         },
         jolly: {
           key: "jolly", name: "Jolly", short: "JOLLY",
+          // COMING SOON (2026-11-04): the market contract is deployed but
+          // the Jolly images are not live yet (IPFS upload in progress).
+          // While this flag is on, the Jolly chip reads "JOLLY · COMING
+          // SOON", the lock banner shows COMING SOON, and trading is
+          // blocked. Remove the flag (and keep JOLLY_IMG_BASE set) once
+          // the images are live to open the market.
+          comingSoon: true,
           nft: "0xdc11764a5664e333c8d303eb465e89a1caadb85b",
           // Market contract NOT deployed yet — paste the deployed Jolly
           // Market address into JOLLY_MARKET above. Until then the Jolly
@@ -503,14 +510,14 @@
           scopeBtn.type = "button";
           scopeBtn.setAttribute("data-scope", key);
           scopeBtn.setAttribute("aria-pressed", idx === 0 ? "true" : "false");
-          scopeBtn.textContent = C.short;
+          scopeBtn.textContent = C.comingSoon ? C.short + " \u00b7 COMING SOON" : C.short;
           if (scopeRow) scopeRow.appendChild(scopeBtn);
           var tradeBtn = document.createElement("button");
           tradeBtn.className = "chip trade-chip";
           tradeBtn.type = "button";
           tradeBtn.setAttribute("data-trade-coll", key);
           tradeBtn.setAttribute("aria-pressed", idx === 0 ? "true" : "false");
-          tradeBtn.textContent = C.short;
+          tradeBtn.textContent = C.comingSoon ? C.short + " \u00b7 COMING SOON" : C.short;
           if (tradeRow) tradeRow.appendChild(tradeBtn);
         });
       }
@@ -690,9 +697,9 @@
         if (!btn) return;
         var kind = btn.getAttribute("data-copy");
         var coll = btn.getAttribute("data-coll") || tradeColl;
-        if (!COLLECTIONS[coll].market) {
+        if (!COLLECTIONS[coll].market || COLLECTIONS[coll].comingSoon) {
           var note0 = $("tradeCopied");
-          if (note0) { note0.textContent = "Market not deployed yet \u2014 trading opens after the market contract deploys."; setTimeout(function () { note0.textContent = ""; }, 4000); }
+          if (note0) { note0.textContent = COLLECTIONS[coll].comingSoon ? "Market coming soon \u2014 trading opens once the images are live." : "Market not deployed yet \u2014 trading opens after the market contract deploys."; setTimeout(function () { note0.textContent = ""; }, 4000); }
           return;
         }
         var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null, coll)
@@ -1367,15 +1374,21 @@
       // Scope UI: the rarity filter row only exists for collections with
       // tiers; a collection without tiers shows a short note instead, and
       // any active tier filter is reset when switching to it.
-      /* The "not deployed yet" banner shows only for a collection whose
-       * market contract address is still empty (Jolly, until its market
-       * deploys). SnakeID and Agent Panda have live markets, so the banner
-       * stays hidden for them. */
+      /* The "not deployed yet" / "coming soon" banner shows for a
+       * collection whose market contract address is still empty, or whose
+       * comingSoon flag is on (Jolly, until its images are live). SnakeID
+       * and Agent Panda have live markets, so the banner stays hidden for
+       * them. */
       function updateLockBanner() {
         var C = COLLECTIONS[collectionFilter];
         var banner = $("lockBanner");
         if (!banner) return;
-        if (!C.market) {
+        if (C.comingSoon) {
+          $("lockTitle").textContent = "COMING SOON";
+          $("lockText").textContent = "The " + C.name + " Market opens soon. Trading opens once the " + C.name + " images are live.";
+          banner.style.display = "block";
+        } else if (!C.market) {
+          $("lockTitle").textContent = "MARKET NOT DEPLOYED YET";
           $("lockText").textContent = "The " + C.name + " Market contract has not been deployed yet. Trading opens when the market contract is live.";
           banner.style.display = "block";
         } else {

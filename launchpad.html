@@ -133,7 +133,7 @@
         <div class="card">
           <h3>HOW IT WORKS</h3>
           <ol>
-            <li><strong>Apply</strong> &mdash; A project applies to launch, sharing its website, X account and contract.</li>
+            <li><strong>Apply</strong> &mdash; A project applies to launch, sharing its verified contract and mint rules. A website and X account are optional.</li>
             <li><strong>Curated</strong> &mdash; The Snake team reviews every application and picks the launches.</li>
             <li><strong>Launch</strong> &mdash; Approved collections get a launch slot on this page, with their mint rules.</li>
             <li><strong>Mint via agent</strong> &mdash; Collectors copy the mint prompt, paste it to their AI agent, check the transaction preview, and confirm.</li>
@@ -207,10 +207,9 @@
           <p>Want your collection on the launchpad? Copy the prompt below, fill in your project details, and paste it to your agent.</p>
           <p style="margin-top: 12px">What the team looks for:</p>
           <ol style="margin-top: 6px">
-            <li>An official website for the project.</li>
-            <li>An active X account.</li>
-            <li>A verified contract, or a clear plan for one.</li>
+            <li>A verified contract on BscScan (required) &mdash; the source code is public, so anyone can audit it. The team also reviews the code for drain, hidden mint, and owner risks before approval.</li>
             <li>Clear mint rules: supply, mint price, and per-wallet limit.</li>
+            <li>A website and an X account are optional &mdash; nice to have, not required.</li>
           </ol>
           <div class="row" style="margin-top: 16px">
             <button class="btn btn-primary" type="button" id="copyApplyPrompt">COPY APPLY PROMPT</button>
@@ -276,7 +275,7 @@
       refreshSnakeMinted();
       setInterval(refreshSnakeMinted, 30000);
       document.getElementById("copyApplyPrompt").addEventListener("click", function () {
-        var p = "I want to apply to launch my NFT collection on the Snake Launchpad. Here are my project details: Project name: ___ / Website: ___ / X account: ___ / Contract address (if deployed): ___ / Supply: ___ / Mint price (BNB): ___ / Per-wallet limit: ___ / One-line description: ___. Please check the project first (official website, X account, verified contract), then prepare my launch application for the Snake team.";
+        var p = "I want to apply to launch my NFT collection on the Snake Launchpad. Here are my project details: Project name: ___ / Website (optional): ___ / X account (optional): ___ / Contract address: ___ / Supply: ___ / Mint price (BNB): ___ / Per-wallet limit: ___ / One-line description: ___. Please check the project first (the contract must be verified on BscScan - read the source and check for drain, hidden mint, or owner risks), then prepare my launch application for the Snake team.";
         copyText(p, document.getElementById("applyPromptCopied"));
       });
       var PANDA_NFT = "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e";

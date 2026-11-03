@@ -422,11 +422,10 @@
       // then the Jolly tab shows "market not deployed yet" and trading is
       // disabled. The SnakeID and Agent Panda markets are unaffected.
       var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
-      // TODO: point at the real Jolly image host after the IPFS upload, e.g.
-      // "https://ipfs.io/ipfs/<images-CID>" — images then load as
-      // <base>/<tokenId>.jpg. Until then Jolly card images fall back to the
-      // plush placeholder. Do NOT put a fake CID here.
-      var JOLLY_IMG_BASE = "";
+      // Jolly images are live on IPFS (CID bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie),
+      // served via the inbrowser.link gateway (confirmed loading on a phone).
+      // Images load as <base>/<tokenId>.jpg.
+      var JOLLY_IMG_BASE = "https://bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.ipfs.inbrowser.link";
       var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID",
@@ -467,11 +466,12 @@
         jolly: {
           key: "jolly", name: "Jolly", short: "JOLLY",
           // COMING SOON (2026-11-04): the market contract is deployed but
-          // the Jolly images are not live yet (IPFS upload in progress).
-          // While this flag is on, the Jolly chip reads "JOLLY · COMING
-          // SOON", the lock banner shows COMING SOON, and trading is
-          // blocked. Remove the flag (and keep JOLLY_IMG_BASE set) once
-          // the images are live to open the market.
+          // the Jolly images ARE live (IPFS, inbrowser.link gateway) and
+          // show in Explore, but trading stays locked by the owner's
+          // choice. While this flag is on, the Jolly chip reads
+          // "JOLLY · COMING SOON", the lock banner shows COMING SOON, and
+          // trading is blocked. Remove the flag only when the owner says
+          // to open trading.
           comingSoon: true,
           nft: "0xdc11764a5664e333c8d303eb465e89a1caadb85b",
           // Market contract NOT deployed yet — paste the deployed Jolly
@@ -699,7 +699,7 @@
         var coll = btn.getAttribute("data-coll") || tradeColl;
         if (!COLLECTIONS[coll].market || COLLECTIONS[coll].comingSoon) {
           var note0 = $("tradeCopied");
-          if (note0) { note0.textContent = COLLECTIONS[coll].comingSoon ? "Market coming soon \u2014 trading opens once the images are live." : "Market not deployed yet \u2014 trading opens after the market contract deploys."; setTimeout(function () { note0.textContent = ""; }, 4000); }
+          if (note0) { note0.textContent = COLLECTIONS[coll].comingSoon ? "Market coming soon \u2014 trading opens soon." : "Market not deployed yet \u2014 trading opens after the market contract deploys."; setTimeout(function () { note0.textContent = ""; }, 4000); }
           return;
         }
         var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null, coll)
@@ -1385,7 +1385,7 @@
         if (!banner) return;
         if (C.comingSoon) {
           $("lockTitle").textContent = "COMING SOON";
-          $("lockText").textContent = "The " + C.name + " Market opens soon. Trading opens once the " + C.name + " images are live.";
+          $("lockText").textContent = "The " + C.name + " collection is live. Trading opens soon.";
           banner.style.display = "block";
         } else if (!C.market) {
           $("lockTitle").textContent = "MARKET NOT DEPLOYED YET";

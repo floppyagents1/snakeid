@@ -1216,6 +1216,21 @@
               if (!st.activeListings[id] && !st.soldMap[id]) rows.push({ coll: coll, tokenId: id, status: "MINTED", seller: null, priceWei: null, block: null, tx: null });
             }
           }
+          // Panda showcase (2026-11-04, owner request): every Panda is
+          // the same card (no tiers, no per-token art), so Explore shows
+          // exactly ONE Panda card — the first minted token that is
+          // neither listed nor sold — instead of an empty grid. Same
+          // MINTED / NOT LISTED card as Jolly; trading stays locked
+          // because Panda is comingSoon.
+          if (coll === "panda") {
+            var showcaseId = 1;
+            if (typeof st.totalMinted === "number" && st.totalMinted > 0) {
+              for (var pid = 1; pid <= st.totalMinted; pid++) {
+                if (!st.activeListings[pid] && !st.soldMap[pid]) { showcaseId = pid; break; }
+              }
+            }
+            if (!st.activeListings[showcaseId] && !st.soldMap[showcaseId]) rows.push({ coll: coll, tokenId: showcaseId, status: "MINTED", seller: null, priceWei: null, block: null, tx: null });
+          }
         });
         return rows;
       }

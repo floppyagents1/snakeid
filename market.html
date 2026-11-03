@@ -831,9 +831,22 @@
 
       /* Replay one collection's market events in block order to derive its
        * listings / sales / price updates. */
+      // Events can arrive twice: the 1-second tick re-runs loadEvents
+      // whenever the block moves, with no in-flight guard, so overlapping
+      // runs re-scan the same recent window and re-push the same logs.
+      // De-dupe both event lists in place (by tx + logIndex, unique per
+      // log) so the activity feed, sales and listings never repeat an event.
+      function dedupeEventLogs(arr, keyFn) {
+        var seen = {};
+        var out = [];
+        arr.forEach(function (x) { var k = keyFn(x); if (!seen[k]) { seen[k] = true; out.push(x); } });
+        return out;
+      }
       function replayEvents(coll) {
         var st = S[coll];
         st.soldMap = {}; st.sales = []; st.activity = [];
+        st.marketEvents = dedupeEventLogs(st.marketEvents, function (e) { return e.tx + ":" + e.logIndex; });
+        st.mintEvents = dedupeEventLogs(st.mintEvents, function (m) { return m[1] + ":" + m[2]; });
         var sorted = st.marketEvents.slice().sort(sortEvents);
         // Tracks which tokens are listed according to the events replayed so
         // far (independent of the snapshot) — a second Listed for the same

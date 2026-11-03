@@ -150,7 +150,8 @@
       /* Activity feed */
       .feed { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
       .feed-row { display: flex; gap: 12px; align-items: flex-start; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
-      .feed-row img, .feed-row .thumb-fallback-sm { width: 52px; height: 52px; flex: none; object-fit: cover; background: #03130a; }
+      .feed-row img, .feed-row .thumb-fallback-sm, .feed-row .thumb-sprite-sm { width: 52px; height: 52px; flex: none; object-fit: cover; background: #03130a; }
+      .feed-row .thumb-sprite-sm { background-repeat: no-repeat; }
       .feed-row .thumb-fallback-sm { display: flex; align-items: center; justify-content: center; color: var(--neon); font-family: var(--display); font-weight: 400; font-size: 11px; }
       .feed-row .body { flex: 1; min-width: 0; }
       .feed-row .line1 { font-family: var(--mono); font-size: 13px; margin: 0 0 3px; word-break: break-word; }
@@ -491,6 +492,24 @@
           return '<div class="thumb thumb-sprite" role="img" aria-label="' + esc(COLLECTIONS.jolly.label(id)) + '" style="background-image:url(\'' + esc(url) + '\');background-size:600% 400%;background-position:' + (cell.col * 20) + '% ' + (cell.row * 100 / 3) + '%"><img src="' + esc(url) + '" alt="" aria-hidden="true" style="display:none" onerror="jollySpriteFallback(this)" /></div>';
         }
         return '<img class="thumb" src="' + esc(COLLECTIONS.jolly.img(id)) + '" alt="' + esc(COLLECTIONS.jolly.label(id)) + '" loading="lazy" data-token="<redacted>" data-gw="0" onerror="jollyImgFallback(this)" />';
+      }
+      function jollyThumbSmHTML(id) {
+        // 52x52 activity-feed thumbnail: same Pinata sprite as the big card,
+        // so it loads on phones where the public IPFS gateways are blocked.
+        var url = jollySpriteUrl(id);
+        if (url) {
+          var cell = jollySpriteCell(id);
+          return '<div class="thumb-sprite-sm" role="img" aria-label="' + esc(COLLECTIONS.jolly.label(id)) + '" style="background-image:url(\'' + esc(url) + '\');background-size:600% 400%;background-position:' + (cell.col * 20) + '% ' + (cell.row * 100 / 3) + '%"><img src="' + esc(url) + '" alt="" aria-hidden="true" style="display:none" onerror="jollySpriteFallbackSm(this)" /></div>';
+        }
+        return '<img src="' + esc(COLLECTIONS.jolly.img(id)) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback-sm&quot;>' + fallbackEmoji("jolly") + '</div>\'" />';
+      }
+      function jollySpriteFallbackSm(img) {
+        // The hidden probe <img> failed: this sprite did not load, so show
+        // the small fallback emoji in place of the sprite div.
+        var div = img.parentNode;
+        if (div && div.className.indexOf("thumb-sprite-sm") !== -1) {
+          div.outerHTML = '<div class="thumb-fallback-sm">' + fallbackEmoji("jolly") + '</div>';
+        }
       }
       var COLLECTIONS = {
         snake: {
@@ -1421,7 +1440,9 @@
             : e.kind === "Minted" ? '<span class="badge minted">MINTED</span>'
             : '<span class="badge updated">PRICE CHANGE</span>';
           var collBadge = e.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : e.coll === "panda" ? '<span class="badge coll-panda">AGENT PANDA</span>' : '<span class="badge coll-jolly">JOLLY</span>';
-          var img = '<img src="' + esc(C.img(e.tokenId)) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback-sm&quot;>' + fallbackEmoji(e.coll) + '</div>\'" />';
+          var img = e.coll === "jolly"
+            ? jollyThumbSmHTML(e.tokenId)
+            : '<img src="' + esc(C.img(e.tokenId)) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback-sm&quot;>' + fallbackEmoji(e.coll) + '</div>\'" />';
           var priceTxt = e.price ? " &middot; " + fmtBNB(BigInt(e.price)) + " BNB" : "";
           var who = e.kind === "Sold"
             ? "Seller " + shortAddr(e.seller) + " &rarr; Buyer " + shortAddr(e.buyer)

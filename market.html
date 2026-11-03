@@ -463,6 +463,13 @@
         },
         panda: {
           key: "panda", name: "Agent Panda", short: "AGENT PANDA",
+          // COMING SOON (2026-11-04, owner rule): while the Panda mint is
+          // still running there is NO buying/selling — the market is closed
+          // and all listings are hidden (see getExploreRows/getListedRows/
+          // updateStats, which skip LISTED rows and counts for comingSoon
+          // collections). Remove the flag only when the owner says to open
+          // trading. Same rule as Jolly.
+          comingSoon: true,
           nft: "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
           market: "0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898",
           minPriceWei: "100000000000000", minPriceBnb: "0.0001",
@@ -824,7 +831,11 @@
         scope.forEach(function (k) { if (S[k].totalMinted === null) tmKnown = false; else tm += S[k].totalMinted; });
         setStat("stTotalMinted", tmKnown ? fmtInt(tm) : "—");
         var activeCount = 0, allReady = true;
-        scope.forEach(function (k) { activeCount += Object.keys(S[k].activeListings).length; if (!S[k].dataReady) allReady = false; });
+        scope.forEach(function (k) {
+          // comingSoon collections count as 0 listed (listings hidden).
+          if (!COLLECTIONS[k].comingSoon) activeCount += Object.keys(S[k].activeListings).length;
+          if (!S[k].dataReady) allReady = false;
+        });
         setStat("stListed", allReady ? fmtInt(activeCount) : "…");
         setStat("stActive", allReady ? fmtInt(activeCount) : "…");
         var soldReady = true, txsReady = true;
@@ -862,6 +873,8 @@
         if (allReady) {
           var floor = null;
           scope.forEach(function (k) {
+            // comingSoon collections are excluded from the floor.
+            if (COLLECTIONS[k].comingSoon) return;
             Object.keys(S[k].activeListings).forEach(function (id) {
               var p = S[k].activeListings[id].priceWei;
               if (floor === null || p < floor) floor = p;
@@ -1182,10 +1195,16 @@
         var rows = [];
         COLL_KEYS.forEach(function (coll) {
           var st = S[coll];
-          Object.keys(st.activeListings).forEach(function (id) {
-            var l = st.activeListings[id];
-            rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx });
-          });
+          // While a collection is comingSoon (mint still running, market
+          // closed by the owner) its listings are hidden — no LISTED rows
+          // at all. MINTED rows (showMinted collections) still show, so the
+          // collection stays visible in Explore with no trading.
+          if (!COLLECTIONS[coll].comingSoon) {
+            Object.keys(st.activeListings).forEach(function (id) {
+              var l = st.activeListings[id];
+              rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx });
+            });
+          }
           Object.keys(st.soldMap).forEach(function (id) {
             var s = st.soldMap[id];
             if (!st.activeListings[id]) rows.push({ coll: coll, tokenId: Number(id), status: "SOLD", seller: s.seller, buyer: s.buyer, priceWei: s.priceWei, block: s.block, tx: s.tx });
@@ -1207,6 +1226,8 @@
       function getListedRows() {
         var rows = [];
         COLL_KEYS.forEach(function (coll) {
+          // comingSoon collections show no listings (see getExploreRows).
+          if (COLLECTIONS[coll].comingSoon) return;
           var st = S[coll];
           Object.keys(st.activeListings).forEach(function (id) {
             var l = st.activeListings[id];

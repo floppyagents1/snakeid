@@ -129,6 +129,7 @@
       .badge.updated { background: var(--neon-dim); color: #021003; }
       .badge.coll-snake { background: var(--neon); color: #021003; }
       .badge.coll-panda { background: var(--gold); color: #1a1200; }
+      .badge.coll-jolly { background: #f9a8d4; color: #500724; }
       .badge.tier-common { background: #5b6b5f; color: #eaffea; }
       .badge.tier-uncommon { background: #1db954; color: #021003; }
       .badge.tier-rare { background: #3b82f6; color: #fff; }
@@ -200,11 +201,11 @@
       <nav aria-label="Pages"><a href="/">HOME</a><a href="/launchpad.html">LAUNCHPAD</a><a href="/market.html" aria-current="page">MARKET</a><a href="/claim.html">CLAIM</a><a href="/presale.html">PRESALE</a><a href="/game.html">PLAY</a></nav>
       <main>
         <h1>Market <em>live</em></h1>
-        <p class="lede">Every listing, sale and price below is read live from the SnakeID and Agent Panda Market contracts on BNB Chain. Nothing here is a guess &mdash; if a number cannot be read on-chain, it shows as &ldquo;&mdash;&rdquo;.</p>
+        <p class="lede">Every listing, sale and price below is read live from the SnakeID, Agent Panda and Jolly Market contracts on BNB Chain. Nothing here is a guess &mdash; if a number cannot be read on-chain, it shows as &ldquo;&mdash;&rdquo;.</p>
 
         <div class="card" id="lockBanner" style="display:none; margin-top: 0">
-          <h3>MARKET NOT OPEN YET</h3>
-          <p id="lockText">The market opens automatically when all 10,000 SnakeID are minted.</p>
+          <h3>MARKET NOT DEPLOYED YET</h3>
+          <p id="lockText">The Jolly Market contract has not been deployed yet. Trading opens when the market contract is live.</p>
         </div>
 
         <div class="scope-row" id="scopeRow" role="group" aria-label="Collection"><!-- Collection chips are built from COLLECTIONS at load — one collection, one chip. --></div>
@@ -262,7 +263,7 @@
             <div class="listing-grid" id="exploreGrid"></div>
             <div class="empty" id="exploreEmpty" style="display:none">
               <h3>No listings yet</h3>
-              <p>Be the first to list yours. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
+              <p>Be the first to list yours. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB, Jolly 0.001 BNB.</p>
               <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
             </div>
             <div class="empty" id="searchEmpty" style="display:none">
@@ -279,7 +280,7 @@
           <div class="listing-grid" id="listedGrid"></div>
           <div class="empty" id="listedEmpty" style="display:none">
             <h3>No listings yet</h3>
-            <p>Be the first to list yours. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB.</p>
+            <p>Be the first to list yours. Minimum listing: SnakeID 0.001 BNB, Agent Panda 0.0001 BNB, Jolly 0.001 BNB.</p>
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
           </div>
           <div class="pagination" id="listedPagination"></div>
@@ -333,7 +334,7 @@
         <div class="card" id="tradePanel">
           <h3>TRADE VIA AGENT &mdash; BUY &amp; SELL</h3>
           <p>This site never connects a wallet and never asks for a seed phrase or private key. Copy a prompt, paste it to your agent (e.g. Binance AI Pro), your agent verifies everything on-chain first, shows a transaction preview, and waits for your confirmation before anything is signed.</p>
-          <p style="margin-top:10px">Minimum listing: SnakeID 0.001 BNB &middot; Agent Panda 0.0001 BNB.</p>
+          <p style="margin-top:10px">Minimum listing: SnakeID 0.001 BNB &middot; Agent Panda 0.0001 BNB &middot; Jolly 0.001 BNB.</p>
           <div class="row" id="tradeChipsRow" style="margin-top:16px"><!-- Trade chips are built from COLLECTIONS at load — one collection, one chip. --></div>
           <div class="row" style="margin-top:16px">
             <button class="btn btn-primary" type="button" data-copy="list">COPY LIST PROMPT</button>
@@ -346,7 +347,7 @@
         <!-- MY NFTS -->
         <div class="card" id="myNfts">
           <h3>MY NFTS &mdash; LOOK UP BY WALLET ADDRESS</h3>
-          <p>Paste any wallet address. The page finds that wallet&rsquo;s SnakeID and Agent Panda tokens by reading ownerOf on both NFT contracts, then shows each token&rsquo;s status: LISTED at its price, or NOT LISTED. Results are cached on this device.</p>
+          <p>Paste any wallet address. The page finds that wallet&rsquo;s SnakeID, Agent Panda and Jolly tokens, then shows each token&rsquo;s status: LISTED at its price, or NOT LISTED. Results are cached on this device.</p>
           <div class="lookup-row">
             <input type="text" id="walletInput" placeholder="0x..." autocomplete="off" spellcheck="false" aria-label="Wallet address" />
             <button class="btn btn-primary" type="button" id="lookupBtn">LOOK UP</button>
@@ -354,7 +355,7 @@
           <p class="mono" id="lookupLine" style="margin-top:12px"></p>
           <div class="my-grid" id="myGrid"></div>
           <div class="empty" id="myEmpty" style="display:none">
-            <h3>No SnakeID or Agent Panda found</h3>
+            <h3>No SnakeID, Agent Panda or Jolly found</h3>
             <p id="myEmptyText">That wallet holds no SnakeID or Agent Panda tokens (or none were found).</p>
           </div>
         </div>
@@ -378,12 +379,15 @@
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898" target="_blank" rel="noopener">View Agent Panda Market on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
           <p style="margin-top: 10px">Agent Panda NFT<br /><span class="addr">0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e</span></p>
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e" target="_blank" rel="noopener">View Agent Panda NFT on BscScan &nearr;</a></p>
+          <p style="margin-top: 10px">Jolly Market<br /><span class="addr">Not deployed yet &mdash; the address goes here after the market contract deploys.</span></p>
+          <p style="margin-top: 10px">Jolly NFT<br /><span class="addr">0xdc11764a5664e333c8d303eb465e89a1caadb85b</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xdc11764a5664e333c8d303eb465e89a1caadb85b" target="_blank" rel="noopener">View Jolly NFT on BscScan &nearr;</a></p>
         </div>
       </main>
 
       <footer>
         <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a> &middot; <a href="/whitepaper.pdf" target="_blank" rel="noopener">Whitepaper</a></div>
-        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898</div>
+        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898 &middot; JOLLY NFT 0xDC11764A5664E333C8D303EB465E89A1CAADB85B &middot; JOLLY MARKET &mdash; NOT DEPLOYED YET</div>
       </footer>
     </div>
 
@@ -413,6 +417,16 @@
        *      in the selector and the trade panel, per-collection stats,
        *      grid, activity feed (live: 1s tick + silent 60s refresh),
        *      sales history, chart, trade prompts, and MY NFTS lookup. */
+      /* ============ Jolly placeholders (fill in after launch steps) ============ */
+      // TODO: paste the deployed Jolly Market contract address here. Until
+      // then the Jolly tab shows "market not deployed yet" and trading is
+      // disabled. The SnakeID and Agent Panda markets are unaffected.
+      var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
+      // TODO: point at the real Jolly image host after the IPFS upload, e.g.
+      // "https://ipfs.io/ipfs/<images-CID>" — images then load as
+      // <base>/<tokenId>.jpg. Until then Jolly card images fall back to the
+      // plush placeholder. Do NOT put a fake CID here.
+      var JOLLY_IMG_BASE = "";
       var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID",
@@ -449,6 +463,29 @@
           zeroSalesKnown: true,
           img: function (id) { return "panda-card.webp"; },
           label: function (id) { return "Agent Panda #" + id; }
+        },
+        jolly: {
+          key: "jolly", name: "Jolly", short: "JOLLY",
+          nft: "0xdc11764a5664e333c8d303eb465e89a1caadb85b",
+          // Market contract NOT deployed yet — paste the deployed Jolly
+          // Market address into JOLLY_MARKET above. Until then the Jolly
+          // tab shows "market not deployed yet" and trading is disabled.
+          market: JOLLY_MARKET,
+          minPriceWei: "1000000000000000", minPriceBnb: "0.001",
+          maxSupply: 10000,
+          // TODO: set to the Jolly Market contract's deploy block after it
+          // deploys. 0 = placeholder (unknown until deploy). The event
+          // loader never scans from here while the market is unset — see
+          // loadEvents — so 0 cannot trigger a full-history scan.
+          eventsStart: 131469781,
+          // Jolly NFT deploy block (lower bound) — the MY NFTS Transfer
+          // scan starts here, so it covers every Jolly token ever minted.
+          nftStart: 131454777,
+          snapListings: "listings-jolly.json", snapEvents: "market-events-jolly.json",
+          cacheEvents: "snakeid-jolly-market-events-v1",
+          hasRarity: true, snapRarity: "rarity-jolly.json",
+          img: function (id) { return JOLLY_IMG_BASE + "/" + id + ".jpg"; },
+          label: function (id) { return "Jolly #" + id; }
         }
       };
       var COLL_KEYS = Object.keys(COLLECTIONS);
@@ -527,7 +564,7 @@
           refreshing: false   // a silent background listings refresh is running for this collection
         };
       }
-      var S = { snake: newCollState(), panda: newCollState() };
+      var S = { snake: newCollState(), panda: newCollState(), jolly: newCollState() };
       var latestBlock = 0;
       var blockTimes = {};     // blockNumber -> unix seconds
       var activityShown = 50;
@@ -653,6 +690,11 @@
         if (!btn) return;
         var kind = btn.getAttribute("data-copy");
         var coll = btn.getAttribute("data-coll") || tradeColl;
+        if (!COLLECTIONS[coll].market) {
+          var note0 = $("tradeCopied");
+          if (note0) { note0.textContent = "Market not deployed yet \u2014 trading opens after the market contract deploys."; setTimeout(function () { note0.textContent = ""; }, 4000); }
+          return;
+        }
         var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null, coll)
           : kind === "buy" ? promptBuy(btn.getAttribute("data-token") || null, btn.getAttribute("data-seller") || null, btn.getAttribute("data-price") || null, coll)
           : promptCancel(btn.getAttribute("data-token") || null, coll);
@@ -839,10 +881,17 @@
         if (!haveSource) coverageStart = fromBlock;
         st.eventsCoverageStart = coverageStart;
         st.eventsPartial = st.eventsCoverageStart > C.eventsStart;
+        // No market contract yet: there are no market events to miss, so the
+        // (empty) market-event history is complete by definition.
+        if (!C.market) { st.soldComplete = true; st.listedComplete = true; st.eventsPartial = false; st.eventsUnavailable = false; }
         if (fromBlock > latestBlock) { st.eventsSettled = true; replayEvents(coll); await fillTimestamps(allEventBlocks(coll)); renderAll(); return; }
         var marketChunks = 0, marketChunkFails = 0;
         var hadCachedEvents = st.marketEvents.length > 0;
-        for (var from = fromBlock; from <= latestBlock; from += CHUNK) {
+        // No market contract yet: skip the whole log scan (market logs and
+        // mint logs alike). eventsStart is still the 0 placeholder, so an
+        // unguarded scan would start at block 1; the Jolly activity feed
+        // stays empty until the market deploys and eventsStart is set.
+        for (var from = fromBlock; C.market && from <= latestBlock; from += CHUNK) {
           var to = Math.min(from + CHUNK - 1, latestBlock);
           marketChunks++;
           try {
@@ -947,6 +996,8 @@
       async function refreshListings(coll) {
         var C = COLLECTIONS[coll];
         var st = S[coll];
+        // No market contract yet (Jolly, until it deploys): nothing to refresh.
+        if (!C.market) return;
         if (st.refreshing) return;
         st.refreshing = true;
         var found = 0;
@@ -998,6 +1049,9 @@
           });
         }
         st.listingsChecked = true;
+        // A full clean contract read is authoritative even without a
+        // snapshot — the stats may now show real numbers.
+        if (failures === 0) st.dataReady = true;
         dirty = true;
         st.refreshing = false;
         updateStats();
@@ -1039,6 +1093,11 @@
         await Promise.all(jobs);
         renderAll();
       }
+
+      /* Thumbnail fallback emoji per collection (shown when an image fails
+       * to load): SnakeID and Agent Panda keep the snake (unchanged),
+       * Jolly gets the plush. */
+      function fallbackEmoji(coll) { return coll === "jolly" ? "&#129518;" : "&#128012;"; }
 
       /* ============ Rendering ============ */
       var currentTab = "explore";
@@ -1096,11 +1155,13 @@
         var C = COLLECTIONS[r.coll];
         var collBadge = r.coll === "snake"
           ? '<span class="badge coll-snake">SNAKEID</span>'
-          : '<span class="badge coll-panda">AGENT PANDA</span>';
+          : r.coll === "panda"
+            ? '<span class="badge coll-panda">AGENT PANDA</span>'
+            : '<span class="badge coll-jolly">JOLLY</span>';
         var statusBadge = r.status === "LISTED"
           ? '<span class="badge listed">LISTED</span>'
           : '<span class="badge sold">SOLD</span>';
-        var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>&#128012;</div>\'" />';
+        var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
         var priceLine = r.status === "LISTED"
           ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>'
           : '<p class="price">Sold ' + fmtBNB(r.priceWei) + ' BNB</p>';
@@ -1190,8 +1251,8 @@
             : e.kind === "Cancelled" ? '<span class="badge cancelled">CANCELLED</span>'
             : e.kind === "Minted" ? '<span class="badge minted">MINTED</span>'
             : '<span class="badge updated">PRICE CHANGE</span>';
-          var collBadge = e.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : '<span class="badge coll-panda">AGENT PANDA</span>';
-          var img = '<img src="' + esc(C.img(e.tokenId)) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback-sm&quot;>&#128012;</div>\'" />';
+          var collBadge = e.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : e.coll === "panda" ? '<span class="badge coll-panda">AGENT PANDA</span>' : '<span class="badge coll-jolly">JOLLY</span>';
+          var img = '<img src="' + esc(C.img(e.tokenId)) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback-sm&quot;>' + fallbackEmoji(e.coll) + '</div>\'" />';
           var priceTxt = e.price ? " &middot; " + fmtBNB(BigInt(e.price)) + " BNB" : "";
           var who = e.kind === "Sold"
             ? "Seller " + shortAddr(e.seller) + " &rarr; Buyer " + shortAddr(e.buyer)
@@ -1230,7 +1291,7 @@
         var body = $("salesBody");
         body.innerHTML = all.map(function (s) {
           var C = COLLECTIONS[s.coll];
-          var collTxt = s.coll === "snake" ? "SNAKEID" : "AGENT PANDA";
+          var collTxt = s.coll === "snake" ? "SNAKEID" : s.coll === "panda" ? "AGENT PANDA" : "JOLLY";
           var tierTxt = COLLECTIONS[s.coll].hasRarity && (rarity[s.coll] || {})[s.tokenId] ? " &middot; " + esc((rarity[s.coll] || {})[s.tokenId]) : "";
           return "<tr><td>" + esc(C.label(s.tokenId)) + tierTxt + "</td><td>" + collTxt + "</td><td>" + fmtBNB(s.priceWei) + " BNB</td><td>" + shortAddr(s.seller) + "</td><td>" + shortAddr(s.buyer) + "</td><td>" + (blockTimes[s.block] ? fmtTime(blockTimes[s.block]) : "Block " + s.block) + "</td><td><a href=\"https://bscscan.com/tx/" + esc(s.tx) + "\" target=\"_blank\" rel=\"noopener\">" + shortTx(s.tx) + " &nearr;</a></td></tr>";
         }).join("");
@@ -1306,7 +1367,23 @@
       // Scope UI: the rarity filter row only exists for collections with
       // tiers; a collection without tiers shows a short note instead, and
       // any active tier filter is reset when switching to it.
+      /* The "not deployed yet" banner shows only for a collection whose
+       * market contract address is still empty (Jolly, until its market
+       * deploys). SnakeID and Agent Panda have live markets, so the banner
+       * stays hidden for them. */
+      function updateLockBanner() {
+        var C = COLLECTIONS[collectionFilter];
+        var banner = $("lockBanner");
+        if (!banner) return;
+        if (!C.market) {
+          $("lockText").textContent = "The " + C.name + " Market contract has not been deployed yet. Trading opens when the market contract is live.";
+          banner.style.display = "block";
+        } else {
+          banner.style.display = "none";
+        }
+      }
       function updateScopeUI() {
+        updateLockBanner();
         var hasRarity = COLLECTIONS[collectionFilter].hasRarity;
         var row = $("rarityRow");
         if (row) row.style.display = hasRarity ? "" : "none";
@@ -1341,13 +1418,12 @@
           return;
         }
         var cached = loadCache(CACHE_WALLET);
-        // Cached results are stored per collection: { snake: {tokens:[...]}, panda: {tokens:[...]} }.
-        // The old single-collection cache shape {tokens:[...]} is NOT trusted
-        // here — its tokens are SnakeID-only, so it is ignored, not misread.
+        // Cached results are stored per collection: { snake: [...], panda: [...], jolly: [...] }.
+        // An older cache without the jolly array is treated as a miss and re-fetched.
         var rows = [];
         var usedCache = false;
-        if (cached && cached[addr.toLowerCase()] && Array.isArray(cached[addr.toLowerCase()].snake) && Array.isArray(cached[addr.toLowerCase()].panda)) {
-          rows = cached[addr.toLowerCase()].snake.concat(cached[addr.toLowerCase()].panda);
+        if (cached && cached[addr.toLowerCase()] && Array.isArray(cached[addr.toLowerCase()].snake) && Array.isArray(cached[addr.toLowerCase()].panda) && Array.isArray(cached[addr.toLowerCase()].jolly)) {
+          rows = cached[addr.toLowerCase()].snake.concat(cached[addr.toLowerCase()].panda).concat(cached[addr.toLowerCase()].jolly);
           usedCache = true;
         } else {
           try {
@@ -1357,18 +1433,55 @@
               var C = COLLECTIONS[coll];
               var balHex = await ethCall(C.nft, SEL_BALANCE_OF + padAddr(addr).slice(2));
               var bal = parseInt(balHex, 16);
+              if (bal === 0) continue;
+              // tokenOfOwnerByIndex (Enumerable) — works for collections that
+              // implement it. Jolly does not, so the first call reverts and
+              // we fall back to a Transfer-log scan for that collection.
+              var enumerated = false;
               for (var i = 0; i < Math.min(bal, 1000); i++) {
                 try {
                   var tokHex = await ethCall(C.nft, SEL_TOKEN_OF_OWNER_BY_INDEX + padAddr(addr).slice(2) + encodeUint256(i));
                   found.push({ coll: coll, tokenId: parseInt(tokHex, 16) });
-                } catch (e) {}
+                  enumerated = true;
+                } catch (e) { break; }
+              }
+              if (!enumerated) {
+                // Transfer-log scan: every Transfer TO this wallet on the NFT
+                // contract, from the collection's NFT deploy block (nftStart
+                // when set, else eventsStart — never 0, which would scan
+                // from block 1), then verify current ownership with ownerOf
+                // (a token received and later sold or transferred away must
+                // not show up).
+                var scanFrom = C.nftStart || C.eventsStart;
+                var seen = {};
+                for (var from = scanFrom; from <= latestBlock; from += CHUNK) {
+                  var to = Math.min(from + CHUNK - 1, latestBlock);
+                  try {
+                    var tlogs = await getLogs(C.nft, [TOPIC_TRANSFER, null, padAddr(addr)], from, to);
+                    tlogs.forEach(function (l) {
+                      var tid = parseInt(l.topics[3], 16);
+                      if (!seen[tid]) { seen[tid] = true; found.push({ coll: coll, tokenId: tid, _verify: true }); }
+                    });
+                  } catch (e) {}
+                }
               }
             }
-            rows = found;
+            // Verify Transfer-scan candidates are still owned by this wallet.
+            var verified = [];
+            for (var vi = 0; vi < found.length; vi++) {
+              var fr = found[vi];
+              if (!fr._verify) { verified.push(fr); continue; }
+              try {
+                var oHex = await ethCall(COLLECTIONS[fr.coll].nft, SEL_OWNER_OF + encodeUint256(fr.tokenId));
+                if (("0x" + oHex.slice(26)).toLowerCase() === addr.toLowerCase()) verified.push({ coll: fr.coll, tokenId: fr.tokenId });
+              } catch (e) {}
+            }
+            rows = verified;
             var toSave = loadCache(CACHE_WALLET) || {};
             toSave[addr.toLowerCase()] = {
-              snake: found.filter(function (r) { return r.coll === "snake"; }).map(function (r) { return r.tokenId; }),
-              panda: found.filter(function (r) { return r.coll === "panda"; }).map(function (r) { return r.tokenId; })
+              snake: rows.filter(function (r) { return r.coll === "snake"; }).map(function (r) { return r.tokenId; }),
+              panda: rows.filter(function (r) { return r.coll === "panda"; }).map(function (r) { return r.tokenId; }),
+              jolly: rows.filter(function (r) { return r.coll === "jolly"; }).map(function (r) { return r.tokenId; })
             };
             saveCache(CACHE_WALLET, toSave);
           } catch (e) {
@@ -1381,12 +1494,12 @@
           var l = S[r.coll].activeListings[r.tokenId];
           return { coll: r.coll, tokenId: r.tokenId, status: l ? "LISTED" : "NOT LISTED", seller: l ? l.seller : addr, priceWei: l ? l.priceWei : null, block: l ? l.block : null, tx: l ? l.tx : null };
         });
-        enriched.sort(function (a, b) { return (a.coll === b.coll) ? a.tokenId - b.tokenId : (a.coll === "snake" ? -1 : 1); });
+        enriched.sort(function (a, b) { var order = { snake: 0, panda: 1, jolly: 2 }; return (a.coll === b.coll) ? a.tokenId - b.tokenId : order[a.coll] - order[b.coll]; });
         grid.innerHTML = enriched.map(function (r) {
           var C = COLLECTIONS[r.coll];
-          var collBadge = r.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : '<span class="badge coll-panda">AGENT PANDA</span>';
+          var collBadge = r.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : r.coll === "panda" ? '<span class="badge coll-panda">AGENT PANDA</span>' : '<span class="badge coll-jolly">JOLLY</span>';
           var statusBadge = r.status === "LISTED" ? '<span class="badge listed">LISTED</span>' : '<span class="badge updated">NOT LISTED</span>';
-          var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>&#128012;</div>\'" />';
+          var img = '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
           var priceLine = r.status === "LISTED" ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>' : '<p class="price">Not listed</p>';
           var action = r.status === "LISTED"
             ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'
@@ -1400,7 +1513,7 @@
           ? ""
           : enriched.length + " token" + (enriched.length === 1 ? "" : "s") + " found" + (usedCache ? " (cached on this device)" : "") + ".";
         empty.style.display = enriched.length === 0 ? "block" : "none";
-        if (enriched.length === 0) $("myEmptyText").textContent = "That wallet holds no SnakeID or Agent Panda tokens (or none were found).";
+        if (enriched.length === 0) $("myEmptyText").textContent = "That wallet holds no SnakeID, Agent Panda or Jolly tokens (or none were found).";
       }
 
       /* ============ Tabs, filters, scope, trade collection ============ */
@@ -1485,6 +1598,10 @@
       async function loadSnapshot(coll) {
         var C = COLLECTIONS[coll];
         var st = S[coll];
+        // No market contract yet (Jolly, until it deploys): there can be no
+        // listings, so the listing state is authoritatively empty — the
+        // stats show 0, not "…", and no snapshot fetch is attempted.
+        if (!C.market) { st.dataReady = true; st.snapshotBlock = latestBlock; return; }
         try {
           var res = await fetch(C.snapListings, { cache: "no-store" });
           if (!res.ok) throw new Error("snapshot " + res.status);
@@ -1519,10 +1636,9 @@
       }
       async function init() {
         blockTimes = loadCache(CACHE_TIMES) || {};
-        // SnakeID lock banner: SnakeID is sold out (10,000/10,000), so the
-        // banner never shows for SnakeID. It stays hidden for Panda too —
-        // Panda's market is live while its mint is still open.
-        $("lockBanner").style.display = "none";
+        // The lock banner shows only for a collection whose market
+        // contract is not deployed yet (Jolly, until it deploys).
+        updateLockBanner();
         var errors = [];
         try {
           var blk = await rpc("eth_blockNumber", []);

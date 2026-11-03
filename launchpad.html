@@ -188,6 +188,13 @@
               <div class="pr"><span>Paid mint</span><span>0.0005 BNB</span></div>
             </div>
             <div class="row" style="margin-top: 16px">
+              <span class="mono">QTY</span>
+              <button class="qty-btn" type="button" data-qty="1" aria-pressed="true">1</button>
+              <button class="qty-btn" type="button" data-qty="2" aria-pressed="false">2</button>
+              <button class="qty-btn" type="button" data-qty="3" aria-pressed="false">3</button>
+              <button class="qty-btn" type="button" data-qty="4" aria-pressed="false">4</button>
+            </div>
+            <div class="row" style="margin-top: 12px">
               <button class="btn btn-primary" type="button" id="copyJollyMintPrompt">MINT VIA AGENT</button>
               <span id="jollyMintCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
             </div>
@@ -288,10 +295,10 @@
       }
       refreshPandaMinted();
       setInterval(refreshPandaMinted, 30000);
-      Array.prototype.forEach.call(document.querySelectorAll(".qty-btn"), function (b) {
+      Array.prototype.forEach.call(document.querySelectorAll("#pandaCard .qty-btn"), function (b) {
         b.addEventListener("click", function () {
           pandaQty = parseInt(b.getAttribute("data-qty"), 10);
-          Array.prototype.forEach.call(document.querySelectorAll(".qty-btn"), function (x) {
+          Array.prototype.forEach.call(document.querySelectorAll("#pandaCard .qty-btn"), function (x) {
             x.setAttribute("aria-pressed", x === b ? "true" : "false");
           });
         });
@@ -318,15 +325,24 @@
       refreshJollyMinted();
       setInterval(refreshJollyMinted, 30000);
       var JOLLY_REGISTRY = "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F";
-      function jollyMintPrompt() {
-        return "Mint 1 Jolly NFT for me. Contract " + JOLLY_NFT + " on BNB Chain. First check if I hold an Agent ID (registry " + JOLLY_REGISTRY + ") and whether the free or paid pool applies. If I am an Agent ID holder and free mints are left (5,000 free pool), call mint() with 0 BNB. Otherwise, call mint() with 0.0005 BNB. Max 1 mint per wallet. Verify on-chain first (Agent ID balance, free mints remaining, total minted), show me a transaction preview, and wait for my confirmation before executing.";
+      var jollyQty = 1;
+      function jollyMintPrompt(qty) {
+        return "Mint " + qty + " Jolly NFT" + (qty > 1 ? "s" : "") + " for me. Contract " + JOLLY_NFT + " on BNB Chain. Max 1 mint per wallet \u2014 if I ask for more than 1, mint 1 and tell me the limit. First check if I hold an Agent ID (registry " + JOLLY_REGISTRY + "). If I am an Agent ID holder and free mints are left (5,000 free pool), that 1 mint is free \u2014 call mint() with 0 BNB. Only 1 free mint per Agent ID holder. Otherwise, call mint() with 0.0005 BNB. Verify on-chain first (Agent ID balance, free mints remaining, total minted), show me a transaction preview, and wait for my confirmation before executing.";
       }
+      Array.prototype.forEach.call(document.querySelectorAll("#jollyCard .qty-btn"), function (b) {
+        b.addEventListener("click", function () {
+          jollyQty = parseInt(b.getAttribute("data-qty"), 10);
+          Array.prototype.forEach.call(document.querySelectorAll("#jollyCard .qty-btn"), function (x) {
+            x.setAttribute("aria-pressed", x === b ? "true" : "false");
+          });
+        });
+      });
       document.getElementById("copyJollyMintPrompt").addEventListener("click", function () {
         if (!JOLLY_NFT) {
           document.getElementById("jollyMintCopied").textContent = "Contract deploys soon \u2014 check back after launch.";
           return;
         }
-        copyText(jollyMintPrompt(), document.getElementById("jollyMintCopied"));
+        copyText(jollyMintPrompt(jollyQty), document.getElementById("jollyMintCopied"));
       });
     </script>
 

@@ -116,6 +116,7 @@
       .listing.sold { opacity: 0.85; }
       .listing .thumb { width: 100%; aspect-ratio: 1 / 1; display: block; object-fit: cover; background: #03130a; }
       .listing .thumb-fallback { width: 100%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; background: #03130a; color: var(--neon); font-family: var(--display); font-weight: 400; font-size: 15px; }
+      .listing .thumb-sprite { background-repeat: no-repeat; background-color: #03130a; }
       .listing .tid { font-family: var(--mono); font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
       .listing .price { color: var(--neon); font-family: var(--mono); font-size: 13px; margin: 0 0 4px; }
       .listing .not-listed { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 0 0 4px; }
@@ -425,9 +426,10 @@
       var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
       // Jolly images v2 (2026-11-04): every token is unique (10,000
       // distinct images with accessories + backgrounds), so the 16 static
-      // colorway files on snakeid.xyz no longer work. Cards load
-      // JOLLY_IMG_BASE/<tokenId>.jpg first and fall back through
-      // JOLLY_IMG_GWS (see jollyImgFallback) if a gateway fails.
+      // colorway files on snakeid.xyz no longer work. Cards use the
+      // Pinata sprite sheets first (see JOLLY_SPRITES below);
+      // JOLLY_IMG_BASE/<tokenId>.jpg is the fallback when the sprite
+      // map has not loaded, and JOLLY_IMG_GWS is the fallback chain
       // Images CID v2: bafybeidezhlk2hvrveuu7mxecssvfe4dkypaly7jhjq47ji2f4apyxrubu.
       var JOLLY_IMG_BASE = "https://bafybeidezhlk2hvrveuu7mxecssvfe4dkypaly7jhjq47ji2f4apyxrubu.ipfs.ipfs.io";
       // If the primary gateway fails for a Jolly image, the card tries the
@@ -447,6 +449,48 @@
         }
         el.setAttribute("data-gw", String(idx));
         el.src = JOLLY_IMG_GWS[idx] + "/" + el.getAttribute("data-token") + ".jpg";
+      }
+      /* ============ Jolly sprite sheets on Pinata ============ */
+      // The 10,000 unique v2 images are packed 24 per sprite (6x4 grid,
+      // 300px cells) into 417 sprite files pinned to the Pinata account
+      // and served by the dedicated gateway below (own pins need no key).
+      // Sprite k (0-based index in JOLLY_SPRITES) covers tokens k*24+1 ..
+      // min((k+1)*24, 10000). The per-token IPFS images (JOLLY_IMG_BASE)
+      // stay as the fallback path when the sprite map is unavailable.
+      var JOLLY_SPRITE_GW = "https://coral-magnificent-bird-273.mypinata.cloud";
+      var JOLLY_SPRITES = []; // 417 sprite CIDs, loaded from sprites-jolly.json
+      function jollySpriteUrl(id) {
+        var idx = Math.floor((id - 1) / 24);
+        if (!JOLLY_SPRITES[idx]) return null;
+        return JOLLY_SPRITE_GW + "/ipfs/" + JOLLY_SPRITES[idx];
+      }
+      function jollySpriteCell(id) {
+        var cell = (id - 1) % 24;
+        return { col: cell % 6, row: Math.floor(cell / 6) };
+      }
+      function jollySpriteFallback(img) {
+        // The hidden probe <img> failed: this sprite did not load, so show
+        // the fallback emoji in place of the sprite div.
+        var div = img.parentNode;
+        if (div && div.className.indexOf("thumb-sprite") !== -1) {
+          div.outerHTML = '<div class="thumb-fallback">' + fallbackEmoji("jolly") + '</div>';
+        }
+      }
+      async function loadSprites() {
+        try {
+          var res = await fetch("sprites-jolly.json", { cache: "no-store" });
+          if (!res.ok) return;
+          var j = await res.json();
+          if (Array.isArray(j) && j.length) { JOLLY_SPRITES = j; dirty = true; renderAll(); }
+        } catch (e) { /* no sprite map — Jolly cards keep the per-token IPFS image */ }
+      }
+      function jollyThumbHTML(id) {
+        var url = jollySpriteUrl(id);
+        if (url) {
+          var cell = jollySpriteCell(id);
+          return '<div class="thumb thumb-sprite" role="img" aria-label="' + esc(COLLECTIONS.jolly.label(id)) + '" style="background-image:url(\'' + esc(url) + '\');background-size:600% 400%;background-position:' + (cell.col * 20) + '% ' + (cell.row * 100 / 3) + '%"><img src="' + esc(url) + '" alt="" aria-hidden="true" style="display:none" onerror="jollySpriteFallback(this)" /></div>';
+        }
+        return '<img class="thumb" src="' + esc(COLLECTIONS.jolly.img(id)) + '" alt="' + esc(COLLECTIONS.jolly.label(id)) + '" loading="lazy" data-token="<redacted>" data-gw="0" onerror="jollyImgFallback(this)" />';
       }
       var COLLECTIONS = {
         snake: {
@@ -495,8 +539,8 @@
         jolly: {
           key: "jolly", name: "Jolly", short: "JOLLY",
           // COMING SOON (2026-11-04): the market contract is deployed but
-          // the Jolly images ARE live (IPFS, ipfs.io gateway) and
-          // show in Explore, but trading stays locked by the owner's
+          // the Jolly images ARE live (Pinata sprite sheets on the
+          // dedicated gateway; per-token IPFS kept as fallback) and
           // choice. While this flag is on, the Jolly chip reads
           // "JOLLY · COMING SOON", the lock banner shows COMING SOON, and
           // trading is blocked. Remove the flag only when the owner says
@@ -1281,7 +1325,7 @@
             ? '<span class="badge unlisted">NOT LISTED</span>'
             : '<span class="badge sold">SOLD</span>';
         var img = r.coll === "jolly"
-          ? '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" data-token="' + r.tokenId + '" data-gw="0" onerror="jollyImgFallback(this)" />'
+          ? jollyThumbHTML(r.tokenId)
           : '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
         var priceLine = r.status === "LISTED"
           ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>'
@@ -1350,6 +1394,7 @@
           }
         }
         renderPagination($("explorePagination"), explorePage, totalPages, function (p) { explorePage = p; renderExplore(); });
+        updateTradeButtons();
       }
       function renderListed() {
         var rows = applyFilters(getListedRows());
@@ -1360,6 +1405,7 @@
         $("listedGrid").innerHTML = pageRows.map(cardHTML).join("");
         $("listedEmpty").style.display = rows.length === 0 ? "block" : "none";
         renderPagination($("listedPagination"), listedPage, totalPages, function (p) { listedPage = p; renderListed(); });
+        updateTradeButtons();
       }
       function renderActivity() {
         var feed = $("activityFeed");
@@ -1537,13 +1583,17 @@
       }
       function renderAll() {
         updateScopeUI();
-        updateTradeButtons();
         updateStats();
         renderExplore();
         renderListed();
         renderActivity();
         renderSales();
         renderChart();
+        // Trade buttons must be (re)locked AFTER the grids render: the
+        // card buttons are created by renderExplore/renderListed, so an
+        // earlier call cannot see them (that was the LIST IT-looking-enabled
+        // bug). The document click gate stays as a backstop.
+        updateTradeButtons();
       }
 
       /* ============ MY NFTS (read-only lookup across BOTH NFT contracts) ============ */
@@ -1642,7 +1692,7 @@
           var collBadge = r.coll === "snake" ? '<span class="badge coll-snake">SNAKEID</span>' : r.coll === "panda" ? '<span class="badge coll-panda">AGENT PANDA</span>' : '<span class="badge coll-jolly">JOLLY</span>';
           var statusBadge = r.status === "LISTED" ? '<span class="badge listed">LISTED</span>' : '<span class="badge updated">NOT LISTED</span>';
           var img = r.coll === "jolly"
-          ? '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" data-token="' + r.tokenId + '" data-gw="0" onerror="jollyImgFallback(this)" />'
+          ? jollyThumbHTML(r.tokenId)
           : '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
           var priceLine = r.status === "LISTED" ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>' : '<p class="price">Not listed</p>';
           var action = r.status === "LISTED"
@@ -1653,6 +1703,7 @@
             + '<div class="tid">' + esc(C.label(r.tokenId)) + '</div>'
             + priceLine + action + '</article>';
         }).join("");
+        updateTradeButtons();
         line.textContent = enriched.length === 0
           ? ""
           : enriched.length + " token" + (enriched.length === 1 ? "" : "s") + " found" + (usedCache ? " (cached on this device)" : "") + ".";
@@ -1810,6 +1861,7 @@
         loadRarity();
         // Jolly colorway map loads once (tokenId -> colorway slug).
         loadColorway();
+        loadSprites();
         if (COLL_KEYS.every(function (k) { return !S[k].dataReady; })) {
           $("loadError").style.display = "block";
           $("loadErrorText").textContent = "Could not load the market data (" + (errors.join(", ") || "all data sources failed") + "). Check your connection and retry.";

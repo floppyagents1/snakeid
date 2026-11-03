@@ -177,10 +177,17 @@
               <span id="pandaMintCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
             </div>
           </div>
-          <div class="launch-card soon">
+          <div class="launch-card soon" id="jollyCard">
             <h3>SLOT 03 &middot; COMING SOON</h3>
-            <div class="launch-name">Coming soon</div>
-            <p>The next launch will be announced here.</p>
+            <div class="launch-name">Jolly</div>
+            <p>The Muse mascot as 10,000 colorful plush NFTs &mdash; 16 colorways, 5 rarity tiers from Common to Legendary. Agent ID holders mint free (5,000), everyone else 0.0005 BNB (5,000), max 1 per wallet.</p>
+            <div class="launch-stats">
+              <div class="pr"><span>Supply</span><span>10,000</span></div>
+              <div class="pr"><span>Minted</span><span id="jollyMinted">0 / 10,000</span></div>
+              <div class="pr"><span>Free mints</span><span id="jollyFreeLeft">5,000 left</span></div>
+              <div class="pr"><span>Paid mint</span><span>0.0005 BNB</span></div>
+            </div>
+            <p style="margin-top: 16px"><a href="https://muse.ai/s/web-mint-farcaster-xaw6xcxl0mu6xam/U_NuPubnaPh_N1CwvG32yFJ5VSzuL_1Uk35L7wgjLDc" target="_blank" rel="noopener">Mint Jolly &nearr;</a> &middot; <span class="mono">Contract deploys soon</span></p>
           </div>
         </div>
 
@@ -204,6 +211,7 @@
           <h3>CONTRACTS</h3>
           <p>SnakeID NFT<br /><span class="addr">0xafc6bca0e191e396306343213b04ff9a8d717263</span></p>
           <p style="margin-top: 10px">Agent Panda NFT<br /><span class="addr">0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e</span></p>
+          <p style="margin-top: 10px">Jolly NFT<br /><span class="addr">Contract deploys soon</span></p>
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">SnakeID on BscScan &nearr;</a> &middot; <a href="https://bscscan.com/address/0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e" target="_blank" rel="noopener">Agent Panda on BscScan &nearr;</a> &middot; <a href="https://agentpandabnb.xyz/" target="_blank" rel="noopener">agentpandabnb.xyz &nearr;</a></p>
         </div>
 
@@ -287,6 +295,24 @@
       document.getElementById("copyPandaMintPrompt").addEventListener("click", function () {
         copyText(pandaMintPrompt(pandaQty), document.getElementById("pandaMintCopied"));
       });
+      var JOLLY_NFT = ""; // Set to the deployed Jolly contract address at launch
+      var SEL_FREE_MINTED = "0xd10a1a2b";
+      async function refreshJollyMinted() {
+        if (!JOLLY_NFT) return;
+        try {
+          var totalHex = await rpcCall(JOLLY_NFT, SEL_TOTAL_MINTED);
+          if (totalHex === null) return;
+          var total = parseInt(totalHex, 16);
+          document.getElementById("jollyMinted").textContent = total.toLocaleString("en-US") + " / 10,000";
+          var freeHex = await rpcCall(JOLLY_NFT, SEL_FREE_MINTED);
+          if (freeHex !== null) {
+            var freeMinted = parseInt(freeHex, 16);
+            document.getElementById("jollyFreeLeft").textContent = (5000 - freeMinted).toLocaleString("en-US") + " left";
+          }
+        } catch (e) {}
+      }
+      refreshJollyMinted();
+      setInterval(refreshJollyMinted, 30000);
     </script>
 
   </body>

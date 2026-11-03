@@ -425,9 +425,11 @@
       // disabled. The SnakeID and Agent Panda markets are unaffected.
       var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
       // Jolly images are live on IPFS (CID bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie),
-      // served via the inbrowser.link gateway (confirmed loading on a phone).
-      // Images load as <base>/<tokenId>.jpg.
-      var JOLLY_IMG_BASE = "https://bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.ipfs.inbrowser.link";
+      // served via the ipfs.io gateway, which returns raw image bytes for
+      // <img> tags. (The inbrowser.link gateway only works on direct
+      // navigation — it serves a JS loader page, so <img> tags showed
+      // broken icons.) Images load as <base>/<tokenId>.jpg.
+      var JOLLY_IMG_BASE = "https://ipfs.io/ipfs/bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie";
       var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID",
@@ -468,7 +470,7 @@
         jolly: {
           key: "jolly", name: "Jolly", short: "JOLLY",
           // COMING SOON (2026-11-04): the market contract is deployed but
-          // the Jolly images ARE live (IPFS, inbrowser.link gateway) and
+          // the Jolly images ARE live (IPFS, ipfs.io gateway) and
           // show in Explore, but trading stays locked by the owner's
           // choice. While this flag is on, the Jolly chip reads
           // "JOLLY · COMING SOON", the lock banner shows COMING SOON, and

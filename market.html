@@ -389,7 +389,7 @@
 
       <footer>
         <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a> &middot; <a href="/whitepaper.pdf" target="_blank" rel="noopener">Whitepaper</a></div>
-        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898 &middot; JOLLY NFT 0xDC11764A5664E333C8D303EB465E89A1CAADB85B &middot; JOLLY MARKET &mdash; NOT DEPLOYED YET</div>
+        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898 &middot; JOLLY NFT 0xDC11764A5664E333C8D303EB465E89A1CAADB85B &middot; JOLLY MARKET 0x5E62D8D344CEE5BBAF70506D32B103D3ED0D5916</div>
       </footer>
     </div>
 
@@ -420,19 +420,19 @@
        *      grid, activity feed (live: 1s tick + silent 60s refresh),
        *      sales history, chart, trade prompts, and MY NFTS lookup. */
       /* ============ Jolly placeholders (fill in after launch steps) ============ */
-      // TODO: paste the deployed Jolly Market contract address here. Until
-      // then the Jolly tab shows "market not deployed yet" and trading is
-      // disabled. The SnakeID and Agent Panda markets are unaffected.
+      // Jolly Market contract, deployed 2026-11-04 (block 131469781).
+      // Trading stays locked while comingSoon is on (see the Jolly entry).
       var JOLLY_MARKET = "0x5e62d8d344cee5bbaf70506d32b103d3ed0d5916";
-      // Jolly images are static files on snakeid.xyz (jolly/<colorway>.jpg,
-      // 16 total — see the Jolly img() function and colorway-jolly.json).
-      // The IPFS CID below is kept only as a fallback for the card image
-      // loader (JOLLY_IMG_GWS) in case a static file is ever missing.
-      // Images CID: bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.
-      var JOLLY_IMG_BASE = "https://bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie.ipfs.ipfs.io";
+      // Jolly images v2 (2026-11-04): every token is unique (10,000
+      // distinct images with accessories + backgrounds), so the 16 static
+      // colorway files on snakeid.xyz no longer work. Cards load
+      // JOLLY_IMG_BASE/<tokenId>.jpg first and fall back through
+      // JOLLY_IMG_GWS (see jollyImgFallback) if a gateway fails.
+      // Images CID v2: bafybeidezhlk2hvrveuu7mxecssvfe4dkypaly7jhjq47ji2f4apyxrubu.
+      var JOLLY_IMG_BASE = "https://bafybeidezhlk2hvrveuu7mxecssvfe4dkypaly7jhjq47ji2f4apyxrubu.ipfs.ipfs.io";
       // If the primary gateway fails for a Jolly image, the card tries the
       // next gateway in this list before giving up (see jollyImgFallback).
-      var JOLLY_IMG_CID = "bafybeibygbgappjxrnga3bnuudbbcftzr775e4dzjldgghlbmsevvp5wie";
+      var JOLLY_IMG_CID = "bafybeidezhlk2hvrveuu7mxecssvfe4dkypaly7jhjq47ji2f4apyxrubu";
       var JOLLY_IMG_GWS = [
         JOLLY_IMG_BASE,
         "https://gateway.pinata.cloud/ipfs/" + JOLLY_IMG_CID,
@@ -509,16 +509,11 @@
           showMinted: true,
           comingSoon: true,
           nft: "0xdc11764a5664e333c8d303eb465e89a1caadb85b",
-          // Market contract NOT deployed yet — paste the deployed Jolly
-          // Market address into JOLLY_MARKET above. Until then the Jolly
-          // tab shows "market not deployed yet" and trading is disabled.
+          // Market contract deployed 2026-11-04 — see JOLLY_MARKET above.
           market: JOLLY_MARKET,
           minPriceWei: "1000000000000000", minPriceBnb: "0.001",
           maxSupply: 10000,
-          // TODO: set to the Jolly Market contract's deploy block after it
-          // deploys. 0 = placeholder (unknown until deploy). The event
-          // loader never scans from here while the market is unset — see
-          // loadEvents — so 0 cannot trigger a full-history scan.
+          // Jolly Market contract deploy block (2026-11-04).
           eventsStart: 131469781,
           // Jolly NFT deploy block (lower bound) — the MY NFTS Transfer
           // scan starts here, so it covers every Jolly token ever minted.
@@ -526,11 +521,11 @@
           snapListings: "listings-jolly.json", snapEvents: "market-events-jolly.json",
           cacheEvents: "snakeid-jolly-market-events-v1",
           hasRarity: true, snapRarity: "rarity-jolly.json",
-          // Jolly images are static files on snakeid.xyz (one per colorway,
-          // 16 total — tokens sharing a colorway have identical images).
-          // colorway-jolly.json maps tokenId -> colorway slug.
+          // Jolly images v2: each token has its own unique image on IPFS
+          // (JOLLY_IMG_BASE/<tokenId>.jpg). The colorway snapshot below
+          // is no longer used for images (kept loaded for reference).
           snapColorway: "colorway-jolly.json",
-          img: function (id) { return "https://snakeid.xyz/jolly/" + (colorway[id] || "aurora") + ".jpg"; },
+          img: function (id) { return JOLLY_IMG_BASE + "/" + id + ".jpg"; },
           label: function (id) { return "Jolly #" + id; }
         }
       };
@@ -1158,8 +1153,9 @@
 
       /* ============ Jolly colorway map ============ */
       // Maps tokenId -> colorway slug (e.g. 55 -> "aurora"), from the
-      // colorway-jolly.json snapshot. Used by the Jolly img() function so
-      // each card shows its token's colorway image from snakeid.xyz.
+      // colorway-jolly.json snapshot. Kept for reference; the Jolly img()
+      // function no longer uses it since v2 (each token has its own
+      // unique IPFS image).
       var colorway = {}; // tokenId -> "aurora"|"berry"|...
       async function loadColorway() {
         try {

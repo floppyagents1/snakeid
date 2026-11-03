@@ -1407,8 +1407,21 @@
           document.querySelectorAll(".rarity-chip").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-rarity") === "all" ? "true" : "false"); });
         }
       }
+      /* Trade buttons lock: when the collection a button would act on is
+       * coming soon (Jolly, until its images are live), the button is
+       * disabled (greyed out, not clickable) so no buy/sell prompt can be
+       * copied for it. Buttons with data-coll act on that collection;
+       * buttons without data-coll act on tradeColl. The document click
+       * handler is a backstop that also blocks the copy. */
+      function updateTradeButtons() {
+        document.querySelectorAll("[data-copy]").forEach(function (btn) {
+          var coll = btn.getAttribute("data-coll") || tradeColl;
+          btn.disabled = !!(COLLECTIONS[coll] && COLLECTIONS[coll].comingSoon);
+        });
+      }
       function renderAll() {
         updateScopeUI();
+        updateTradeButtons();
         updateStats();
         renderExplore();
         renderListed();
@@ -1547,6 +1560,11 @@
           document.querySelectorAll(".scope-chip").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
           btn.setAttribute("aria-pressed", "true");
           collectionFilter = btn.getAttribute("data-scope");
+          // The trade panel follows the collection being viewed, so the
+          // trade buttons act on the same collection — and lock when it
+          // is coming soon (Jolly, until its images are live).
+          tradeColl = collectionFilter;
+          document.querySelectorAll(".trade-chip").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-trade-coll") === tradeColl ? "true" : "false"); });
           explorePage = 1; listedPage = 1;
           renderAll();
         });
@@ -1566,6 +1584,7 @@
           document.querySelectorAll(".trade-chip").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
           btn.setAttribute("aria-pressed", "true");
           tradeColl = btn.getAttribute("data-trade-coll");
+          updateTradeButtons();
         });
       });
       document.querySelectorAll("[data-filter]").forEach(function (btn) {

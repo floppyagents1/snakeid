@@ -73,6 +73,13 @@
       .btn { display: inline-block; font-family: var(--sans); font-size: 15px; font-weight: 700; letter-spacing: 0; text-decoration: none; cursor: pointer; border: 1px solid var(--line); border-radius: 10px; background: rgba(2, 14, 4, .7); color: var(--ink); padding: 13px 20px; }
       .btn-primary { background: var(--neon); border-color: var(--neon); color: #021003; box-shadow: 0 0 24px rgba(57, 255, 20, .35); }
       .btn:hover { filter: brightness(1.1); }
+      .apply-form { display: grid; gap: 12px; margin-top: 16px; }
+      .apply-form label { display: block; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+      .apply-form input, .apply-form textarea { width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); background: rgba(2, 14, 4, .7); border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; }
+      .apply-form input:focus, .apply-form textarea:focus { outline: 2px solid var(--neon); outline-offset: 1px; border-color: var(--neon); }
+      .apply-form textarea { min-height: 64px; resize: vertical; }
+      .apply-form .half { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 560px) { .apply-form .half { grid-template-columns: 1fr; } }
       .qty-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; background: rgba(2, 14, 4, .7); padding: 7px 13px; cursor: pointer; }
       .qty-btn[aria-pressed="true"] { background: var(--neon); border-color: var(--neon); color: #021003; }
       .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-top: 30px; }
@@ -204,17 +211,57 @@
 
         <div class="card" id="applyCard">
           <h3>APPLY TO LAUNCH</h3>
-          <p>Want your collection on the launchpad? Copy the prompt below, fill in your project details, and paste it to your agent.</p>
+          <p>Want your collection on the launchpad? Fill in the form below and send your application to the Snake team.</p>
           <p style="margin-top: 12px">What the team looks for:</p>
           <ol style="margin-top: 6px">
             <li>A verified contract on BscScan (required) &mdash; the source code is public, so anyone can audit it. The team also reviews the code for drain, hidden mint, and owner risks before approval.</li>
             <li>Clear mint rules: supply, mint price, and per-wallet limit.</li>
             <li>A website and an X account are optional &mdash; nice to have, not required.</li>
           </ol>
-          <div class="row" style="margin-top: 16px">
-            <button class="btn btn-primary" type="button" id="copyApplyPrompt">COPY APPLY PROMPT</button>
-            <span id="applyPromptCopied" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
-          </div>
+          <form class="apply-form" id="applyForm">
+            <div>
+              <label for="applyName">Project name *</label>
+              <input id="applyName" name="name" type="text" required maxlength="80" placeholder="Your collection name" />
+            </div>
+            <div class="half">
+              <div>
+                <label for="applyWebsite">Website (optional)</label>
+                <input id="applyWebsite" name="website" type="url" maxlength="200" placeholder="https://…" />
+              </div>
+              <div>
+                <label for="applyX">X account (optional)</label>
+                <input id="applyX" name="x" type="text" maxlength="80" placeholder="@yourproject" />
+              </div>
+            </div>
+            <div>
+              <label for="applyContract">Contract address *</label>
+              <input id="applyContract" name="contract" type="text" required maxlength="42" placeholder="0x…" />
+            </div>
+            <div class="half">
+              <div>
+                <label for="applySupply">Supply *</label>
+                <input id="applySupply" name="supply" type="number" required min="1" max="1000000000" placeholder="10000" />
+              </div>
+              <div>
+                <label for="applyPrice">Mint price (BNB) *</label>
+                <input id="applyPrice" name="price" type="text" required maxlength="20" placeholder="0.001" />
+              </div>
+            </div>
+            <div>
+              <label for="applyLimit">Per-wallet limit *</label>
+              <input id="applyLimit" name="limit" type="number" required min="1" max="1000000" placeholder="4" />
+            </div>
+            <div>
+              <label for="applyDesc">One-line description *</label>
+              <textarea id="applyDesc" name="description" required maxlength="200" placeholder="What is your collection about?"></textarea>
+            </div>
+            <div class="row" style="margin-top: 4px">
+              <button class="btn btn-primary" type="submit">SEND APPLICATION</button>
+              <button class="btn" type="button" id="copyApplyForm">COPY APPLICATION</button>
+              <span id="applyFormStatus" style="font-family: var(--mono); font-size: 12px; color: var(--neon)"></span>
+            </div>
+            <p style="font-family: var(--mono); font-size: 12px; color: var(--muted)">Sending opens your email app with the application addressed to the Snake team. No wallet connection needed.</p>
+          </form>
         </div>
 
         <div class="card">
@@ -274,9 +321,24 @@
       }
       refreshSnakeMinted();
       setInterval(refreshSnakeMinted, 30000);
-      document.getElementById("copyApplyPrompt").addEventListener("click", function () {
-        var p = "I want to apply to launch my NFT collection on the Snake Launchpad. Here are my project details: Project name: ___ / Website (optional): ___ / X account (optional): ___ / Contract address: ___ / Supply: ___ / Mint price (BNB): ___ / Per-wallet limit: ___ / One-line description: ___. Please check the project first (the contract must be verified on BscScan - read the source and check for drain, hidden mint, or owner risks), then prepare my launch application for the Snake team.";
-        copyText(p, document.getElementById("applyPromptCopied"));
+      function applyFormText() {
+        var v = function (id) { var el = document.getElementById(id); return el ? el.value.trim() : ""; };
+        return "Launchpad application — Snake Launchpad\n\nProject name: " + v("applyName") + "\nWebsite: " + (v("applyWebsite") || "-") + "\nX account: " + (v("applyX") || "-") + "\nContract address: " + v("applyContract") + "\nSupply: " + v("applySupply") + "\nMint price (BNB): " + v("applyPrice") + "\nPer-wallet limit: " + v("applyLimit") + "\nOne-line description: " + v("applyDesc");
+      }
+      document.getElementById("applyForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var form = document.getElementById("applyForm");
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+        var name = document.getElementById("applyName").value.trim();
+        var subject = "Launchpad Application: " + name;
+        var mailto = "mailto:snakeid.official@gmail.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(applyFormText());
+        document.getElementById("applyFormStatus").textContent = "Opening your email app…";
+        window.location.href = mailto;
+      });
+      document.getElementById("copyApplyForm").addEventListener("click", function () {
+        var form = document.getElementById("applyForm");
+        if (!form.checkValidity()) { form.reportValidity(); return; }
+        copyText(applyFormText(), document.getElementById("applyFormStatus"));
       });
       var PANDA_NFT = "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e";
       var PANDA_REGISTRY = "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F";

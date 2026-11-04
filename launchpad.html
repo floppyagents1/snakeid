@@ -80,6 +80,9 @@
       .apply-form textarea { min-height: 64px; resize: vertical; }
       .apply-form .half { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       @media (max-width: 560px) { .apply-form .half { grid-template-columns: 1fr; } }
+      .apply-form-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+      .apply-form-wrap > * { overflow: hidden; min-height: 0; }
+      .apply-form-wrap.open { grid-template-rows: 1fr; }
       .qty-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; background: rgba(2, 14, 4, .7); padding: 7px 13px; cursor: pointer; }
       .qty-btn[aria-pressed="true"] { background: var(--neon); border-color: var(--neon); color: #021003; }
       .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin-top: 30px; }
@@ -211,13 +214,17 @@
 
         <div class="card" id="applyCard">
           <h3>APPLY TO LAUNCH</h3>
-          <p>Want your collection on the launchpad? Fill in the form below and send your application to the Snake team.</p>
+          <p>Want your collection on the launchpad? Open the form below and send your application to the Snake team.</p>
           <p style="margin-top: 12px">What the team looks for:</p>
           <ol style="margin-top: 6px">
             <li>A verified contract on BscScan (required) &mdash; the source code is public, so anyone can audit it. The team also reviews the code for drain, hidden mint, and owner risks before approval.</li>
             <li>Clear mint rules: supply, mint price, and per-wallet limit.</li>
             <li>A website and an X account are optional &mdash; nice to have, not required.</li>
           </ol>
+          <div class="row" style="margin-top: 16px">
+            <button class="btn btn-primary" type="button" id="toggleApplyForm" aria-expanded="false" aria-controls="applyFormWrap">SHOW APPLICATION FORM</button>
+          </div>
+          <div class="apply-form-wrap" id="applyFormWrap">
           <form class="apply-form" id="applyForm">
             <div>
               <label for="applyName">Project name *</label>
@@ -262,6 +269,7 @@
             </div>
             <p style="font-family: var(--mono); font-size: 12px; color: var(--muted)">Sending opens your email app with the application addressed to the Snake team. No wallet connection needed.</p>
           </form>
+          </div>
         </div>
 
         <div class="card">
@@ -321,6 +329,14 @@
       }
       refreshSnakeMinted();
       setInterval(refreshSnakeMinted, 30000);
+      document.getElementById("toggleApplyForm").addEventListener("click", function () {
+        var wrap = document.getElementById("applyFormWrap");
+        var btn = document.getElementById("toggleApplyForm");
+        var open = wrap.classList.toggle("open");
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        btn.textContent = open ? "HIDE APPLICATION FORM" : "SHOW APPLICATION FORM";
+        if (open) { wrap.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+      });
       function applyFormText() {
         var v = function (id) { var el = document.getElementById(id); return el ? el.value.trim() : ""; };
         return "Launchpad application — Snake Launchpad\n\nProject name: " + v("applyName") + "\nWebsite: " + (v("applyWebsite") || "-") + "\nX account: " + (v("applyX") || "-") + "\nContract address: " + v("applyContract") + "\nSupply: " + v("applySupply") + "\nMint price (BNB): " + v("applyPrice") + "\nPer-wallet limit: " + v("applyLimit") + "\nOne-line description: " + v("applyDesc");

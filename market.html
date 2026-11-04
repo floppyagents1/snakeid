@@ -134,6 +134,11 @@
       .badge.coll-panda { background: var(--gold); color: #1a1200; }
       .badge.coll-jolly { background: #f9a8d4; color: #500724; }
       .verified { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: var(--neon); color: #021003; font-size: 10px; font-weight: 700; line-height: 1; vertical-align: -2px; margin-left: 5px; box-shadow: 0 0 8px rgba(57, 255, 20, .5); }
+      .coll-header { margin-top: 22px; padding: 20px 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+      .coll-header .coll-name { display: flex; align-items: center; font-family: var(--display); font-size: 20px; line-height: 1.5; color: #fff; }
+      .coll-header .coll-desc { color: #c9e8c4; font-size: 15px; line-height: 1.65; margin: 10px 0 0; }
+      .coll-header .coll-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font-family: var(--mono); font-size: 12px; }
+      .coll-header .coll-links a { color: var(--neon); }
       .badge.tier-common { background: #5b6b5f; color: #eaffea; }
       .badge.tier-uncommon { background: #1db954; color: #021003; }
       .badge.tier-rare { background: #3b82f6; color: #fff; }
@@ -214,6 +219,8 @@
         </div>
 
         <div class="scope-row" id="scopeRow" role="group" aria-label="Collection"><!-- Collection chips are built from COLLECTIONS at load — one collection, one chip. --></div>
+
+        <div class="coll-header" id="collHeader"><!-- Collection header (name, description, links) is rendered from COLLECTIONS at load and on every collection switch. --></div>
 
         <div class="stat-grid" id="statsBar" aria-live="polite">
           <div class="stat"><div class="k">TOTAL MINTED</div><div class="v" id="stTotalMinted">&hellip;</div></div>
@@ -515,6 +522,8 @@
       var COLLECTIONS = {
         snake: {
           key: "snake", name: "SnakeID", short: "SNAKEID", verified: true,
+          desc: "10,000 snakes. One ID to collect them all. Sold out in one day — now trading on the SnakeID market.",
+          x: "@snakeidbnb", xUrl: "https://x.com/snakeidbnb", website: "https://snakeid.xyz",
           nft: "0xafc6bca0e191e396306343213b04ff9a8d717263",
           market: "0x0a5e8d61230241312a623e17d61540d0dff2feb7",
           minPriceWei: "1000000000000000", minPriceBnb: "0.001",
@@ -527,6 +536,8 @@
         },
         panda: {
           key: "panda", name: "Agent Panda", short: "AGENT PANDA",
+          desc: "One golden panda card shared by 10,000 tokens. Burn a panda for 50,000 $APANDA, or stake it to earn 500 $APANDA per day.",
+          x: null, xUrl: null, website: "https://agentpandabnb.xyz",
           // COMING SOON (2026-11-04, owner rule): while the Panda mint is
           // still running there is NO buying/selling — the market is closed
           // and all listings are hidden (see getExploreRows/getListedRows/
@@ -558,6 +569,8 @@
         },
         jolly: {
           key: "jolly", name: "Jolly", short: "JOLLY",
+          desc: "The Muse mascot as 10,000 colorful plush NFTs — 16 colorways, 5 rarity tiers from Common to Legendary.",
+          x: null, xUrl: null, website: "https://snakeid.xyz/launchpad",
           // COMING SOON (2026-11-04): the market contract is deployed but
           // the Jolly images ARE live (Pinata sprite sheets on the
           // dedicated gateway; per-token IPFS kept as fallback) and
@@ -620,6 +633,21 @@
         });
       }
       buildCollectionChips();
+      // Collection header (OpenSea-style): name + verified badge, description,
+      // and the project's X / website / contract links. Re-rendered on every
+      // collection switch, so each collection reads as its own page.
+      function renderCollHeader() {
+        var C = COLLECTIONS[collectionFilter];
+        var el = document.getElementById("collHeader");
+        if (!el || !C) return;
+        var links = "";
+        if (C.x && C.xUrl) links += '<a href="' + esc(C.xUrl) + '" target="_blank" rel="noopener">X ' + esc(C.x) + ' \u2197</a>';
+        if (C.website) links += '<a href="' + esc(C.website) + '" target="_blank" rel="noopener">Website \u2197</a>';
+        links += '<a href="https://bscscan.com/address/' + C.nft + '" target="_blank" rel="noopener">Contract \u2197</a>';
+        el.innerHTML = '<div class="coll-name">' + esc(C.name) + (C.verified ? ' <span class="verified" title="Verified collection">\u2713</span>' : "") + '</div>'
+          + '<p class="coll-desc">' + esc(C.desc || "") + '</p>'
+          + '<div class="coll-links">' + links + '</div>';
+      }
       var MULTICALL = "0xcA11bde05977b3631167028862bE2a173976CA11";
       var PAGE_SIZE = 24;
       var CHUNK = 50; // 1RPC caps eth_getLogs at 50-block ranges; dRPC also handles 50
@@ -1771,6 +1799,8 @@
           document.querySelectorAll(".trade-chip").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-trade-coll") === tradeColl ? "true" : "false"); });
           explorePage = 1; listedPage = 1;
           renderAll();
+          renderCollHeader();
+          try { history.replaceState(null, "", "#" + collectionFilter); } catch (e) {}
         });
       });
       document.querySelectorAll(".rarity-chip").forEach(function (btn) {
@@ -1903,6 +1933,15 @@
           return;
         }
         renderAll();
+        renderCollHeader();
+        // Deep link: #snake / #panda / #jolly opens that collection's page.
+        (function () {
+          var h = (location.hash || "").replace("#", "");
+          if (h && COLLECTIONS[h] && h !== collectionFilter) {
+            var chip = document.querySelector('.scope-chip[data-scope="' + h + '"]');
+            if (chip) chip.click();
+          }
+        })();
         if (!liveStarted) {
           liveStarted = true;
           // 1-second tick: polls the latest block; when it moves, the

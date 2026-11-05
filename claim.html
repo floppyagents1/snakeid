@@ -455,7 +455,7 @@
           meta.textContent = pct.toFixed(2) + "% claimed \u00b7 " + totalWallets.toLocaleString("en-US") + " wallets in the claim list";
           document.getElementById("claimProgressNote").textContent = "Claimed (" + fmtSnakeWhole(claimedWei) + ") + remaining (" + fmtSnakeWhole(remainingWei) + ") = 194,790,000 SNAKE allocated to the claim list. The claim contract also holds unallocated SNAKE that was never assigned to anyone \u2014 it goes into the PancakeSwap pool after the claim deadline (30 Nov 2026), not to the team.";
           var now = new Date();
-          document.getElementById("claimProgressUpdated").textContent = "Updated " + now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          document.getElementById("claimProgressUpdated").textContent = "Updated " + now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "UTC" }) + " UTC";
         } catch (e) {
           meta.textContent = "Could not load claim progress \u2014 retrying\u2026";
         }

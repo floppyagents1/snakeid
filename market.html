@@ -389,8 +389,12 @@
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xafc6bca0e191e396306343213b04ff9a8d717263" target="_blank" rel="noopener">View SnakeID NFT on BscScan &nearr;</a></p>
           <p style="margin-top: 10px">Agent Panda Market<br /><span class="addr">0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898</span></p>
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898" target="_blank" rel="noopener">View Agent Panda Market on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
+          <p style="margin-top: 10px">Agent Panda Market V4 (v3 + v4 tokens)<br /><span class="addr">0x7fc3328Fbda2551911F3B13E3AfB6877403f9080</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x7fc3328Fbda2551911F3B13E3AfB6877403f9080" target="_blank" rel="noopener">View Agent Panda Market V4 on BscScan &nearr;</a> &middot; <a href="https://sourcify.dev/server/v2/contract/56/0x7fc3328Fbda2551911F3B13E3AfB6877403f9080" target="_blank" rel="noopener">Sourcify verified &nearr;</a></p>
           <p style="margin-top: 10px">Agent Panda NFT<br /><span class="addr">0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e</span></p>
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e" target="_blank" rel="noopener">View Agent Panda NFT on BscScan &nearr;</a></p>
+          <p style="margin-top: 10px">Agent Panda NFT V4<br /><span class="addr">0x2820e61eD78aC29F52eDAE05F01aB552307b907C</span></p>
+          <p style="margin-top: 10px"><a href="https://bscscan.com/address/0x2820e61eD78aC29F52eDAE05F01aB552307b907C" target="_blank" rel="noopener">View Agent Panda NFT V4 on BscScan &nearr;</a></p>
           <p style="margin-top: 10px">Jolly Market<br /><span class="addr">Not deployed yet &mdash; the address goes here after the market contract deploys.</span></p>
           <p style="margin-top: 10px">Jolly NFT<br /><span class="addr">0xdc11764a5664e333c8d303eb465e89a1caadb85b</span></p>
           <p style="margin-top: 10px"><a href="https://bscscan.com/address/0xdc11764a5664e333c8d303eb465e89a1caadb85b" target="_blank" rel="noopener">View Jolly NFT on BscScan &nearr;</a></p>
@@ -399,7 +403,7 @@
 
       <footer>
         <div>SnakeID &middot; Built on BNB Chain &middot; Follow on X <a href="https://x.com/snakeidbnb" target="_blank" rel="noopener">@snakeidbnb</a> &middot; <a href="/whitepaper.pdf" target="_blank" rel="noopener">Whitepaper</a></div>
-        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898 &middot; JOLLY NFT 0xDC11764A5664E333C8D303EB465E89A1CAADB85B &middot; JOLLY MARKET 0x5E62D8D344CEE5BBAF70506D32B103D3ED0D5916</div>
+        <div class="contracts">&copy; 2026 SNAKEID &middot; SNAKEID NFT 0xAFC6BCA0E191E396306343213B04FF9A8D717263 &middot; SNAKEID MARKET 0x0A5E8D61230241312A623E17D61540D0FF2FEB7 &middot; AGENT PANDA NFT 0x7561C414A7A6FF44FC81E9BFC2EDA8F57C3EC61E &middot; AGENT PANDA MARKET 0x5266D91A9452C61D6EC7627FE8FC85A4CB00E898 &middot; AGENT PANDA NFT V4 0x2820E61ED78AC29F52EDAE05F01AB552307B907C &middot; AGENT PANDA MARKET V4 0X7FC3328FBDA2551911F3B13E3AFB6877403F9080 &middot; JOLLY NFT 0xDC11764A5664E333C8D303EB465E89A1CAADB85B &middot; JOLLY MARKET 0x5E62D8D344CEE5BBAF70506D32B103D3ED0D5916</div>
       </footer>
     </div>
 
@@ -538,18 +542,33 @@
           key: "panda", name: "Agent Panda", short: "AGENT PANDA",
           desc: "One golden panda card shared by 10,000 tokens. Burn a panda for 50,000 $APANDA, or stake it to earn 500 $APANDA per day.",
           x: "@agentpandaonbnb", xUrl: "https://x.com/agentpandaonbnb", website: "https://agentpandabnb.xyz",
-          // COMING SOON (2026-11-04, owner rule): while the Panda mint is
-          // still running there is NO buying/selling — the market is closed
-          // and all listings are hidden (see getExploreRows/getListedRows/
-          // updateStats, which skip LISTED rows and counts for comingSoon
-          // collections). Remove the flag only when the owner says to open
-          // trading. Same rule as Jolly.
-          comingSoon: true,
+          // Trading OPEN (2026-11-07): the v4 market is live, so v3/v4
+          // tokens can now be listed and bought here alongside v1 tokens.
+          // The old comingSoon flag (mint still running, market closed by
+          // the owner) was removed when MarketV4 deployed — see marketV4
+          // below. Jolly keeps its own comingSoon flag.
           nft: "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
           market: "0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898",
+          // Second market (2026-11-07): AgentPandaMarketV4 accepts the v3
+          // and v4 NFT contracts (the v1 market only accepts v1 tokens).
+          // Listings/events are read from BOTH markets and merged; a
+          // listing carries its NFT contract so buy/cancel route to the
+          // matching market. v3 has only 8 tokens (8116-8123); v4 tokens
+          // are 8751-10000. marketV4Start is the MarketV4 deploy block.
+          marketV4: "0x7fc3328Fbda2551911F3B13E3AfB6877403f9080",
+          nftV3: "0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7",
+          nftV4: "0x2820e61eD78aC29F52eDAE05F01aB552307b907C",
+          marketV4Start: 132130091,
           minPriceWei: "1200000000000000", minPriceBnb: "0.0012",
           maxSupply: 10000, eventsStart: 131130000,
           snapListings: "listings-panda.json", snapEvents: "market-events-panda.json",
+          // v4 snapshots (optional, best-effort): listings-panda-v4.json /
+          // market-events-panda-v4.json. Neither file exists yet (the v4
+          // market just deployed with 0 listings) — the loaders skip a
+          // missing file silently and the live Multicall + log scans cover
+          // v4. Generate these files once v4 listings/events exist so the
+          // first paint seeds from them like the v1 snapshots do.
+          snapListingsV4: "listings-panda-v4.json", snapEventsV4: "market-events-panda-v4.json",
           cacheEvents: "snakeid-panda-market-events-v1",
           hasRarity: false, snapRarity: null,
           // zeroSalesKnown: verified 2026-11-02 — no Sold event for Agent
@@ -670,6 +689,17 @@
       var TOPIC_LISTED = "0x6e16e8064e3c8254cef11e01e152416398602d7e8785f743f1c2f93a9a15ff35";
       var TOPIC_CANCELLED = "0x36ea5cd5608625e789af0282eecdb4eae1cb7c1cf6d0ec3f9a84f35be850260b";
       var TOPIC_SOLD = "0x16dd16959a056953a63cf14bf427881e762e54f03d86b864efea8238dd3b822f";
+      // AgentPandaMarketV4 event topics (2026-11-07): the v4 market's events
+      // carry the NFT contract as an indexed topic, so the signatures (and
+      // the topic layout) differ from v1:
+      //   Listed(address,address,uint256,uint256) — topics: seller, nft, tokenId
+      //   Cancelled(address,address,uint256) — topics: seller, nft, tokenId
+      //   Sold(address,address,address,uint256,uint256) — topics: seller,
+      //   buyer, nft; data = tokenId (32B) + price (32B)
+      var TOPIC_LISTED_V4 = "0xd9d69fee247951cc283dc6f5b64c36ce396a36146405a798b86ebfd113c8b5ca";
+      var TOPIC_CANCELLED_V4 = "0x915fb8c652d6245752cc491b71bd8e87ab6761417f8d2ca353c8055103294c03";
+      var TOPIC_SOLD_V4 = "0x5764dbcef91eb6f946584f4ea671217c686fa7e858ce4f9f42d08422b86556a9";
+      var SEL_LISTINGS_V4 = "0x0007df30"; // listings(address,uint256) on AgentPandaMarketV4
       var TOPIC_TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
       var ZERO = "0x0000000000000000000000000000000000000000";
       var CACHE_TIMES = "snakeid-block-times-v1";
@@ -792,18 +822,67 @@
       }
 
       /* ============ Copy prompts (agent pattern — no wallet connect anywhere) ============ */
-      function promptList(tokenId, coll) {
+      // Panda market routing (2026-11-07): the v1 market only accepts v1
+      // tokens; v3/v4 tokens list on AgentPandaMarketV4. Given a Panda
+      // token's NFT contract, return the matching {market, nft}. A null
+      // nft falls back to the v1 market (the prompt then tells the agent
+      // to verify the token's contract on-chain first).
+      function pandaMarketFor(nftAddr) {
+        var C = COLLECTIONS.panda;
+        var n = (nftAddr || "").toLowerCase();
+        if (C.marketV4 && (n === (C.nftV3 || "").toLowerCase() || n === (C.nftV4 || "").toLowerCase())) {
+          return { market: C.marketV4, nft: nftAddr };
+        }
+        return { market: C.market, nft: C.nft };
+      }
+      // For an unlisted Panda token the NFT contract is not on a listing,
+      // so infer it from the tokenId range: 8751+ is v4, 8116-8123 exists
+      // on BOTH v1 and v3 (ambiguous — the prompt tells the agent to check
+      // ownership on both), everything else is v1. A null tokenId (the
+      // generic trade-panel prompt, no token chosen yet) is ambiguous too.
+      function pandaMarketForToken(tokenId) {
+        var C = COLLECTIONS.panda;
+        if (typeof tokenId !== "number") return { market: null, nft: null, ambiguous: true };
+        if (tokenId >= 8751) return { market: C.marketV4, nft: C.nftV4 };
+        if (tokenId >= 8116 && tokenId <= 8123) return { market: null, nft: null, ambiguous: true };
+        return { market: C.market, nft: C.nft };
+      }
+      function promptList(tokenId, coll, nft) {
         var C = COLLECTIONS[coll || tradeColl];
         var t = tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT";
+        if ((coll || tradeColl) === "panda" && C.marketV4) {
+          var route = nft ? pandaMarketFor(nft) : pandaMarketForToken(tokenId ? Number(tokenId) : null);
+          if (route.ambiguous) {
+            if (!tokenId) {
+              return "List my Agent Panda NFT on the Agent Panda Market on BNB Chain. Panda tokens live on three NFT contracts — v1 (0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e), v3 (0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7), v4 (0x2820e61eD78aC29F52eDAE05F01aB552307b907C). First ask me which token, then check which contract I own it on. If it is a v1 token, list it on the v1 Market 0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898. If it is a v3 or v4 token, list it on the v4 Market 0x7fc3328Fbda2551911F3B13E3AfB6877403f9080 with that token's NFT contract (the v4 market list takes nftContract first). Minimum listing " + C.minPriceBnb + " BNB. Ask me which token and what price. Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
+            }
+            return "List" + t + " on the Agent Panda Market on BNB Chain. This token number exists on BOTH the v1 NFT (0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e) and the v3 NFT (0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7) — first check which contract I own this token on. If it is a v1 token, list it on the v1 Market 0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898. If it is a v3 token, list it on the v4 Market 0x7fc3328Fbda2551911F3B13E3AfB6877403f9080 with NFT contract 0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7 (the v4 market list takes nftContract first). Minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
+          }
+          return "List" + t + " on the Agent Panda Market on BNB Chain. NFT " + route.nft + ", Market " + route.market + ", minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + (route.market === C.marketV4 ? " The v4 market list takes the NFT contract first: list(nftContract, tokenId, price)." : "") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
+        }
         return "List" + t + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ", minimum listing " + C.minPriceBnb + " BNB." + (tokenId ? " I want to list it at [PRICE IN BNB — minimum " + C.minPriceBnb + "] BNB." : " Ask me which token and what price.") + " Verify on-chain first, show me a transaction preview, and wait for my confirmation before signing.";
       }
-      function promptBuy(tokenId, seller, priceWei, coll) {
+      function promptBuy(tokenId, seller, priceWei, coll, nft) {
         var C = COLLECTIONS[coll || tradeColl];
         var detail = tokenId ? " " + C.name + " #" + tokenId + (seller ? " from seller " + seller : "") + (priceWei !== undefined && priceWei !== null ? " at " + fmtBNB(priceWei) + " BNB" : "") + "." : " a " + C.name + " NFT.";
+        if ((coll || tradeColl) === "panda" && C.marketV4) {
+          var route = pandaMarketFor(nft);
+          return "Buy" + detail + " NFT " + route.nft + ", Market " + route.market + "." + (route.market === C.marketV4 ? " The v4 market buy takes the NFT contract first: buy(nftContract, tokenId)." : "") + " Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
+        }
         return "Buy" + detail + " NFT " + C.nft + ", Market " + C.market + ". Verify the listing on-chain first (seller, price, active), show me a transaction preview, and wait for my confirmation before signing.";
       }
-      function promptCancel(tokenId, coll) {
+      function promptCancel(tokenId, coll, nft) {
         var C = COLLECTIONS[coll || tradeColl];
+        if ((coll || tradeColl) === "panda" && C.marketV4) {
+          var route = nft ? pandaMarketFor(nft) : pandaMarketForToken(tokenId ? Number(tokenId) : null);
+          if (route.ambiguous) {
+            if (!tokenId) {
+              return "Cancel my listing for my Agent Panda NFT on the Agent Panda Market on BNB Chain. Panda tokens live on three NFT contracts — v1 (0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e), v3 (0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7), v4 (0x2820e61eD78aC29F52eDAE05F01aB552307b907C). First ask me which token, then check which market my listing is on. If it is on the v1 Market 0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898, cancel it there. If it is on the v4 Market 0x7fc3328Fbda2551911F3B13E3AfB6877403f9080, cancel it there with that token's NFT contract (the v4 market cancel takes nftContract first). Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
+            }
+            return "Cancel my listing for" + (tokenId ? " Agent Panda #" + tokenId : " my Agent Panda NFT") + " on the Agent Panda Market on BNB Chain. This token number exists on BOTH the v1 NFT (0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e) and the v3 NFT (0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7) — first check which contract my listing is on. If it is on the v1 Market 0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898, cancel it there. If it is on the v4 Market 0x7fc3328Fbda2551911F3B13E3AfB6877403f9080, cancel it there with NFT contract 0x4134b3bb3b293551e0b4e6ba04175b6bbb457dd7 (the v4 market cancel takes nftContract first). Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
+          }
+          return "Cancel my listing for" + (tokenId ? " Agent Panda #" + tokenId : " my Agent Panda NFT") + " on the Agent Panda Market on BNB Chain. NFT " + route.nft + ", Market " + route.market + "." + (route.market === C.marketV4 ? " The v4 market cancel takes the NFT contract first: cancel(nftContract, tokenId)." : "") + " Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
+        }
         return "Cancel my listing for" + (tokenId ? " " + C.name + " #" + tokenId : " my " + C.name + " NFT") + " on the " + C.name + " Market on BNB Chain. NFT " + C.nft + ", Market " + C.market + ". Verify on-chain first that the listing is mine and active, show me a transaction preview, and wait for my confirmation before signing.";
       }
       function copyText(text, noteEl) {
@@ -829,9 +908,9 @@
           if (note0) { note0.textContent = COLLECTIONS[coll].comingSoon ? "Market coming soon \u2014 trading opens soon." : "Market not deployed yet \u2014 trading opens after the market contract deploys."; setTimeout(function () { note0.textContent = ""; }, 4000); }
           return;
         }
-        var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null, coll)
-          : kind === "buy" ? promptBuy(btn.getAttribute("data-token") || null, btn.getAttribute("data-seller") || null, btn.getAttribute("data-price") || null, coll)
-          : promptCancel(btn.getAttribute("data-token") || null, coll);
+        var text = kind === "list" ? promptList(btn.getAttribute("data-token") || null, coll, btn.getAttribute("data-nft") || null)
+          : kind === "buy" ? promptBuy(btn.getAttribute("data-token") || null, btn.getAttribute("data-seller") || null, btn.getAttribute("data-price") || null, coll, btn.getAttribute("data-nft") || null)
+          : promptCancel(btn.getAttribute("data-token") || null, coll, btn.getAttribute("data-nft") || null);
         var note = $("tradeCopied");
         copyText(text, note);
         if (note) setTimeout(function () { note.textContent = ""; }, 4000);
@@ -846,15 +925,36 @@
 
       /* ============ Event parsing ============ */
       function topicAddr(t) { return "0x" + t.slice(26); }
-      function parseMarketLog(l) {
+      /* Parse one market log (v1 or v4 layout) into an event object.
+       * defaultNft is the collection's v1 NFT — v1 events carry no NFT
+       * topic, so they are tagged with it. v4 events carry the NFT
+       * contract as an indexed topic (topics[2] for Listed/Cancelled,
+       * topics[3] for Sold) and it is read from the log. Every returned
+       * event has an `nft` field so listings/activity/sales know which
+       * NFT contract the token belongs to. */
+      function parseMarketLog(l, defaultNft) {
         var t0 = l.topics[0];
+        var price = null;
+        if (t0 === TOPIC_LISTED_V4 || t0 === TOPIC_CANCELLED_V4 || t0 === TOPIC_SOLD_V4) {
+          if (t0 === TOPIC_SOLD_V4) {
+            // data = tokenId (32B) + price (32B); nft is topics[3].
+            var tokenId = null;
+            try { if (l.data && l.data.length >= 130) tokenId = parseInt(l.data.slice(2, 66), 16); } catch (e) {}
+            try { if (l.data && l.data.length >= 130) price = BigInt("0x" + l.data.slice(66, 130)).toString(); } catch (e) {}
+            return { type: "Sold", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), buyer: topicAddr(l.topics[2]), nft: topicAddr(l.topics[3]), tokenId: tokenId, price: price };
+          }
+          var tokenId4 = l.topics.length > 3 ? parseInt(l.topics[3], 16) : null;
+          try { if (l.data && l.data.length >= 66) price = BigInt(l.data.slice(0, 66)).toString(); } catch (e) {}
+          if (t0 === TOPIC_LISTED_V4) return { type: "Listed", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), nft: topicAddr(l.topics[2]), tokenId: tokenId4, price: price };
+          if (t0 === TOPIC_CANCELLED_V4) return { type: "Cancelled", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), nft: topicAddr(l.topics[2]), tokenId: tokenId4, price: null };
+          return null;
+        }
         var tokenId = l.topics.length > 2 && t0 !== TOPIC_SOLD ? parseInt(l.topics[2], 16)
           : t0 === TOPIC_SOLD ? parseInt(l.topics[3], 16) : null;
-        var price = null;
         try { if (l.data && l.data.length >= 66) price = BigInt(l.data.slice(0, 66)).toString(); } catch (e) {}
-        if (t0 === TOPIC_LISTED) return { type: "Listed", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), tokenId: tokenId, price: price };
-        if (t0 === TOPIC_CANCELLED) return { type: "Cancelled", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), tokenId: tokenId, price: null };
-        if (t0 === TOPIC_SOLD) return { type: "Sold", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), buyer: topicAddr(l.topics[2]), tokenId: tokenId, price: price };
+        if (t0 === TOPIC_LISTED) return { type: "Listed", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), nft: defaultNft, tokenId: tokenId, price: price };
+        if (t0 === TOPIC_CANCELLED) return { type: "Cancelled", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), nft: defaultNft, tokenId: tokenId, price: null };
+        if (t0 === TOPIC_SOLD) return { type: "Sold", block: l.blockNumber, tx: l.transactionHash, logIndex: l.logIndex, seller: topicAddr(l.topics[1]), buyer: topicAddr(l.topics[2]), nft: defaultNft, tokenId: tokenId, price: price };
         return null;
       }
       function sortEvents(a, b) { return (a.block - b.block) || (a.logIndex - b.logIndex); }
@@ -874,6 +974,7 @@
       }
       function replayEvents(coll) {
         var st = S[coll];
+        var C = COLLECTIONS[coll];
         st.soldMap = {}; st.sales = []; st.activity = [];
         st.marketEvents = dedupeEventLogs(st.marketEvents, function (e) { return e.tx + ":" + e.logIndex; });
         st.mintEvents = dedupeEventLogs(st.mintEvents, function (m) { return m[1] + ":" + m[2]; });
@@ -883,6 +984,16 @@
         // token is a "Price change", a Listed after a Cancelled is a fresh
         // "Listed" again.
         var seenListed = {};
+        // A listing entry belongs to one NFT contract (v1 vs v3/v4 for
+        // Panda). Cancelled/Sold only remove the entry when the event's NFT
+        // matches the stored one — tokenId 8116-8123 exists on BOTH v1 and
+        // v3, so a v3 cancel must not wipe a v1 listing of the same number.
+        function nftOf(e) { return (e.nft || C.nft || "").toLowerCase(); }
+        function entryMatches(e) {
+          var cur = st.activeListings[e.tokenId];
+          if (!cur) return false;
+          return ((cur.nft || C.nft || "").toLowerCase() === nftOf(e));
+        }
         sorted.forEach(function (e) {
           // activeListings is owned by the listings snapshot + the Multicall
           // refresh. Events only adjust it for blocks NEWER than the snapshot
@@ -892,20 +1003,20 @@
             var isUpdate = !!seenListed[e.tokenId];
             seenListed[e.tokenId] = true;
             if (e.block > st.snapshotBlock) {
-              st.activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
+              st.activeListings[e.tokenId] = { seller: e.seller, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex, nft: e.nft || C.nft };
             }
-            st.activity.push({ coll: coll, kind: isUpdate ? "Price change" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            st.activity.push({ coll: coll, kind: isUpdate ? "Price change" : "Listed", tokenId: e.tokenId, seller: e.seller, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex, nft: e.nft || C.nft });
           } else if (e.type === "Cancelled") {
-            if (e.block > st.snapshotBlock) delete st.activeListings[e.tokenId];
+            if (e.block > st.snapshotBlock && entryMatches(e)) delete st.activeListings[e.tokenId];
             delete seenListed[e.tokenId];
-            st.activity.push({ coll: coll, kind: "Cancelled", tokenId: e.tokenId, seller: e.seller, price: null, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            st.activity.push({ coll: coll, kind: "Cancelled", tokenId: e.tokenId, seller: e.seller, price: null, block: e.block, tx: e.tx, logIndex: e.logIndex, nft: e.nft || C.nft });
           } else if (e.type === "Sold") {
-            if (e.block > st.snapshotBlock) delete st.activeListings[e.tokenId];
+            if (e.block > st.snapshotBlock && entryMatches(e)) delete st.activeListings[e.tokenId];
             delete seenListed[e.tokenId];
-            var sale = { coll: coll, seller: e.seller, buyer: e.buyer, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex };
+            var sale = { coll: coll, seller: e.seller, buyer: e.buyer, priceWei: BigInt(e.price || "0"), block: e.block, tx: e.tx, logIndex: e.logIndex, nft: e.nft || C.nft };
             st.soldMap[e.tokenId] = sale;
-            st.sales.push({ coll: coll, tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, priceWei: sale.priceWei, block: e.block, tx: e.tx, logIndex: e.logIndex });
-            st.activity.push({ coll: coll, kind: "Sold", tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex });
+            st.sales.push({ coll: coll, tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, priceWei: sale.priceWei, block: e.block, tx: e.tx, logIndex: e.logIndex, nft: e.nft || C.nft });
+            st.activity.push({ coll: coll, kind: "Sold", tokenId: e.tokenId, seller: e.seller, buyer: e.buyer, price: e.price, block: e.block, tx: e.tx, logIndex: e.logIndex, nft: e.nft || C.nft });
           }
         });
         st.mintEvents.forEach(function (m) {
@@ -1027,6 +1138,28 @@
               }
             }
           } catch (e) { /* no snapshot seed — fall through to the live log calls */ }
+          // v4 events snapshot (optional, best-effort): the file does not
+          // exist yet (v4 market just deployed), so a 404 is expected and
+          // silently skipped — the live log scan below covers v4. Once the
+          // file exists it seeds v4 history the same way the v1 snapshot
+          // seeds v1 history. v4 events are tagged with their NFT contract.
+          if (C.snapEventsV4) {
+            try {
+              var res4 = await fetch(C.snapEventsV4, { cache: "no-store" });
+              if (res4.ok) {
+                var snap4 = await res4.json();
+                if (snap4 && Array.isArray(snap4.market)) {
+                  snap4.market.forEach(function (e) {
+                    if (e && typeof e === "object" && typeof e.block === "number") {
+                      if (!e.nft) e.nft = C.nftV4;
+                      st.marketEvents.push(e);
+                    }
+                  });
+                  if (typeof snap4.toBlock === "number" && snap4.toBlock >= (C.marketV4Start || 0)) haveSource = haveSource || st.marketEvents.length > 0;
+                }
+              }
+            } catch (e) { /* no v4 events snapshot yet */ }
+          }
         }
         // Clamp the live fetch to the recent window the free plan serves.
         // Already-loaded events are unaffected; only the new fetch is limited.
@@ -1049,8 +1182,21 @@
           marketChunks++;
           try {
             var logs = await getLogs(C.market, null, from, to);
-            logs.forEach(function (l) { var e = parseMarketLog(l); if (e) st.marketEvents.push(e); });
+            logs.forEach(function (l) { var e = parseMarketLog(l, C.nft); if (e) st.marketEvents.push(e); });
           } catch (e) { marketChunkFails++; /* one chunk failing must not kill the whole load; it is retried on the next visit */ }
+          // Second market (Panda v4): scan the same window for v4 market
+          // logs. Clamped to the v4 market's deploy block — there are no
+          // v4 logs before it. A v4 chunk failing never counts toward
+          // marketChunkFails (v1 availability is judged on v1 alone).
+          if (C.marketV4) {
+            var from4 = Math.max(from, C.marketV4Start || 0);
+            if (from4 <= to) {
+              try {
+                var logs4 = await getLogs(C.marketV4, null, from4, to);
+                logs4.forEach(function (l) { var e = parseMarketLog(l, C.nft); if (e) st.marketEvents.push(e); });
+              } catch (e) { /* v4 chunk failed — retried on the next visit */ }
+            }
+          }
           try {
             var mlogs = await getLogs(C.nft, [TOPIC_TRANSFER, padAddr(ZERO), null], from, to);
             mlogs.forEach(function (l) {
@@ -1157,41 +1303,62 @@
         var failures = 0;
         var foundIds = {};
         var BATCH = 400;
-        for (var start = 1; start <= C.maxSupply; start += BATCH) {
-          var ids = [];
-          for (var i = start; i < start + BATCH && i <= C.maxSupply; i++) ids.push(i);
-          var results = null;
-          try {
-            var calls = ids.map(function (id) { return { target: C.market, allowFailure: true, callData: SEL_LISTINGS + encodeUint256(id) }; });
-            var mcHex = await ethCall(MULTICALL, encodeAggregate3(calls));
-            var decoded = decodeAggregate3(mcHex);
-            if (decoded.length === ids.length) {
-              results = decoded.map(function (d, k) { if (!d.success) failures++; return d.success ? parseListingHex(d.returnData) : null; });
-            }
-          } catch (e) { results = null; }
-          if (!results) {
-            // Fallback: batched eth_call, 20 at a time
-            results = [];
-            for (var g = 0; g < ids.length; g += 20) {
-              var part = await Promise.all(ids.slice(g, g + 20).map(function (id) {
-                return ethCall(C.market, SEL_LISTINGS + encodeUint256(id)).then(parseListingHex).catch(function () { failures++; return null; });
-              }));
-              results = results.concat(part);
-            }
-          }
-          results.forEach(function (l, k) {
-            if (l && l.active) {
-              found++;
-              var id = ids[k];
-              foundIds[id] = true;
-              if (!st.activeListings[id]) {
-                st.activeListings[id] = { seller: l.seller, priceWei: l.priceWei, block: null, tx: null, logIndex: 0 };
-              } else {
-                st.activeListings[id].seller = l.seller;
-                st.activeListings[id].priceWei = l.priceWei;
+        // Market reads: each is {market, nft, from, to, twoArg}. Panda
+        // reads the v1 market (all ids) PLUS the v4 market for the v3
+        // range (8116-8123, the only v3 tokenIds) and the v4 range
+        // (8751-10000, the only v4 tokenIds) — the v4 listings() takes
+        // (nftContract, tokenId), so its callData carries the NFT address
+        // first. Other collections read only their single market. The v4
+        // scan runs AFTER the v1 scan, so on the 8 tokenIds that exist on
+        // both v1 and v3 (8116-8123) a live v4 listing wins over a v1 one.
+        var targets = [{ market: C.market, nft: C.nft, from: 1, to: C.maxSupply, twoArg: false }];
+        if (C.marketV4) {
+          if (C.nftV3) targets.push({ market: C.marketV4, nft: C.nftV3, from: 8116, to: 8123, twoArg: true });
+          if (C.nftV4) targets.push({ market: C.marketV4, nft: C.nftV4, from: 8751, to: C.maxSupply, twoArg: true });
+        }
+        for (var ti = 0; ti < targets.length; ti++) {
+          var tgt = targets[ti];
+          for (var start = tgt.from; start <= tgt.to; start += BATCH) {
+            var ids = [];
+            for (var i = start; i < start + BATCH && i <= tgt.to; i++) ids.push(i);
+            var results = null;
+            try {
+              var calls = ids.map(function (id) {
+                var cd = tgt.twoArg ? SEL_LISTINGS_V4 + padAddr(tgt.nft).slice(2) + encodeUint256(id) : SEL_LISTINGS + encodeUint256(id);
+                return { target: tgt.market, allowFailure: true, callData: cd };
+              });
+              var mcHex = await ethCall(MULTICALL, encodeAggregate3(calls));
+              var decoded = decodeAggregate3(mcHex);
+              if (decoded.length === ids.length) {
+                results = decoded.map(function (d, k) { if (!d.success) failures++; return d.success ? parseListingHex(d.returnData) : null; });
+              }
+            } catch (e) { results = null; }
+            if (!results) {
+              // Fallback: batched eth_call, 20 at a time
+              results = [];
+              for (var g = 0; g < ids.length; g += 20) {
+                var part = await Promise.all(ids.slice(g, g + 20).map(function (id) {
+                  var cd2 = tgt.twoArg ? SEL_LISTINGS_V4 + padAddr(tgt.nft).slice(2) + encodeUint256(id) : SEL_LISTINGS + encodeUint256(id);
+                  return ethCall(tgt.market, cd2).then(parseListingHex).catch(function () { failures++; return null; });
+                }));
+                results = results.concat(part);
               }
             }
-          });
+            results.forEach(function (l, k) {
+              if (l && l.active) {
+                found++;
+                var id = ids[k];
+                foundIds[id] = true;
+                if (!st.activeListings[id]) {
+                  st.activeListings[id] = { seller: l.seller, priceWei: l.priceWei, block: null, tx: null, logIndex: 0, nft: tgt.nft };
+                } else {
+                  st.activeListings[id].seller = l.seller;
+                  st.activeListings[id].priceWei = l.priceWei;
+                  st.activeListings[id].nft = tgt.nft;
+                }
+              }
+            });
+          }
         }
         // Prune listings the contract no longer shows as active —
         // but only if every single listings() call succeeded (a failed call must
@@ -1304,12 +1471,12 @@
           if (!COLLECTIONS[coll].comingSoon) {
             Object.keys(st.activeListings).forEach(function (id) {
               var l = st.activeListings[id];
-              rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx });
+              rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx, nft: l.nft || COLLECTIONS[coll].nft });
             });
           }
           Object.keys(st.soldMap).forEach(function (id) {
             var s = st.soldMap[id];
-            if (!st.activeListings[id]) rows.push({ coll: coll, tokenId: Number(id), status: "SOLD", seller: s.seller, buyer: s.buyer, priceWei: s.priceWei, block: s.block, tx: s.tx });
+            if (!st.activeListings[id]) rows.push({ coll: coll, tokenId: Number(id), status: "SOLD", seller: s.seller, buyer: s.buyer, priceWei: s.priceWei, block: s.block, tx: s.tx, nft: s.nft || COLLECTIONS[coll].nft });
           });
           // Minted-tokens view (collections with showMinted, currently
           // Jolly only): every minted token appears in Explore, not just
@@ -1348,7 +1515,7 @@
           var st = S[coll];
           Object.keys(st.activeListings).forEach(function (id) {
             var l = st.activeListings[id];
-            rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx });
+            rows.push({ coll: coll, tokenId: Number(id), status: "LISTED", seller: l.seller, priceWei: l.priceWei, block: l.block, tx: l.tx, nft: l.nft || COLLECTIONS[coll].nft });
           });
         });
         return rows;
@@ -1397,8 +1564,8 @@
         var sellerLine = r.status === "MINTED" ? "" : '<p class="seller">Seller ' + shortAddr(r.seller) + '</p>';
         var listedLine = r.block && blockTimes[r.block] ? '<p class="listed-at">' + fmtTime(blockTimes[r.block]) + ' &middot; ' + fmtRel(blockTimes[r.block]) + ' ago</p>' : "";
         var action = r.status === "LISTED"
-          ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'
-          : '<button class="btn" type="button" data-copy="list" data-coll="' + r.coll + '" data-token="' + r.tokenId + '">LIST IT</button>';
+          ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '"' + (r.nft ? ' data-nft="' + esc(r.nft) + '"' : "") + '>BUY NOW</button>'
+          : '<button class="btn" type="button" data-copy="list" data-coll="' + r.coll + '" data-token="' + r.tokenId + '"' + (r.nft ? ' data-nft="' + esc(r.nft) + '"' : "") + '>LIST IT</button>';
         return '<article class="listing' + (r.status === "SOLD" ? " sold" : "") + '">' + img
           + '<div class="badge-row">' + collBadge + statusBadge + tierBadge(r.coll, r.tokenId) + '</div>'
           + '<div class="tid">' + esc(C.label(r.tokenId)) + '</div>'
@@ -1687,38 +1854,48 @@
             for (var ci = 0; ci < COLL_KEYS.length; ci++) {
               var coll = COLL_KEYS[ci];
               var C = COLLECTIONS[coll];
-              var balHex = await ethCall(C.nft, SEL_BALANCE_OF + padAddr(addr).slice(2));
-              var bal = parseInt(balHex, 16);
-              if (bal === 0) continue;
-              // tokenOfOwnerByIndex (Enumerable) — works for collections that
-              // implement it. Jolly does not, so the first call reverts and
-              // we fall back to a Transfer-log scan for that collection.
-              var enumerated = false;
-              for (var i = 0; i < Math.min(bal, 1000); i++) {
-                try {
-                  var tokHex = await ethCall(C.nft, SEL_TOKEN_OF_OWNER_BY_INDEX + padAddr(addr).slice(2) + encodeUint256(i));
-                  found.push({ coll: coll, tokenId: parseInt(tokHex, 16) });
-                  enumerated = true;
-                } catch (e) { break; }
-              }
-              if (!enumerated) {
-                // Transfer-log scan: every Transfer TO this wallet on the NFT
-                // contract, from the collection's NFT deploy block (nftStart
-                // when set, else eventsStart — never 0, which would scan
-                // from block 1), then verify current ownership with ownerOf
-                // (a token received and later sold or transferred away must
-                // not show up).
-                var scanFrom = C.nftStart || C.eventsStart;
-                var seen = {};
-                for (var from = scanFrom; from <= latestBlock; from += CHUNK) {
-                  var to = Math.min(from + CHUNK - 1, latestBlock);
+              // NFT contracts to check for this collection. Panda has three
+              // (v1, v3, v4) — a wallet may hold tokens on any of them, and
+              // the rows carry the NFT contract so LIST IT routes to the
+              // matching market. Other collections have one.
+              var nftAddrs = [C.nft];
+              if (C.nftV3) nftAddrs.push(C.nftV3);
+              if (C.nftV4) nftAddrs.push(C.nftV4);
+              for (var ni = 0; ni < nftAddrs.length; ni++) {
+                var nftAddr = nftAddrs[ni];
+                var balHex = await ethCall(nftAddr, SEL_BALANCE_OF + padAddr(addr).slice(2));
+                var bal = parseInt(balHex, 16);
+                if (bal === 0) continue;
+                // tokenOfOwnerByIndex (Enumerable) — works for collections that
+                // implement it. Jolly does not, so the first call reverts and
+                // we fall back to a Transfer-log scan for that collection.
+                var enumerated = false;
+                for (var i = 0; i < Math.min(bal, 1000); i++) {
                   try {
-                    var tlogs = await getLogs(C.nft, [TOPIC_TRANSFER, null, padAddr(addr)], from, to);
-                    tlogs.forEach(function (l) {
-                      var tid = parseInt(l.topics[3], 16);
-                      if (!seen[tid]) { seen[tid] = true; found.push({ coll: coll, tokenId: tid, _verify: true }); }
-                    });
-                  } catch (e) {}
+                    var tokHex = await ethCall(nftAddr, SEL_TOKEN_OF_OWNER_BY_INDEX + padAddr(addr).slice(2) + encodeUint256(i));
+                    found.push({ coll: coll, tokenId: parseInt(tokHex, 16), nft: nftAddr });
+                    enumerated = true;
+                  } catch (e) { break; }
+                }
+                if (!enumerated) {
+                  // Transfer-log scan: every Transfer TO this wallet on the NFT
+                  // contract, from the collection's NFT deploy block (nftStart
+                  // when set, else eventsStart — never 0, which would scan
+                  // from block 1), then verify current ownership with ownerOf
+                  // (a token received and later sold or transferred away must
+                  // not show up).
+                  var scanFrom = C.nftStart || C.eventsStart;
+                  var seen = {};
+                  for (var from = scanFrom; from <= latestBlock; from += CHUNK) {
+                    var to = Math.min(from + CHUNK - 1, latestBlock);
+                    try {
+                      var tlogs = await getLogs(nftAddr, [TOPIC_TRANSFER, null, padAddr(addr)], from, to);
+                      tlogs.forEach(function (l) {
+                        var tid = parseInt(l.topics[3], 16);
+                        if (!seen[tid]) { seen[tid] = true; found.push({ coll: coll, tokenId: tid, _verify: true, nft: nftAddr }); }
+                      });
+                    } catch (e) {}
+                  }
                 }
               }
             }
@@ -1728,8 +1905,8 @@
               var fr = found[vi];
               if (!fr._verify) { verified.push(fr); continue; }
               try {
-                var oHex = await ethCall(COLLECTIONS[fr.coll].nft, SEL_OWNER_OF + encodeUint256(fr.tokenId));
-                if (("0x" + oHex.slice(26)).toLowerCase() === addr.toLowerCase()) verified.push({ coll: fr.coll, tokenId: fr.tokenId });
+                var oHex = await ethCall(fr.nft || COLLECTIONS[fr.coll].nft, SEL_OWNER_OF + encodeUint256(fr.tokenId));
+                if (("0x" + oHex.slice(26)).toLowerCase() === addr.toLowerCase()) verified.push({ coll: fr.coll, tokenId: fr.tokenId, nft: fr.nft || COLLECTIONS[fr.coll].nft });
               } catch (e) {}
             }
             rows = verified;
@@ -1748,7 +1925,7 @@
         // Attach live status per token (listed at price, or not listed).
         var enriched = rows.map(function (r) {
           var l = S[r.coll].activeListings[r.tokenId];
-          return { coll: r.coll, tokenId: r.tokenId, status: l ? "LISTED" : "NOT LISTED", seller: l ? l.seller : addr, priceWei: l ? l.priceWei : null, block: l ? l.block : null, tx: l ? l.tx : null };
+          return { coll: r.coll, tokenId: r.tokenId, status: l ? "LISTED" : "NOT LISTED", seller: l ? l.seller : addr, priceWei: l ? l.priceWei : null, block: l ? l.block : null, tx: l ? l.tx : null, nft: l ? (l.nft || COLLECTIONS[r.coll].nft) : (r.nft || COLLECTIONS[r.coll].nft) };
         });
         enriched.sort(function (a, b) { var order = { snake: 0, panda: 1, jolly: 2 }; return (a.coll === b.coll) ? a.tokenId - b.tokenId : order[a.coll] - order[b.coll]; });
         grid.innerHTML = enriched.map(function (r) {
@@ -1760,8 +1937,8 @@
           : '<img class="thumb" src="' + esc(C.img(r.tokenId)) + '" alt="' + esc(C.label(r.tokenId)) + '" loading="lazy" onerror="this.outerHTML=\'<div class=&quot;thumb-fallback&quot;>' + fallbackEmoji(r.coll) + '</div>\'" />';
           var priceLine = r.status === "LISTED" ? '<p class="price">' + fmtBNB(r.priceWei) + ' BNB</p>' : '<p class="price">Not listed</p>';
           var action = r.status === "LISTED"
-            ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '">BUY NOW</button>'
-            : '<button class="btn" type="button" data-copy="list" data-coll="' + r.coll + '" data-token="' + r.tokenId + '">LIST IT</button>';
+            ? '<button class="btn btn-primary" type="button" data-copy="buy" data-coll="' + r.coll + '" data-token="' + r.tokenId + '" data-seller="' + esc(r.seller) + '" data-price="' + r.priceWei.toString() + '"' + (r.nft ? ' data-nft="' + esc(r.nft) + '"' : "") + '>BUY NOW</button>'
+            : '<button class="btn" type="button" data-copy="list" data-coll="' + r.coll + '" data-token="' + r.tokenId + '"' + (r.nft ? ' data-nft="' + esc(r.nft) + '"' : "") + '>LIST IT</button>';
           return '<article class="listing">' + img
             + '<div class="badge-row">' + collBadge + statusBadge + tierBadge(r.coll, r.tokenId) + '</div>'
             + '<div class="tid">' + esc(C.label(r.tokenId)) + '</div>'
@@ -1880,19 +2057,42 @@
             // Real snapshot format: a price-sorted `listings` array
             // [{tokenId, seller, priceWei, priceBnb}]. A map-shaped
             // `activeListings` is also accepted, defensively.
+            // Snapshot entries carry no NFT field (they all come from the
+            // v1 market), so they are tagged with the v1 NFT here.
             if (Array.isArray(snap.listings)) {
               snap.listings.forEach(function (l) {
                 if (l && typeof l.tokenId === "number" && l.seller && l.priceWei) {
-                  st.activeListings[l.tokenId] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0 };
+                  st.activeListings[l.tokenId] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0, nft: l.nft || C.nft };
                 }
               });
             } else if (snap.activeListings && typeof snap.activeListings === "object") {
               Object.keys(snap.activeListings).forEach(function (id) {
                 var l = snap.activeListings[id];
                 if (l && l.seller && l.priceWei) {
-                  st.activeListings[id] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0 };
+                  st.activeListings[id] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0, nft: l.nft || C.nft };
                 }
               });
+            }
+            // v4 listings snapshot (optional, best-effort): the file does
+            // not exist yet (v4 market just deployed with 0 listings), so
+            // a 404 is expected and silently skipped — the live Multicall
+            // refresh covers v4. Same format as the v1 snapshot; entries
+            // are tagged with their NFT (default v4) so buy/cancel route
+            // to the v4 market.
+            if (C.snapListingsV4) {
+              try {
+                var res4 = await fetch(C.snapListingsV4, { cache: "no-store" });
+                if (res4.ok) {
+                  var snap4 = await res4.json();
+                  if (snap4 && Array.isArray(snap4.listings)) {
+                    snap4.listings.forEach(function (l) {
+                      if (l && typeof l.tokenId === "number" && l.seller && l.priceWei) {
+                        st.activeListings[l.tokenId] = { seller: l.seller, priceWei: BigInt(l.priceWei), block: l.block || null, tx: l.tx || null, logIndex: l.logIndex || 0, nft: l.nft || C.nftV4 };
+                      }
+                    });
+                  }
+                }
+              } catch (e) { /* no v4 listings snapshot yet */ }
             }
             st.dataReady = true;
             dirty = true;

@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-07T12:39:10.524Z",
+  "generatedAt": "2026-11-07T13:02:55.008Z",
   "listings": [
     {
       "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
-      "tokenId": 7561,
-      "seller": "0x86f968019392986b2de1e5ccd8fb845a6aaaf1e3",
-      "price": "500000000000000"
+      "tokenId": 6142,
+      "seller": "0xf37380385a7070abd4550ca1ee1d8a9b821b3ec9",
+      "price": "690000000000000"
     },
     {
       "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
@@ -15,26 +15,8 @@
     },
     {
       "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
-      "tokenId": 2121,
-      "seller": "0x9bd5c982a0492be6f68ef9ae84c785ca545a0acd",
-      "price": "720000000000000"
-    },
-    {
-      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
-      "tokenId": 8036,
-      "seller": "0x9bd5c982a0492be6f68ef9ae84c785ca545a0acd",
-      "price": "720000000000000"
-    },
-    {
-      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
       "tokenId": 2343,
       "seller": "0x3fccb0b07e35ee3e29d064283db19ad2bbdfd9df",
-      "price": "900000000000000"
-    },
-    {
-      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
-      "tokenId": 6142,
-      "seller": "0xf37380385a7070abd4550ca1ee1d8a9b821b3ec9",
       "price": "900000000000000"
     },
     {
@@ -479,6 +461,24 @@
       "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
       "tokenId": 4707,
       "seller": "0x6a89f2d9f3c305d36b8bc7c054eced53ca33ed06",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9096,
+      "seller": "0xc91326b31f7648bf0cededf0a06d8e40a023e4d9",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9108,
+      "seller": "0xc91326b31f7648bf0cededf0a06d8e40a023e4d9",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7434,
+      "seller": "0x4a56489117263f8899e4654ef0a776cebd0ef993",
       "price": "1200000000000000"
     },
     {

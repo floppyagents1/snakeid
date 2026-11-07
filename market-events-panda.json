@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-11-07T12:32:09.415Z",
+  "generatedAt": "2026-11-07T12:39:10.524Z",
   "fromBlock": 130800000,
-  "toBlock": 132200608,
+  "toBlock": 132201972,
   "soldComplete": true,
   "listedComplete": true,
   "market": [
@@ -3239,6 +3239,182 @@
       "tokenId": 9331,
       "price": "1200000000000000",
       "ts": 1794054286
+    },
+    {
+      "type": "Sold",
+      "block": 132200672,
+      "tx": "0x5106904048879296ca22179147e850070f4d6c7a3373f4bb9e6ed572984d296a",
+      "logIndex": 120,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "buyer": "0x67f0c048c2893492b3553b3edc0218e0be65d463",
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9708,
+      "price": "100000000000000",
+      "ts": 1794054502
+    },
+    {
+      "type": "Sold",
+      "block": 132200679,
+      "tx": "0x2a5ee61a0b44148f333dca50667cdd004f16cdc61c1c6dde3732d7ed15710a78",
+      "logIndex": 119,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "buyer": "0x67f0c048c2893492b3553b3edc0218e0be65d463",
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9709,
+      "price": "100000000000000",
+      "ts": 1794054505
+    },
+    {
+      "type": "Sold",
+      "block": 132200687,
+      "tx": "0x56e078503e52b3edda7dfa9d5fe6325e7d6ee3954ca291a94761ca3bcd4b7559",
+      "logIndex": 141,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "buyer": "0x67f0c048c2893492b3553b3edc0218e0be65d463",
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9710,
+      "price": "100000000000000",
+      "ts": 1794054509
+    },
+    {
+      "type": "Listed",
+      "block": 132200815,
+      "tx": "0x87bc584914d7871564a60ab62dbca1fb932aafa495053a4aeed4b565c5e8f7cf",
+      "logIndex": 69,
+      "seller": "0x6be959bd1856b188713bf53966c0285591ddb9c6",
+      "tokenId": 4440,
+      "price": "1200000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794054566
+    },
+    {
+      "type": "Listed",
+      "block": 132201054,
+      "tx": "0xcf868b3be3c0f484c08bcf7390af2aaacaa36812e16e5e664ff7c70f58410ed0",
+      "logIndex": 148,
+      "seller": "0x6a89f2d9f3c305d36b8bc7c054eced53ca33ed06",
+      "tokenId": 4702,
+      "price": "1200000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794054674
+    },
+    {
+      "type": "Sold",
+      "block": 132201101,
+      "tx": "0xd54b2e5fd396d82ba4995145d4bcbf208d249f7e990055262beaa9cdfdcf2197",
+      "logIndex": 123,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "buyer": "0x67f0c048c2893492b3553b3edc0218e0be65d463",
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9711,
+      "price": "100000000000000",
+      "ts": 1794054695
+    },
+    {
+      "type": "Listed",
+      "block": 132201105,
+      "tx": "0xa72a096cc3eab35fe0d2e5f583b2b856e9ff9acf702f452d665e07a2bfe51d71",
+      "logIndex": 193,
+      "seller": "0x6a89f2d9f3c305d36b8bc7c054eced53ca33ed06",
+      "tokenId": 4707,
+      "price": "1200000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794054697
+    },
+    {
+      "type": "Sold",
+      "block": 132201260,
+      "tx": "0x141fb06cbf69501ac05881cc9cd3eea33b8ae6033a4a344154f35d9f69bccf09",
+      "logIndex": 102,
+      "seller": "0xe933e546110e5c93c7c9155be7f34b2c08f6dbcb",
+      "buyer": "0x71ba8361bcce9408989147abd1a6a0aa087bce76",
+      "tokenId": 3950,
+      "price": "250000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794054766
+    },
+    {
+      "type": "Sold",
+      "block": 132201391,
+      "tx": "0x0ca9941aaf04bb3ea294a5a4039a45e22d2e5ca3b34b5c870023c0c165d51a89",
+      "logIndex": 214,
+      "seller": "0xe933e546110e5c93c7c9155be7f34b2c08f6dbcb",
+      "buyer": "0x0e1bfe7200a3b2230fd86fc48d7c1cb35b3079e1",
+      "tokenId": 3973,
+      "price": "250000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794054825
+    },
+    {
+      "type": "Listed",
+      "block": 132201618,
+      "tx": "0xd2ddd837bbe07f266fb01055e850a5f675b0f167ae02a7031d234d6da4ef5aef",
+      "logIndex": 116,
+      "seller": "0xf37380385a7070abd4550ca1ee1d8a9b821b3ec9",
+      "tokenId": 6142,
+      "price": "900000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794054928
+    },
+    {
+      "type": "Sold",
+      "block": 132201920,
+      "tx": "0x04e91d56729a93a003fd2e4642fbbb5da1cd4285b01418f394d63d981c806777",
+      "logIndex": 51,
+      "seller": "0xa1c564b132198552f3d24eae34240cd9cadd4884",
+      "buyer": "0x0e1bfe7200a3b2230fd86fc48d7c1cb35b3079e1",
+      "tokenId": 2102,
+      "price": "500000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794055063
+    },
+    {
+      "type": "Sold",
+      "block": 132201926,
+      "tx": "0x231c6382f66cff69d942a812e32cc875b76c7dc81c65235d0355a7fb566dbc61",
+      "logIndex": 220,
+      "seller": "0xa1c564b132198552f3d24eae34240cd9cadd4884",
+      "buyer": "0x0e1bfe7200a3b2230fd86fc48d7c1cb35b3079e1",
+      "tokenId": 2103,
+      "price": "500000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794055066
+    },
+    {
+      "type": "Sold",
+      "block": 132201932,
+      "tx": "0xd1da2f6737431b7ccc3531539f1945e99120eba5588105b3d6b8cd3145b6c032",
+      "logIndex": 113,
+      "seller": "0x3ac792863edc61751a1519e94ad9893c4a68ab12",
+      "buyer": "0x0e1bfe7200a3b2230fd86fc48d7c1cb35b3079e1",
+      "tokenId": 7367,
+      "price": "500000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794055069
+    },
+    {
+      "type": "Sold",
+      "block": 132201938,
+      "tx": "0x446fec502ec23efbc2390b34e84d4eb1f62aa2ad4d2fb31a294bc7d577fffa87",
+      "logIndex": 149,
+      "seller": "0x3ac792863edc61751a1519e94ad9893c4a68ab12",
+      "buyer": "0x0e1bfe7200a3b2230fd86fc48d7c1cb35b3079e1",
+      "tokenId": 7377,
+      "price": "500000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794055072
+    },
+    {
+      "type": "Sold",
+      "block": 132201945,
+      "tx": "0x8604bceace924ccf759530fb47bb9e91cc22653e64c4ad270a062be3c6e68d55",
+      "logIndex": 97,
+      "seller": "0x86f968019392986b2de1e5ccd8fb845a6aaaf1e3",
+      "buyer": "0x0e1bfe7200a3b2230fd86fc48d7c1cb35b3079e1",
+      "tokenId": 7532,
+      "price": "500000000000000",
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "ts": 1794055075
     }
   ]
 }

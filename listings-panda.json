@@ -1,6 +1,54 @@
 {
-  "generatedAt": "2026-11-07T13:02:55.008Z",
+  "generatedAt": "2026-11-07T13:19:49.270Z",
   "listings": [
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 778,
+      "seller": "0x4d5e140bd26c03a81c6362f24f48b80de6bfbf94",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1196,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1197,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1389,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1396,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1539,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1544,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2156,
+      "seller": "0x73d69d94c487c7c7208459ed5ede4d4f88e557a8",
+      "price": "600000000000000"
+    },
     {
       "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
       "tokenId": 6142,
@@ -552,12 +600,6 @@
       "tokenId": 9290,
       "seller": "0x0cb4d8e1c29b5731467a2c47f54ece92f0981d99",
       "price": "2000000000000000"
-    },
-    {
-      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
-      "tokenId": 778,
-      "seller": "0x4d5e140bd26c03a81c6362f24f48b80de6bfbf94",
-      "price": "4000000000000000"
     },
     {
       "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",

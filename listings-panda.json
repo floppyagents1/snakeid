@@ -1,44 +1,725 @@
 {
- "generatedAt": "2026-11-02T09:34:11.760Z",
- "latestBlock": 131217692,
- "totalMinted": 653,
- "count": 6,
- "listings": [
-  {
-   "tokenId": 350,
-   "seller": "0xd23b108ed352cbbaadc52ab416f9eaa33082f80a",
-   "priceWei": "6660000000000000",
-   "priceBnb": "0.00666"
-  },
-  {
-   "tokenId": 352,
-   "seller": "0xd23b108ed352cbbaadc52ab416f9eaa33082f80a",
-   "priceWei": "6660000000000000",
-   "priceBnb": "0.00666"
-  },
-  {
-   "tokenId": 92,
-   "seller": "0x1e4fe11535c8c97eae4226c1820e1c7457b8fb63",
-   "priceWei": "7008887269057165",
-   "priceBnb": "0.007008887269057165"
-  },
-  {
-   "tokenId": 166,
-   "seller": "0x1e4fe11535c8c97eae4226c1820e1c7457b8fb63",
-   "priceWei": "7008887269057165",
-   "priceBnb": "0.007008887269057165"
-  },
-  {
-   "tokenId": 292,
-   "seller": "0xcd5676ceea5e5acf8518cad820a1b2e9818e5255",
-   "priceWei": "7008887269057165",
-   "priceBnb": "0.007008887269057165"
-  },
-  {
-   "tokenId": 318,
-   "seller": "0xcd5676ceea5e5acf8518cad820a1b2e9818e5255",
-   "priceWei": "7008887269057165",
-   "priceBnb": "0.007008887269057165"
-  }
- ]
+  "generatedAt": "2026-11-07T12:32:09.415Z",
+  "listings": [
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9708,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "price": "100000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9709,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "price": "100000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9710,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "price": "100000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9711,
+      "seller": "0x0513e4093997bf670dec4e4ed3178d18e65b9be8",
+      "price": "100000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 3950,
+      "seller": "0xe933e546110e5c93c7c9155be7f34b2c08f6dbcb",
+      "price": "250000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 3973,
+      "seller": "0xe933e546110e5c93c7c9155be7f34b2c08f6dbcb",
+      "price": "250000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2102,
+      "seller": "0xa1c564b132198552f3d24eae34240cd9cadd4884",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2103,
+      "seller": "0xa1c564b132198552f3d24eae34240cd9cadd4884",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7532,
+      "seller": "0x86f968019392986b2de1e5ccd8fb845a6aaaf1e3",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7561,
+      "seller": "0x86f968019392986b2de1e5ccd8fb845a6aaaf1e3",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7367,
+      "seller": "0x3ac792863edc61751a1519e94ad9893c4a68ab12",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7377,
+      "seller": "0x3ac792863edc61751a1519e94ad9893c4a68ab12",
+      "price": "500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2817,
+      "seller": "0x157637ce0017dede322d6d2188f8df7b9b08d7d6",
+      "price": "700000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2121,
+      "seller": "0x9bd5c982a0492be6f68ef9ae84c785ca545a0acd",
+      "price": "720000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 8036,
+      "seller": "0x9bd5c982a0492be6f68ef9ae84c785ca545a0acd",
+      "price": "720000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2343,
+      "seller": "0x3fccb0b07e35ee3e29d064283db19ad2bbdfd9df",
+      "price": "900000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1224,
+      "seller": "0x4845d6f4857721ee138ab05dbebd26f1bc399412",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1228,
+      "seller": "0x4845d6f4857721ee138ab05dbebd26f1bc399412",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1235,
+      "seller": "0x3c06f378b7e7dae9e903b52c5f9c3fae4b24e922",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1238,
+      "seller": "0x3c06f378b7e7dae9e903b52c5f9c3fae4b24e922",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1240,
+      "seller": "0x15c759b4077406919923b1b8f44388950c662509",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1244,
+      "seller": "0x15c759b4077406919923b1b8f44388950c662509",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1250,
+      "seller": "0xb4961b31bad9d471fa80567ebbc8fabc8a36838e",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1279,
+      "seller": "0xb4961b31bad9d471fa80567ebbc8fabc8a36838e",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1283,
+      "seller": "0xded4a693e9ec8adbeaf4e3849c0a2edb56e071b3",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1301,
+      "seller": "0xded4a693e9ec8adbeaf4e3849c0a2edb56e071b3",
+      "price": "950000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 862,
+      "seller": "0x4bcca4b973251a33605e03328c266239e78c0c7e",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 864,
+      "seller": "0x4bcca4b973251a33605e03328c266239e78c0c7e",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1165,
+      "seller": "0xeda59f0b738cea6f7b1132a734b9cb1f1a979f76",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1194,
+      "seller": "0xeda59f0b738cea6f7b1132a734b9cb1f1a979f76",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1213,
+      "seller": "0x722491af868fec1d533eff0ab7c23387e65703f2",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1221,
+      "seller": "0x722491af868fec1d533eff0ab7c23387e65703f2",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1287,
+      "seller": "0xd29f3212a3712160e864f81acdcb7738a67b6115",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1332,
+      "seller": "0xd29f3212a3712160e864f81acdcb7738a67b6115",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1081,
+      "seller": "0x3cea708aadf73b1afa8d884214ccc100acdcda55",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1082,
+      "seller": "0x3cea708aadf73b1afa8d884214ccc100acdcda55",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1157,
+      "seller": "0x193618ddfc70cc3d5cc30753aedbb704b49316a3",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1160,
+      "seller": "0x193618ddfc70cc3d5cc30753aedbb704b49316a3",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1850,
+      "seller": "0x30b1a0e287319774b526d43525ffd60bbed8d06e",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2272,
+      "seller": "0xa70f4fd0e9903eb44b7a255147abbef201fe3cd7",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2276,
+      "seller": "0xa70f4fd0e9903eb44b7a255147abbef201fe3cd7",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4347,
+      "seller": "0xe5e90f27990478ef6248112b2edb3321dc8b90de",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4360,
+      "seller": "0xe5e90f27990478ef6248112b2edb3321dc8b90de",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4986,
+      "seller": "0x78e508feeb3c4460dfacc6d4c35ea4cfb8a7034f",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7691,
+      "seller": "0x746c824440b297e268166398236c36db992654b3",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7699,
+      "seller": "0x746c824440b297e268166398236c36db992654b3",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7327,
+      "seller": "0x56f830c1d5a222f926d5a9d735cd514a7983cee5",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7343,
+      "seller": "0x56f830c1d5a222f926d5a9d735cd514a7983cee5",
+      "price": "1000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 6269,
+      "seller": "0x3b6d4f34ece959e48379fd61efaeecbdd70cd5aa",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 6287,
+      "seller": "0x3b6d4f34ece959e48379fd61efaeecbdd70cd5aa",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 6145,
+      "seller": "0xfcf6f7336a8b107203a706fc820306d4bef06e98",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 6147,
+      "seller": "0xfcf6f7336a8b107203a706fc820306d4bef06e98",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1154,
+      "seller": "0xf822edba01a14fd74ee4fe79afaefd0c8eb0590c",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1156,
+      "seller": "0xf822edba01a14fd74ee4fe79afaefd0c8eb0590c",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7026,
+      "seller": "0x2b3018f74b761c2daafad30cb6151601d8af44c2",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7032,
+      "seller": "0x2b3018f74b761c2daafad30cb6151601d8af44c2",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7370,
+      "seller": "0xe86303b40c198ef6dac94cad914956132493c212",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7378,
+      "seller": "0xe86303b40c198ef6dac94cad914956132493c212",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7404,
+      "seller": "0x8db669eabef961dbca3da7fc407a41a19b06702e",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7413,
+      "seller": "0x8db669eabef961dbca3da7fc407a41a19b06702e",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7396,
+      "seller": "0xe02ce2730ede4b8e27ca66ef61a1ba1d363964c2",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7454,
+      "seller": "0xe02ce2730ede4b8e27ca66ef61a1ba1d363964c2",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7338,
+      "seller": "0xa081f7b38c353f2ac999af535f69b3fc7f1e4578",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7372,
+      "seller": "0xa081f7b38c353f2ac999af535f69b3fc7f1e4578",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7510,
+      "seller": "0xfa5a06981e02853ab1f166072e3b6933f83cd683",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 7511,
+      "seller": "0xfa5a06981e02853ab1f166072e3b6933f83cd683",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 8182,
+      "seller": "0xc0fa0c65d47e6a7e43ce9450b0c188537c5a0bf4",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9156,
+      "seller": "0xe027eb9d86fdf27b579a6d0b31e1d9a23e9e0c3f",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1667,
+      "seller": "0x29774df60df6bca5d0c46752e04d4c6d4196f1e3",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1995,
+      "seller": "0x29774df60df6bca5d0c46752e04d4c6d4196f1e3",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4704,
+      "seller": "0xe37e84584b89fb7ef8655a21e492d11ca6b72a89",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4705,
+      "seller": "0xe37e84584b89fb7ef8655a21e492d11ca6b72a89",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9436,
+      "seller": "0x24dc64cee8cd2fe22ad91e95d37bf887917c9f9a",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9460,
+      "seller": "0x24dc64cee8cd2fe22ad91e95d37bf887917c9f9a",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9439,
+      "seller": "0xde4c56adeb8a0fb4f099f6c8c9ee99765103b0bc",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9464,
+      "seller": "0xde4c56adeb8a0fb4f099f6c8c9ee99765103b0bc",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4701,
+      "seller": "0x3bab40b58c30aaf256c8cae75cdfe8e65763e072",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 4706,
+      "seller": "0x3bab40b58c30aaf256c8cae75cdfe8e65763e072",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9239,
+      "seller": "0xe30069da96f28185deff3380e04a8bcaf0c04428",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9901,
+      "seller": "0x6aa623f002549b73bedc403179cbe7f6636f74ab",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9374,
+      "seller": "0xe0764abdf30c257e8ca1cbdd1f5b9c72590abede",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9255,
+      "seller": "0x5f6011eb24b2524bc0d9df99cac69c12c94f54e4",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9567,
+      "seller": "0x09640bb3aa21cc513c3a962427f7aaacd046919a",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9243,
+      "seller": "0xe30069da96f28185deff3380e04a8bcaf0c04428",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9465,
+      "seller": "0xe0764abdf30c257e8ca1cbdd1f5b9c72590abede",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9885,
+      "seller": "0x09640bb3aa21cc513c3a962427f7aaacd046919a",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9331,
+      "seller": "0x5f6011eb24b2524bc0d9df99cac69c12c94f54e4",
+      "price": "1200000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 5489,
+      "seller": "0x1f5ed49c31e65fefb97ff1cf9d2cbe06adafef73",
+      "price": "1405165387966163"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2910,
+      "seller": "0x098982d36a016ca03e4d922a0e000064dc9479eb",
+      "price": "1431000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1169,
+      "seller": "0xb1bcc969f3b6e9810f6bdc00bc89effbfd665036",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1178,
+      "seller": "0xb1bcc969f3b6e9810f6bdc00bc89effbfd665036",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1173,
+      "seller": "0x4b2f290af691518414bd87f388d7e1cda6e48dd2",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1175,
+      "seller": "0x4b2f290af691518414bd87f388d7e1cda6e48dd2",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1091,
+      "seller": "0xc1abe0219580947746432785281d954aafb17463",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1495,
+      "seller": "0x0046ff863a5fdfb2e85ff4078fa53fcfddab2fe1",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9283,
+      "seller": "0x0cb4d8e1c29b5731467a2c47f54ece92f0981d99",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9288,
+      "seller": "0x0cb4d8e1c29b5731467a2c47f54ece92f0981d99",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9289,
+      "seller": "0x0cb4d8e1c29b5731467a2c47f54ece92f0981d99",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x2820e61ed78ac29f52edae05f01ab552307b907c",
+      "tokenId": 9290,
+      "seller": "0x0cb4d8e1c29b5731467a2c47f54ece92f0981d99",
+      "price": "2000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 778,
+      "seller": "0x4d5e140bd26c03a81c6362f24f48b80de6bfbf94",
+      "price": "4000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1102,
+      "seller": "0x2db8be71ccdaa91f578721378fba05f6ee198686",
+      "price": "4000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1269,
+      "seller": "0x07d39003699380f4dd4587a3c6c8bec1e50ec47b",
+      "price": "5000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1315,
+      "seller": "0x07d39003699380f4dd4587a3c6c8bec1e50ec47b",
+      "price": "5000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2392,
+      "seller": "0x26978a8ea15b5cda98e9f97eb1dafa24ecefa313",
+      "price": "5000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 2424,
+      "seller": "0x26978a8ea15b5cda98e9f97eb1dafa24ecefa313",
+      "price": "5000000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1540,
+      "seller": "0xb5ae925f8417883782b6d35c8e85c42b54a7bd50",
+      "price": "5550000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1548,
+      "seller": "0x14336220a5bdf43fb92fb2db8e9fe64d0a833301",
+      "price": "5550000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1272,
+      "seller": "0xe3eade36370ec61f48aca58f47c251c2a9d29538",
+      "price": "6500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1280,
+      "seller": "0xe3eade36370ec61f48aca58f47c251c2a9d29538",
+      "price": "6500000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 350,
+      "seller": "0xd23b108ed352cbbaadc52ab416f9eaa33082f80a",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 352,
+      "seller": "0xd23b108ed352cbbaadc52ab416f9eaa33082f80a",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1210,
+      "seller": "0x0bf9a4364b16cb53ded5ab1383ab6e88028ec078",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1307,
+      "seller": "0x0bf9a4364b16cb53ded5ab1383ab6e88028ec078",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1517,
+      "seller": "0x12bcb951bff743190fe68a569341f2a008346a4d",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 1519,
+      "seller": "0x12bcb951bff743190fe68a569341f2a008346a4d",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 747,
+      "seller": "0x79a90256644c8f0707b9e5dc69bba7e93a31a5a6",
+      "price": "6660000000000000"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 292,
+      "seller": "0xcd5676ceea5e5acf8518cad820a1b2e9818e5255",
+      "price": "7008887269057165"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 318,
+      "seller": "0xcd5676ceea5e5acf8518cad820a1b2e9818e5255",
+      "price": "7008887269057165"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 92,
+      "seller": "0x1e4fe11535c8c97eae4226c1820e1c7457b8fb63",
+      "price": "7008887269057165"
+    },
+    {
+      "nft": "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
+      "tokenId": 166,
+      "seller": "0x1e4fe11535c8c97eae4226c1820e1c7457b8fb63",
+      "price": "7008887269057165"
+    }
+  ]
 }

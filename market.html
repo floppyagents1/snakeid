@@ -542,11 +542,14 @@
           key: "panda", name: "Agent Panda", short: "AGENT PANDA",
           desc: "One golden panda card shared by 10,000 tokens. Burn a panda for 50,000 $APANDA, or stake it to earn 500 $APANDA per day.",
           x: "@agentpandaonbnb", xUrl: "https://x.com/agentpandaonbnb", website: "https://agentpandabnb.xyz",
-          // Trading OPEN (2026-11-07): the v4 market is live, so v3/v4
-          // tokens can now be listed and bought here alongside v1 tokens.
-          // The old comingSoon flag (mint still running, market closed by
-          // the owner) was removed when MarketV4 deployed — see marketV4
-          // below. Jolly keeps its own comingSoon flag.
+          // CLOSED until sold out (2026-11-07, owner request): the mint is
+          // still running, so trading stays locked. While this flag is on,
+          // the chip reads "AGENT PANDA · COMING SOON", listings are hidden,
+          // and the LIST/BUY/CANCEL buttons show "Market coming soon".
+          // Remove the flag only when the owner says to open trading
+          // (after sold out). The v4 market contract itself is already
+          // deployed (see marketV4 below) — this flag only locks the site UI.
+          comingSoon: true,
           nft: "0x7561c414a7a6ff44fc81e9bfc2eda8f57c3ec61e",
           market: "0x5266d91a9452c61d6ec7627fe8fc85a4cb00e898",
           // Second market (2026-11-07): AgentPandaMarketV4 accepts the v3
